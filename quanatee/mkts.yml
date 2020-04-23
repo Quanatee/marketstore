@@ -1,0 +1,57 @@
+root_directory: data
+listen_port: 5993
+log_level: info
+queryable: true
+stop_grace_period: 0
+wal_rotate_interval: 10
+enable_add: true
+enable_remove: true
+enable_last_known: false
+timezone: "UTC"
+triggers:
+  - module: stream.so
+    on: "*/*/*"
+  - module: ondiskagg.so
+    on: "*/1Min/*"
+    config:
+      destinations:
+        - 6Min
+        - 12Min
+        - 15Min
+        - 1H
+        - 4H
+bgworkers:
+  - module: polygon.so
+    config:
+      api_key: "<polygon_api_key>"
+      ws_servers: wss://socket.polygon.io/forex
+      data_types: ["bars", "quotes"]
+      query_start: "2017-01-01 00:00"
+      symbols:
+        # Forex
+        - EURUSD
+        - GBPUSD
+        - USDJPY 
+        - AUDUSD
+        - USDCAD
+        - USDCHF
+        - USDMXN 
+        - USDBRL
+        - USDDKK 
+        - USDNOK 
+        - USDSEK
+        - USDCNH 
+        - USDHKD
+        - USDRUB
+        - KRWUSD
+        - TWDUSD
+        - USDSGD
+        - USDINR 
+        - THBUSD
+        - VNDUSD
+        - PHPUSD
+        - AUDUSD
+        - NZDUSD
+        - XAGUSD
+        - XAUUSD
+        
