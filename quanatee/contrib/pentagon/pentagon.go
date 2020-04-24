@@ -15,7 +15,7 @@ import (
 	"github.com/alpacahq/marketstore/plugins/bgworker"
 	"github.com/alpacahq/marketstore/utils"
 	"github.com/alpacahq/marketstore/utils/io"
-	"github.com/alpacahq/marketstore/utils/log"
+	//"github.com/alpacahq/marketstore/utils/log"
 )
 
 type QuanateeFetcher struct {
@@ -52,7 +52,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 func (qf *QuanateeFetcher) Run() {
 
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
-	
+
 	select {}
 }
 
