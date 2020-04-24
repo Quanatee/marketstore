@@ -52,7 +52,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
     // Store {Bar:Epoch} when creating new bar
     // BackfillManager.LoadOrStore(bar.Symbol, &epoch)
 	return &QuanateeFetcher{
-		config: config
+		config: config,
 	}, nil
 }
 
