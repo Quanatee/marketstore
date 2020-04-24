@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	//"github.com/alpacahq/marketstore/contrib/polygon/api"
-	//"github.com/alpacahq/marketstore/contrib/polygon/backfill"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/backfill"
 	//"github.com/alpacahq/marketstore/contrib/polygon/handlers"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/planner"
@@ -41,9 +41,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
     }
     
 	backfill.BackfillM = &sync.Map{}
-
-    // Store {Bar:Epoch} when creating new bar
-    // BackfillManager.LoadOrStore(bar.Symbol, &epoch)
+	
 	return &QuanateeFetcher{
 		config: config,
 	}, nil
@@ -53,12 +51,8 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
 
-	api.SetAPIKey(qf.config.APIKey)
-
-	if qf.config.BaseURL != "" {
-		api.SetBaseURL(qf.config.BaseURL)
-	}
-    
+	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
+	
 	select {}
 }
 
@@ -71,7 +65,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
-		BackfillManager.Range(func(key, value interface{}) bool {
+		backfill.BackfillM.Range(func(key, value interface{}) bool {
 			symbol := key.(string)
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
@@ -82,7 +76,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 					// backfill the symbol in parallel
 					qf.backfillBars(symbol, *value.(*int64))
-					BackfillManager.Store(key, nil)
+					backfill.BackfillM.Store(key, nil)
 				}()
 			}
 
