@@ -39,6 +39,7 @@ plugins:
 	$(MAKE) -C contrib/binancefeeder
 	$(MAKE) -C contrib/iex
 	$(MAKE) -C contrib/xignitefeeder
+	$(MAKE) -C quanatee/contrib/pentagon
 
 fmt:
 	GOFLAGS=$(GOFLAGS) go fmt ./...
