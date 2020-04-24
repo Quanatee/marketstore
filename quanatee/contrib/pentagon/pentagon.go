@@ -15,7 +15,7 @@ import (
 	"github.com/alpacahq/marketstore/plugins/bgworker"
 	"github.com/alpacahq/marketstore/utils"
 	"github.com/alpacahq/marketstore/utils/io"
-	//"github.com/alpacahq/marketstore/utils/log"
+	"github.com/alpacahq/marketstore/utils/log"
 )
 
 type QuanateeFetcher struct {
