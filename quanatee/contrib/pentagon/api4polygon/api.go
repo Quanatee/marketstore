@@ -200,7 +200,10 @@ func GetPastAggregates(
 			ohlcv.Close[bar] = agg.PriceData[bar].Close
 			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
 			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
+
 		}
+		
+	}
 			
 	return ohlcv, nil
 }
