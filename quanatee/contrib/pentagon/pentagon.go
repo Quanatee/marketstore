@@ -54,11 +54,14 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 func (qf *QuanateeFetcher) Run() {
 
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
+	livefill.SetMarketType = qf.config.MarketType
+	backfill.SetMarketType = qf.config.MarketType
+	log.Info("%s", qf.config.PolygonApiKey)
 
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute*time.Duration(1))
-		
+	
 	for {
 
 		for {
@@ -66,7 +69,7 @@ func (qf *QuanateeFetcher) Run() {
 				break
 			} else {
 				oneMinuteAhead := time.Now().Add(time.Minute)
-				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 0, 0, time.UTC)
+				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 1, 0, time.UTC)
 				time.Sleep(oneMinuteAhead.UTC().Sub(time.Now()))
 			}
 		}
@@ -76,7 +79,7 @@ func (qf *QuanateeFetcher) Run() {
 				err  error
 				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 			)
-			if err = livefill.Bars(symbol, from, to); err != nil {
+			if err = livefill.Bars(symbol, qf.config.PolygonApiKey, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}
 
@@ -185,7 +188,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	}
 
 	// request & write the missing bars
-	if err = backfill.Bars(symbol, from, time.Time{}); err != nil {
+	if err = backfill.Bars(symbol, qf.config.PolygonApiKey, from, time.Time{}); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
 }
