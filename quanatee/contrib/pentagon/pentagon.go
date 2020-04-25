@@ -50,6 +50,8 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	}, nil
 }
 
+// backfill.BackfillM.LoadOrStore(bar.Symbol, &epoch)
+
 // Run the QuanateeFetcher. It starts the streaming API as well as the
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
