@@ -41,10 +41,7 @@ func Bars(symbol string, from, to time.Time) (err error) {
 	if err != nil {
 		return err
 	}
-
 	
-	log.Info("2.%s %v %v", symbol, from, to)
-
 	if len(ohlcv.Epoch) == 0 {
 		return
 	}

@@ -148,9 +148,6 @@ func GetLiveAggregates(
 	if err != nil {
 		return &OHLCV{}, err
 	}
-	if agg.resultsCount == 0 {
-		return &OHLCV{}, nil
-	}
 
 	length := len(agg.PriceData)
     ohlcv := &OHLCV{

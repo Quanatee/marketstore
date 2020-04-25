@@ -23,7 +23,7 @@ FROM ubuntu:18.04
 RUN apt update
 RUN apt install -y ca-certificates tzdata
 # set your timezone
-RUN ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime
 RUN dpkg-reconfigure --frontend noninteractive tzdata
 
 COPY --from=builder /go/src/github.com/alpacahq/marketstore/marketstore /bin/
