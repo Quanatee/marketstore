@@ -41,7 +41,7 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	ohlcv, err := api4polygon.GetPastAggregates(PolygonPrefix[MarketType]+symbol, "1", "minute", from, to)
+	ohlcv, err := api4polygon.GetAggregates(PolygonPrefix[MarketType]+symbol, "1", "minute", from, to)
 	if err != nil {
 		return err
 	}

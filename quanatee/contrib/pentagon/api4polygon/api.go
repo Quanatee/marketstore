@@ -129,7 +129,7 @@ func ListTickers() (*ListTickersResponse, error) {
 	return &resp, nil
 }
 
-func GetLiveAggregates(
+func GetAggregates(
 	symbol, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
 		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
@@ -181,60 +181,6 @@ func GetLiveAggregates(
 
 	}
 	
-	return ohlcv, nil
-}
-
-func GetPastAggregates(
-	symbol, multiplier, resolution string,
-	from, to time.Time) (*OHLCV, error) {
-	
-		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
-	if err != nil {
-		return nil, err
-	}
-
-	q := u.Query()
-	q.Set("apiKey", apiKey)
-	q.Set("unadjusted", "true")
-
-	u.RawQuery = q.Encode()
-
-	agg := &Aggv2{}
-	err = downloadAndUnmarshal(u.String(), retryCount, agg)
-	if err != nil {
-		return &OHLCV{}, err
-	}
-	if agg.resultsCount == 0 {
-		return &OHLCV{}, nil
-	}
-	
-	length := len(agg.PriceData)
-    ohlcv := &OHLCV{
-        Epoch: make([]int64, length),
-        Open: make([]float32, length),
-        High: make([]float32, length),
-        Low: make([]float32, length),
-        Close: make([]float32, length),
-        HLC: make([]float32, length),
-        Volume: make([]float32, length),
-	}
-	
-    for bar := 0; bar < length; bar++ {
-
-		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-
-			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
-			ohlcv.Open[bar] = agg.PriceData[bar].Open
-			ohlcv.High[bar] = agg.PriceData[bar].High
-			ohlcv.Low[bar] = agg.PriceData[bar].Low
-			ohlcv.Close[bar] = agg.PriceData[bar].Close
-			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
-
-		}
-
-	}
-			
 	return ohlcv, nil
 }
 
