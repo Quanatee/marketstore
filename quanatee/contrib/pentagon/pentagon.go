@@ -125,8 +125,12 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					defer wg.Done()
 
 					// backfill the symbol in parallel
-					qf.backfillBars(symbol, value.(int64))
-					backfill.BackfillM.LoadOrStore(key, nil)
+					stop := qf.backfillBars(symbol, value.(int64))
+					if stop == true {
+						backfill.BackfillM.Store(key, nil)
+					} else {
+						backfill.BackfillM.LoadOrStore(key, nil)
+					}
 				}()
 			}
 
@@ -142,28 +146,29 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 }
 
 // Backfill bars from start
-func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
+func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 
 	log.Info("backfillBars(%s)", symbol)
 
 	var (
+		// start time.Time
 		from time.Time
 		err  error
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 	)
 	
-	for _, layout := range []string{
-		"2006-01-02 03:04:05",
-		"2006-01-02T03:04:05",
-		"2006-01-02 03:04",
-		"2006-01-02T03:04",
-		"2006-01-02",
-	} {
-		from, err = time.Parse(layout, qf.config.QueryStart)
-		if err == nil {
-			break
-		}
-	}
+	// for _, layout := range []string{
+	// 	"2006-01-02 03:04:05",
+	// 	"2006-01-02T03:04:05",
+	// 	"2006-01-02 03:04",
+	// 	"2006-01-02T03:04",
+	// 	"2006-01-02",
+	// } {
+	// 	start, err = time.Parse(layout, qf.config.QueryStart)
+	// 	if err == nil {
+	// 		break
+	// 	}
+	// }
 
 	// query the latest entry prior to the streamed record	
 	instance := executor.ThisInstance
@@ -196,15 +201,19 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	// has gap to fill
 	if len(epoch) != 0 {
 		from = time.Unix(epoch[len(epoch)-1], 0)
-		log.Info("from csm %v", from)
-	} else {
-		log.Info("exit csm %v", from)
-		return
+		to = from.AddDate(0, 0, 7)
+		log.Info("%s from csm %v to %v", symbol from, to)
+		if from >= endEpoch {
+			log.Info("%s exiting from csm %v to %v", symbol from, to)
+			return true
+		}
 	}
 	
 	// request & write the missing bars
-	if err = backfill.Bars(symbol, from, from.AddDate(0, 0, 5)); err != nil {
+	if err = backfill.Bars(symbol, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
+	} else {
+		return false
 	}
 }
 
