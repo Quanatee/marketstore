@@ -200,13 +200,13 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 
 	// has gap to fill
 	if len(epoch) != 0 {
+		if epoch[len(epoch)-1] >= endEpoch {
+			log.Info("%s exiting from backfill")
+			return true
+		}
 		from = time.Unix(epoch[len(epoch)-1], 0)
 		to := from.AddDate(0, 0, 7)
 		log.Info("%s from csm %v to %v", symbol, from, to)
-		if from.Unix() >= endEpoch {
-			log.Info("%s exiting from csm %v to %v", symbol, from, to)
-			return true
-		}
 	}
 	
 	// request & write the missing bars
