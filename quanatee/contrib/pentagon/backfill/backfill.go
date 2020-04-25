@@ -46,7 +46,9 @@ func Bars(symbol string, from, to time.Time) (err error) {
 	if len(ohlcv.Epoch) == 0 {
 		return
 	}
-
+	
+	log.Info("Backfill: %s %v %v", symbol, from, to)
+	
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/OHLCV")
 	csm := io.NewColumnSeriesMap()
 	

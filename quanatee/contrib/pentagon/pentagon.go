@@ -50,8 +50,6 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	}, nil
 }
 
-// backfill.BackfillM.LoadOrStore(bar.Symbol, &epoch)
-
 // Run the QuanateeFetcher. It starts the streaming API as well as the
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
@@ -66,6 +64,10 @@ func (qf *QuanateeFetcher) Run() {
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
 	
+	for _, symbol := range qf.config.Symbols {
+		backfill.BackfillM.LoadOrStore(symbol, from)
+	}
+
 	for {
 
 		for {
@@ -83,7 +85,6 @@ func (qf *QuanateeFetcher) Run() {
 				err  error
 				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 			)
-			log.Info("1.%s %v %v", symbol, from, to)
 			if err = livefill.Bars(symbol, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}

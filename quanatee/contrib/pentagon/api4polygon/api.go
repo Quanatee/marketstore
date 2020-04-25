@@ -165,8 +165,6 @@ func GetLiveAggregates(
         Volume: make([]float32, length),
 	}
 	
-	log.Info("3.%s %v %v", symbol, from, to)
-	
     for bar := 0; bar < length; bar++ {
 		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
