@@ -87,7 +87,6 @@ func (qf *QuanateeFetcher) Run() {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			} else {
 				backfill.BackfillM.LoadOrStore(symbol, from.Unix())
-				go qf.workBackfillBars()
 			}
 			// if first_loop == true {
 			// 	log.Info("First loop")
@@ -97,6 +96,8 @@ func (qf *QuanateeFetcher) Run() {
 			// }
 
 		}
+		
+		go qf.workBackfillBars()
 		
 		from = from.Add(time.Minute)
 		to = to.Add(time.Minute)
@@ -196,7 +197,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	// has gap to fill
 	if len(epoch) != 0 {
 		from = time.Unix(epoch[len(epoch)-1], 0)
-	} 
+		log.Info("from csm %v", from)
+	}
 	// else {
 		// log.Error("[]polygon() no gap to fill ")
 		// return
