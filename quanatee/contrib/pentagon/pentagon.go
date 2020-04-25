@@ -105,7 +105,7 @@ func (qf *QuanateeFetcher) Run() {
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 
 	for range ticker.C {
 		
@@ -201,12 +201,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 		}
 	}
 	
-	log.Info("backfillBars() %s from %v", symbol, from)
-	
-	to := time.Unix(endEpoch, 0)
-	
 	// request & write the missing bars
-	if err = backfill.Bars(symbol, from, to); err != nil {
+	if err = backfill.Bars(symbol, from, from..AddDate(0, 0, 5)); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
 }
