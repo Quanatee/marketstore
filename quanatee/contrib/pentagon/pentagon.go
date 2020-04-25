@@ -175,7 +175,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	q := planner.NewQuery(cDir)
 	q.AddTargetKey(tbk)
 	q.SetRowLimit(io.LAST, 1)
-	q.SetEnd(from.Unix())
+	q.SetEnd(endEpoch - int64(time.Minute.Seconds()))
 
 	parsed, err := q.Parse()
 	if err != nil {
