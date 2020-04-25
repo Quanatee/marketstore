@@ -18,7 +18,7 @@ var (
 	ErrRetry  = fmt.Errorf("retry error")
 	BackfillM *sync.Map
 	MarketType string
-	PolygonPrefix := map[string]string{
+	PolygonPrefix = map[string]string{
 		"forex": "C:",
 		"crypto": "X:",
 		"stocks": "",
