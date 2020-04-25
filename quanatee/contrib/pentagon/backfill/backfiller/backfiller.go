@@ -12,7 +12,7 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"github.com/alpacahq/marketstore/contrib/calendar"
 	"github.com/alpacahq/marketstore/contrib/ondiskagg/aggtrigger"
-	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/backfill"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/plugins/trigger"
