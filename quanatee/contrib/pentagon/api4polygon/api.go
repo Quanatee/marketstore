@@ -152,17 +152,23 @@ func GetLiveAggregates(
 	agg := &Aggv2{}
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	if err != nil {
-		ohlcv := NewOHLCV(0)
-		return ohlcv, err
+		return &OHLCV{}, err
 	}
 	if agg.resultsCount == 0 {
-		ohlcv := NewOHLCV(0)
-		return ohlcv, nil
+		return &OHLCV{}, nil
 	}
 
-	ohlcv := NewOHLCV(len(agg.PriceData))
-
-    for bar := 0; bar < len(agg.PriceData); bar++ {
+	length = len(agg.PriceData)
+    ohlcv := &OHLCV{
+        Epoch: make([]int64, length),
+        Open: make([]float32, length),
+        High: make([]float32, length),
+        Low: make([]float32, length),
+        Close: make([]float32, length),
+        Volume: make([]float32, length),
+	}
+	
+    for bar := 0; bar < length; bar++ {
 
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
 
@@ -199,17 +205,23 @@ func GetPastAggregates(
 	agg := &Aggv2{}
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	if err != nil {
-		ohlcv := NewOHLCV(0)
-		return ohlcv, err
+		return &OHLCV{}, err
 	}
 	if agg.resultsCount == 0 {
-		ohlcv := NewOHLCV(0)
-		return ohlcv, nil
+		return &OHLCV{}, nil
 	}
 	
-	ohlcv := NewOHLCV(len(agg.PriceData))
-
-    for bar := 0; bar < len(agg.PriceData); bar++ {
+	length = len(agg.PriceData)
+    ohlcv := &House{
+        Epoch: make([]int64, length),
+        Open: make([]float32, length),
+        High: make([]float32, length),
+        Low: make([]float32, length),
+        Close: make([]float32, length),
+        Volume: make([]float32, length),
+	}
+	
+    for bar := 0; bar < length; bar++ {
 
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
 

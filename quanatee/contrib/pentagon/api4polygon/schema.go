@@ -125,14 +125,3 @@ type OHLCV struct {
 	HLC       []float32   `json:"HLC"`
 	Volume    []float32   `json:"volume"`
 }
-func NewOHLCV(bars int) OHLCV {
-	return OHLCV{
-		Epoch:  make([]int64,   bars),
-		Open:   make([]float32, bars),
-		High:   make([]float32, bars),
-		Low:    make([]float32, bars),
-		Close:  make([]float32, bars),
-		HLC:    make([]float32, bars),
-		Volume: make([]float32, bars),
-	}
-}
