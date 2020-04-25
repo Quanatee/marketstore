@@ -213,8 +213,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
-		return false
 	}
+	return false
 }
 
 func main() {}
