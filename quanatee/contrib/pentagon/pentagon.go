@@ -197,12 +197,10 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	if len(epoch) != 0 {
 		from = time.Unix(epoch[len(epoch)-1], 0)
 		log.Info("from csm %v", from)
+	} else {
+		log.Info("exit csm %v", from)
+		return
 	}
-	// else {
-		// log.Error("[]polygon() no gap to fill ")
-		// return
-	// }
-
 	
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, from.AddDate(0, 0, 5)); err != nil {
