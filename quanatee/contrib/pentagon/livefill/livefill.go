@@ -42,11 +42,11 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		return err
 	}
 
+	log.Info("%s: %v", symbol, len(ohlcv.Epoch))
+	
 	if len(ohlcv.Epoch) == 0 {
 		return
 	}
-
-	log.Info("%s: %v", symbol, len(ohlcv.Epoch))
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/OHLCV")
 	csm := io.NewColumnSeriesMap()
