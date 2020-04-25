@@ -19,13 +19,14 @@ import (
 )
 
 const (
-	aggURL     = "%v/v1/historic/agg/%v/%v"
+	//aggURL     = "%v/v1/historic/agg/%v/%v"
+	aggURL     = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
 	tradesURL  = "%v/v2/ticks/stocks/trades/%v/%v"
 	quotesURL  = "%v/v1/historic/quotes/%v/%v"
 	tickersURL = "%v/v2/reference/tickers"
 	retryCount = 10
 )
-
+	
 var (
 	baseURL = "https://api.polygon.io"
 	servers = "ws://socket.polygon.io:30328" // default
@@ -33,37 +34,12 @@ var (
 	NY, _   = time.LoadLocation("America/New_York")
 )
 
-type GetAggregatesResponse struct {
-	Symbol  string `json:"symbol"`
-	AggType string `json:"aggType"`
-	Map     struct {
-		O string `json:"o"`
-		C string `json:"c"`
-		H string `json:"h"`
-		L string `json:"l"`
-		V string `json:"v"`
-		D string `json:"d"`
-	} `json:"map"`
-	Ticks []struct {
-		Open        float64 `json:"o"`
-		Close       float64 `json:"c"`
-		High        float64 `json:"h"`
-		Low         float64 `json:"l"`
-		Volume      int     `json:"v"`
-		EpochMillis int64   `json:"d"`
-	} `json:"ticks"`
-}
-
 func SetAPIKey(key string) {
 	apiKey = key
 }
 
 func SetBaseURL(url string) {
 	baseURL = url
-}
-
-func SetWSServers(serverList string) {
-	servers = serverList
 }
 
 type ListTickersResponse struct {
@@ -158,6 +134,74 @@ func ListTickers() (*ListTickersResponse, error) {
 	return &resp, nil
 }
 
+func GetLiveAggregates(
+	symbol, multiplier, resolution string,
+	from, to time.Time) (*Aggv2, error) {
+	
+		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.AddDate(0, 0, -1).Format(time.RFC3339), to.AddDate(0, 0, 1).Format(time.RFC3339)))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", apiKey)
+	q.Set("unadjusted", "true")
+
+	u.RawQuery = q.Encode()
+
+	agg := &Aggv2{}
+	err = downloadAndUnmarshal(u.String(), retryCount, agg)
+	if err != nil {
+		return nil, err
+	}
+	if agg["resultsCount"] == 0:
+		return nil, nil
+
+	return agg, nil
+}
+
+func GetPastAggregates(
+	symbol, multiplier, resolution string,
+	from, to time.Time) (*Aggv2, error) {
+	
+		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.AddDate(0, 0, -1).Format(time.RFC3339), to.AddDate(0, 0, 1).Format(time.RFC3339)))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", apiKey)
+	q.Set("unadjusted", "true")
+
+	u.RawQuery = q.Encode()
+
+	agg := &Aggv2{}
+	err = downloadAndUnmarshal(u.String(), retryCount, agg)
+	
+	if err != nil {
+		return NewOHLCV(0), err
+	}
+
+	if agg["resultsCount"] == 0:
+		return NewOHLCV(0), nil
+	
+	ohlcv := NewOHLCV(len(agg.PriceData))
+
+    for bar := 0; bar < len(agg.PriceData); bar++ {
+
+		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
+
+			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
+			ohlcv.Open[bar] = agg.PriceData[bar].Open
+			ohlcv.High[bar] = agg.PriceData[bar].High
+			ohlcv.Low[bar] = agg.PriceData[bar].Low
+			ohlcv.Close[bar] = agg.PriceData[bar].Close
+			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
+			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
+			
+	return ohlcv, nil
+}
+
 // GetHistoricAggregates requests polygon's REST API for historic aggregates
 // for the provided resolution based on the provided query parameters.
 func GetHistoricAggregates(
@@ -197,108 +241,6 @@ func GetHistoricAggregates(
 	}
 
 	return agg, nil
-}
-
-// GetHistoricTrades requests polygon's REST API for historic trades
-// on the provided date .
-func GetHistoricTrades(symbol, date string, batchSize int) (totalTrades *HistoricTrades, err error) {
-	var (
-		offset = int64(0)
-		u      *url.URL
-		q      url.Values
-	)
-
-	for {
-		u, err = url.Parse(fmt.Sprintf(tradesURL, baseURL, symbol, date))
-		if err != nil {
-			return nil, err
-		}
-
-		q = u.Query()
-		q.Set("apiKey", apiKey)
-		q.Set("limit", strconv.Itoa(batchSize))
-
-		if offset > 0 {
-			q.Set("timestamp", strconv.FormatInt(offset, 10))
-		}
-
-		u.RawQuery = q.Encode()
-
-		trades := &HistoricTrades{}
-		err := downloadAndUnmarshal(u.String(), retryCount, trades)
-		if err != nil {
-			return nil, err
-		}
-
-		if totalTrades == nil {
-			totalTrades = trades
-		} else {
-			totalTrades.Results = append(totalTrades.Results, trades.Results...)
-		}
-
-		if len(trades.Results) == batchSize {
-			offset = trades.Results[len(trades.Results)-1].SipTimestamp
-			if offset == 0 {
-				log.Fatal("Unable to paginate: Timestamp was empty for %v @ %v", symbol, date)
-			}
-		} else {
-			break
-		}
-	}
-
-	totalTrades.Ticker = symbol
-	totalTrades.Success = true
-	totalTrades.ResultsCount = len(totalTrades.Results)
-
-	return totalTrades, nil
-}
-
-// GetHistoricQuotes requests polygon's REST API for historic quotes
-// on the provided date.
-func GetHistoricQuotes(symbol, date string, batchSize int) (totalQuotes *HistoricQuotes, err error) {
-	// FIXME: Move this to Polygon API v2
-	var (
-		offset = int64(0)
-		u      *url.URL
-		q      url.Values
-		quotes = &HistoricQuotes{}
-	)
-
-	for {
-		u, err = url.Parse(fmt.Sprintf(quotesURL, baseURL, symbol, date))
-		if err != nil {
-			return nil, err
-		}
-
-		q = u.Query()
-		q.Set("apiKey", apiKey)
-		q.Set("limit", strconv.Itoa(batchSize))
-
-		if offset > 0 {
-			q.Set("offset", strconv.FormatInt(offset, 10))
-		}
-
-		u.RawQuery = q.Encode()
-
-		err = downloadAndUnmarshal(u.String(), retryCount, quotes)
-		if err != nil {
-			return nil, err
-		}
-
-		if totalQuotes == nil {
-			totalQuotes = quotes
-		} else {
-			totalQuotes.Ticks = append(totalQuotes.Ticks, quotes.Ticks...)
-		}
-
-		if len(quotes.Ticks) == batchSize {
-			offset = quotes.Ticks[len(quotes.Ticks)-1].Timestamp
-		} else {
-			break
-		}
-	}
-
-	return totalQuotes, nil
 }
 
 func downloadAndUnmarshal(url string, retryCount int, data interface{}) error {

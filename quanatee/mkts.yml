@@ -21,12 +21,13 @@ triggers:
         - 1H
         - 4H
 bgworkers:
-  - module: polygon.so
+  - module: pentagon.so
     config:
-      api_key: "<polygon_api_key>"
-      ws_servers: wss://socket.polygon.io/forex
-      data_types: ["bars", "quotes"]
-      query_start: "2017-01-01 00:00"
+      polygon_api_key: "<polygon_api_key>"
+      tiingo_api_key:  "<tiingo_api_key>"
+      twelve_api_key:  "<twelve_api_key>"
+      market_type: "forex"
+      query_start: "2020-01-01 00:00"
       symbols:
         # Forex
         - EURUSD

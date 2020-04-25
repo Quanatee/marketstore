@@ -12,8 +12,8 @@ import (
 	"code.cloudfoundry.org/bytefmt"
 	"github.com/alpacahq/marketstore/contrib/calendar"
 	"github.com/alpacahq/marketstore/contrib/ondiskagg/aggtrigger"
-	"github.com/alpacahq/marketstore/contrib/polygon/api"
-	"github.com/alpacahq/marketstore/contrib/polygon/backfill"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/backfill"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/plugins/trigger"
 	"github.com/alpacahq/marketstore/utils"
@@ -149,8 +149,8 @@ func initWriter() {
 		true, true, true, true)
 
 	config := map[string]interface{}{
-		"filter":       "nasdaq",
-		"destinations": []string{"5Min", "15Min", "1H", "1D"},
+		//"filter":       "nasdaq",
+		"destinations": []string{"5Min", "15Min", "1H", "4H"},
 	}
 
 	trig, err := aggtrigger.NewTrigger(config)

@@ -95,76 +95,44 @@ type HistoricAggregates struct {
 	Ticks []AggTick `json:"ticks"`
 }
 
-// AggTick is the structure that contains the actual
-// tick data included in a HistoricAggregates response
-type AggTick struct {
-	EpochMilliseconds int64   `json:"d"`
-	Open              float64 `json:"o"`
-	High              float64 `json:"h"`
-	Low               float64 `json:"l"`
-	Close             float64 `json:"c"`
-	Volume            int     `json:"v"`
+type AggData struct {
+	Ticker         string  `json:"T"`
+	Volume         float32 `json:"v"`
+	VolumeWeighted float32 `json:"vw"`
+	Open           float32 `json:"o"`
+	High           float32 `json:"h"`
+	Low            float32 `json:"l"`
+	Close          float32 `json:"c"`
+	Timestamp      int64   `json:"t"`
+	Ticks          int64   `json:"n"`
 }
 
-// HistoricTrades is the structure that defines trade
-// data served through polygon's REST API.
-type HistoricTrades struct {
-	Ticker       string      `json:"ticker"`
-	Success      bool        `json:"success"`
-	ResultsCount int         `json:"results_count"`
-	Results      []TradeTick `json:"results"`
-	DbLatency    int         `json:"db_latency"`
-	// `map` is excluded as it only contains variable shortening info for ticks
+type Aggv2 struct {
+	Symbol          string        `json:"ticker"`
+	Status          string        `json:"status"`
+	Adjusted        bool          `json:"adjusted"`
+	queryCount      int64         `json:"queryCount"`
+	resultsCount    int64         `json:"resultsCount"`
+	PriceData       []AggData     `json:"results"`
 }
 
-// TradeTick is the structure that contains the actual
-// tick data included in a HistoricTrades response
-type TradeTick struct {
-	ParticipantTimestamp int64   `json:"y"` // Participant/Exchange timestamp
-	TrfTimestamp         int64   `json:"f"`
-	SipTimestamp         int64   `json:"t"` // Optional
-	Price                float64 `json:"p"`
-	Size                 int     `json:"s"`
-	Exchange             int     `json:"x"`
-	Conditions           []int   `json:"c"`
-	Id                   string  `json:"i"`
-	Correction           int     `json:"e"`
-	SequenceNumber       int     `json:"q"`
-	TrfId                int     `json:"r"`
-	Tape                 int     `json:"z"`
-	OrigId               string  `string:"I"`
+type OHLCV struct {
+	Epoch     []int64     `json:"epoch"`
+	Open      []float32   `json:"open"`
+	High      []float32   `json:"high"`
+	Low       []float32   `json:"low"`
+	Close     []float32   `json:"close"`
+	HLC       []float32   `json:"HLC"`
+	Volume    []float32   `json:"volume"`
 }
-
-// HistoricQuotes is the structure that defines quote
-// data served through polygon's REST API.
-type HistoricQuotes struct {
-	Day string `json:"day"`
-	Map struct {
-		AE string `json:"aE"`
-		AP string `json:"aP"`
-		AS string `json:"aS"`
-		BE string `json:"bE"`
-		BP string `json:"bP"`
-		BS string `json:"bS"`
-		C  string `json:"c"`
-		T  string `json:"t"`
-	} `json:"map"`
-	MsLatency int         `json:"msLatency"`
-	Status    string      `json:"status"`
-	Symbol    string      `json:"symbol"`
-	Ticks     []QuoteTick `json:"ticks"`
-	Type      string      `json:"type"`
-}
-
-// QuoteTick is the structure that contains the actual
-// tick data included in a HistoricQuotes response
-type QuoteTick struct {
-	Timestamp   int64   `json:"t"`
-	BidExchange string  `json:"bE"`
-	AskExchange string  `json:"aE"`
-	BidPrice    float64 `json:"bP"`
-	AskPrice    float64 `json:"aP"`
-	BidSize     int     `json:"bS"`
-	AskSize     int     `json:"aS"`
-	Condition   int     `json:"c"`
+func NewOHLCV(bars int) OHLCV {
+	return OHLCV{
+		Epoch:  make([]int64,   bars),
+		Open:   make([]float32, bars),
+		High:   make([]float32, bars),
+		Low:    make([]float32, bars),
+		Close:  make([]float32, bars),
+		HLC:    make([]float32, bars),
+		Volume: make([]float32, bars),
+	}
 }
