@@ -79,22 +79,6 @@ type PolyAggregate struct {
 Historical data
 */
 
-// HistoricAggregates is the structure that defines
-// aggregate data served through polygon's REST API.
-type HistoricAggregates struct {
-	Symbol        string `json:"symbol"`
-	AggregateType string `json:"aggType"`
-	Map           struct {
-		O string `json:"o"`
-		C string `json:"c"`
-		H string `json:"h"`
-		L string `json:"l"`
-		V string `json:"v"`
-		D string `json:"d"`
-	} `json:"map"`
-	Ticks []AggTick `json:"ticks"`
-}
-
 type AggData struct {
 	Ticker         string  `json:"T"`
 	Volume         float32 `json:"v"`

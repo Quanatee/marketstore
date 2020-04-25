@@ -212,7 +212,7 @@ func GetPastAggregates(
 	}
 	
 	length := len(agg.PriceData)
-    ohlcv := &House{
+    ohlcv := &OHLCV{
         Epoch: make([]int64, length),
         Open: make([]float32, length),
         High: make([]float32, length),
@@ -238,47 +238,6 @@ func GetPastAggregates(
 	}
 			
 	return ohlcv, nil
-}
-
-// GetHistoricAggregates requests polygon's REST API for historic aggregates
-// for the provided resolution based on the provided query parameters.
-func GetHistoricAggregates(
-	symbol,
-	resolution string,
-	from, to time.Time,
-	limit *int) (*HistoricAggregates, error) {
-	// FIXME: Move this to Polygon API v2
-	// FIXME: This function does not handle pagination
-
-	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, resolution, symbol))
-	if err != nil {
-		return nil, err
-	}
-
-	q := u.Query()
-	q.Set("apiKey", apiKey)
-
-	if !from.IsZero() {
-		q.Set("from", from.Format(time.RFC3339))
-	}
-
-	if !to.IsZero() {
-		q.Set("to", to.Format(time.RFC3339))
-	}
-
-	if limit != nil {
-		q.Set("limit", strconv.FormatInt(int64(*limit), 10))
-	}
-
-	u.RawQuery = q.Encode()
-
-	agg := &HistoricAggregates{}
-	err = downloadAndUnmarshal(u.String(), retryCount, agg)
-	if err != nil {
-		return nil, err
-	}
-
-	return agg, nil
 }
 
 func downloadAndUnmarshal(url string, retryCount int, data interface{}) error {
