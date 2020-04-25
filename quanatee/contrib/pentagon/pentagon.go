@@ -88,7 +88,7 @@ func (qf *QuanateeFetcher) Run() {
 			} else {
 				if first_loop == true {
 					log.Info("First loop")
-					backfill.BackfillM.LoadOrStore(symbol, &from.Unix())
+					backfill.BackfillM.LoadOrStore(symbol, from.Unix())
 					first_loop = false
 				}
 			}

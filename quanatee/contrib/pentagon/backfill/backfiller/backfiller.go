@@ -26,11 +26,10 @@ var (
 	symbols              string
 	parallelism          int
 	apiKey               string
-	exchanges            string
 	batchSize            int
 
 	// NY timezone
-	NY, _  = time.LoadLocation("America/New_York")
+	NY, _  = time.LoadLocation("UTC")
 	format = "2006-01-02"
 )
 
@@ -38,7 +37,6 @@ func init() {
 	flag.StringVar(&dir, "dir", "/project/data", "mktsdb directory to backfill to")
 	flag.StringVar(&from, "from", time.Now().Add(-365*24*time.Hour).Format(format), "backfill from date (YYYY-MM-DD)")
 	flag.StringVar(&to, "to", time.Now().Format(format), "backfill from date (YYYY-MM-DD)")
-	flag.StringVar(&exchanges, "exchanges", "*", "comma separated list of exchange")
 	flag.BoolVar(&bars, "bars", false, "backfill bars")
 	flag.BoolVar(&quotes, "quotes", false, "backfill quotes")
 	flag.BoolVar(&trades, "trades", false, "backfill trades")
@@ -109,26 +107,78 @@ func main() {
 
 	sem := make(chan struct{}, parallelism)
 
-	log.Info("[polygon] backfilling bars from %v to %v", start, end)
+	if bars {
+		log.Info("[polygon] backfilling bars from %v to %v", start, end)
 
-	for _, sym := range symbolList {
-		s := start
-		e := end
+		for _, sym := range symbolList {
+			s := start
+			e := end
 
-		log.Info("[polygon] backfilling bars for %v", sym)
+			log.Info("[polygon] backfilling bars for %v", sym)
 
-		for e.After(s) {
-			if calendar.Nasdaq.IsMarketDay(e) {
+			for e.After(s) {
+				//if calendar.Nasdaq.IsMarketDay(e) {
 				sem <- struct{}{}
 				go func(t time.Time) {
 					defer func() { <-sem }()
-
+					
 					if err = backfill.Bars(sym, t.Add(-24*time.Hour), t); err != nil {
 						log.Warn("[polygon] failed to backfill trades for %v (%v)", sym, err)
 					}
 				}(e)
+				//}
+				e = e.Add(-24 * time.Hour)
 			}
-			e = e.Add(-24 * time.Hour)
+		}
+	}
+
+	if quotes {
+		log.Info("[polygon] backfilling quotes from %v to %v", start, end)
+
+		for _, sym := range symbolList {
+			s := start
+			e := end
+
+			log.Info("[polygon] backfilling quotes for %v", sym)
+
+			for e.After(s) {
+				if calendar.Nasdaq.IsMarketDay(e) {
+					sem <- struct{}{}
+					go func(t time.Time) {
+						defer func() { <-sem }()
+
+						if err = backfill.Quotes(sym, t.Add(-24*time.Hour), t, batchSize); err != nil {
+							log.Warn("[polygon] failed to backfill quotes for %v (%v)", sym, err)
+						}
+					}(e)
+				}
+				e = e.Add(-24 * time.Hour)
+			}
+		}
+	}
+
+	if trades {
+		log.Info("[polygon] backfilling trades from %v to %v", start, end)
+
+		for _, sym := range symbolList {
+			s := start
+			e := end
+
+			log.Info("[polygon] backfilling trades for %v", sym)
+
+			for e.After(s) {
+				if calendar.Nasdaq.IsMarketDay(e) {
+					sem <- struct{}{}
+					go func(t time.Time) {
+						defer func() { <-sem }()
+
+						if err = backfill.Trades(sym, t, batchSize); err != nil {
+							log.Warn("[polygon] failed to backfill trades for %v @ %v (%v)", sym, t, err)
+						}
+					}(e)
+				}
+				e = e.Add(-24 * time.Hour)
+			}
 		}
 	}
 
@@ -149,8 +199,8 @@ func initWriter() {
 		true, true, true, true)
 
 	config := map[string]interface{}{
-		//"filter":       "nasdaq",
-		"destinations": []string{"5Min", "15Min", "1H", "4H"},
+		"filter":       "nasdaq",
+		"destinations": []string{"5Min", "15Min", "1H", "1D"},
 	}
 
 	trig, err := aggtrigger.NewTrigger(config)
