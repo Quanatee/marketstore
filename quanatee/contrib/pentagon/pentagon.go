@@ -151,58 +151,56 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 		err  error
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 	)
-
-	// query the latest entry prior to the streamed record
-	if qf.config.QueryStart == "" {
-		instance := executor.ThisInstance
-		cDir := instance.CatalogDir
-		q := planner.NewQuery(cDir)
-		q.AddTargetKey(tbk)
-		q.SetRowLimit(io.LAST, 1)
-		q.SetEnd(endEpoch - int64(time.Minute.Seconds()))
-
-		parsed, err := q.Parse()
-		if err != nil {
-			log.Error("[polygon] query parse failure (%v)", err)
-			return
-		}
-
-		scanner, err := executor.NewReader(parsed)
-		if err != nil {
-			log.Error("[polygon] new scanner failure (%v)", err)
-			return
-		}
-
-		csm, err := scanner.Read()
-		if err != nil {
-			log.Error("[polygon] scanner read failure (%v)", err)
-			return
-		}
-
-		epoch := csm[*tbk].GetEpoch()
-
-		// no gap to fill
-		if len(epoch) == 0 {
-			log.Error("[]polygon() no gap to fill ")
-			return
-		}
-
-		from = time.Unix(epoch[len(epoch)-1], 0)
-
-	} else {
-		for _, layout := range []string{
-			"2006-01-02 03:04:05",
-			"2006-01-02T03:04:05",
-			"2006-01-02 03:04",
-			"2006-01-02T03:04",
-			"2006-01-02",
-		} {
-			from, err = time.Parse(layout, qf.config.QueryStart)
-			if err == nil {
-				break
-			}
+	
+	for _, layout := range []string{
+		"2006-01-02 03:04:05",
+		"2006-01-02T03:04:05",
+		"2006-01-02 03:04",
+		"2006-01-02T03:04",
+		"2006-01-02",
+	} {
+		from, err = time.Parse(layout, qf.config.QueryStart)
+		if err == nil {
+			break
 		}
 	}
+
+	// query the latest entry prior to the streamed record	
+	instance := executor.ThisInstance
+	cDir := instance.CatalogDir
+	q := planner.NewQuery(cDir)
+	q.AddTargetKey(tbk)
+	q.SetRowLimit(io.LAST, 1)
+	q.SetEnd(from.Unix())
+
+	parsed, err := q.Parse()
+	if err != nil {
+		log.Error("[polygon] query parse failure (%v)", err)
+		return
+	}
+
+	scanner, err := executor.NewReader(parsed)
+	if err != nil {
+		log.Error("[polygon] new scanner failure (%v)", err)
+		return
+	}
+
+	csm, err := scanner.Read()
+	if err != nil {
+		log.Error("[polygon] scanner read failure (%v)", err)
+		return
+	}
+
+	epoch := csm[*tbk].GetEpoch()
+
+	// no gap to fill
+	if len(epoch) == 0 {
+		log.Error("[]polygon() no gap to fill ")
+		return
+	}
+	
+	from = time.Unix(epoch[len(epoch)-1], 0)
+
 	
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, from.AddDate(0, 0, 5)); err != nil {
