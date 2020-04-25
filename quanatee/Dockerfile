@@ -19,8 +19,7 @@ RUN if [ "$INCLUDE_PLUGINS" = "true" ] ; then make build plugins ; else make bui
 #
 # Create final image
 #
-FROM ubuntu:18.04
-# FROM debian:10.3
+FROM debian:10.3
 WORKDIR /
 COPY --from=builder /go/src/github.com/alpacahq/marketstore/marketstore /bin/
 # copy plugins if any
@@ -36,5 +35,4 @@ EXPOSE 5993
 # CMD ["start", "--config", "/etc/mkts.yml"]
 
 COPY /quanatee/mkts.yml .
-# ENTRYPOINT sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tdameritrade_api_key>|${TDAMERITRADE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
-ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
+ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash

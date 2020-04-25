@@ -23,11 +23,11 @@ triggers:
 bgworkers:
   - module: pentagon.so
     config:
-      polygon_api_key: "<polygon_api_key>"
-      tiingo_api_key:  "<tiingo_api_key>"
-      twelve_api_key:  "<twelve_api_key>"
-      market_type: "forex"
-      query_start: "2020-01-01 00:00"
+      polygon_api_key: <polygon_api_key>
+      tiingo_api_key: <tiingo_api_key>
+      twelve_api_key: <twelve_api_key>
+      market_type: forex
+      query_start: 2020-01-01 00:00
       symbols:
         # Forex
         - EURUSD
