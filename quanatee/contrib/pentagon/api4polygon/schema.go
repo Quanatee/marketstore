@@ -1,40 +1,6 @@
 package api4polygon
 
 /*
-Streaming Schema from Polygon
-
-// Stocks QUOTE:
-{
-    "ev": "Q",              // Event Type
-    "sym": "MSFT",          // Symbol Ticker
-    "bx": "4",              // Bix Exchange ID
-    "bp": 114.125,          // Bid Price
-    "bs": 100,              // Bid Size
-    "ax": "7",              // Ask Exchange ID
-    "ap": 114.128,          // Ask Price
-    "as": 160,              // Ask Size
-    "c": 0,                 // Quote Condition
-    "t": 1536036818784      // Quote Timestamp ( Unix MS )
-}
-
-// Stocks Aggregate:
-{
-    "ev": "AM",             // Event Type ( A = Second Agg, AM = Minute Agg )
-    "sym": "MSFT",          // Symbol Ticker
-    "v": 10204,             // Tick Volume
-    "av": 200304,           // Accumlated Volume ( Today )
-    "op": 114.04,           // Todays official opening price
-    "vw": 114.4040,         // VWAP (Volume Weighted Average Price)
-    "o": 114.11,            // Tick Open Price
-    "c": 114.14,            // Tick Close Price
-    "h": 114.19,            // Tick High Price
-    "l": 114.09,            // Tick Low Price
-    "a": 114.1314,          // Tick Average / VWAP Price
-    "s": 1536036818784,     // Tick Start Timestamp ( Unix MS )
-    "e": 1536036818784,     // Tick End Timestamp ( Unix MS )
-}
-*/
-/*
 Streaming data
 */
 type PolyTrade struct {

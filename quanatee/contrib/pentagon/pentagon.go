@@ -106,13 +106,9 @@ func (qf *QuanateeFetcher) Run() {
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	log.Info("workBackfillBars()")
-
 	ticker := time.NewTicker(30 * time.Second)
 
 	for range ticker.C {
-		
-		log.Info("workBackfillBars() %v", ticker.C)
 		
 		wg := sync.WaitGroup{}
 		count := 0
@@ -147,6 +143,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 // Backfill bars from start
 func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
+	
+	log.Info("backfillBars() %s to %v", symbol, to)
+
 	var (
 		from time.Time
 		err  error
@@ -184,6 +183,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 
 		// no gap to fill
 		if len(epoch) == 0 {
+			log.Error("[]polygon() no gap to fill ")
 			return
 		}
 
@@ -203,7 +203,9 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 			}
 		}
 	}
-
+	
+	log.Info("backfillBars() %s from %v", symbol, from)
+	
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, time.Time{}); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
