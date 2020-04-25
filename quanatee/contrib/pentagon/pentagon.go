@@ -64,7 +64,7 @@ func (qf *QuanateeFetcher) Run() {
 
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
-	to := from.Add(time.Minute*time.Duration(1))
+	to := from.Add(time.Minute)
 	
 	for {
 
@@ -73,8 +73,8 @@ func (qf *QuanateeFetcher) Run() {
 				break
 			} else {
 				oneMinuteAhead := time.Now().Add(time.Minute)
-				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 1, 0, time.UTC)
-				time.Sleep(oneMinuteAhead.UTC().Sub(time.Now()))
+				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 0, 0, time.UTC)
+				time.Sleep(oneMinuteAhead.Sub(time.Now()))
 			}
 		}
 		
@@ -83,6 +83,7 @@ func (qf *QuanateeFetcher) Run() {
 				err  error
 				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 			)
+			log.Info("1.%s %v %v", symbol, from, to)
 			if err = livefill.Bars(symbol, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}

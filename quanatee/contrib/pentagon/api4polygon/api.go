@@ -162,7 +162,7 @@ func GetLiveAggregates(
         Volume: make([]float32, length),
 	}
 	
-	log.Info("%s: %v", symbol, length)
+	log.Info("3.%s %v %v", symbol, from, to)
 	
     for bar := 0; bar < length; bar++ {
 		
