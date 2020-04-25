@@ -136,7 +136,7 @@ func GetLiveAggregates(
 	if err != nil {
 		return nil, err
 	}
-
+	
 	q := u.Query()
 	q.Set("apiKey", apiKey)
 	q.Set("unadjusted", "true")
@@ -162,8 +162,10 @@ func GetLiveAggregates(
         Volume: make([]float32, length),
 	}
 	
+	log.Info("%s: %v", symbol, length)
+	
     for bar := 0; bar < length; bar++ {
-
+		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
 
 			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
