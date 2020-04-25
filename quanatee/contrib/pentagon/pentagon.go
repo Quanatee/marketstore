@@ -126,7 +126,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 					// backfill the symbol in parallel
 					qf.backfillBars(symbol, value.(int64))
-					backfill.BackfillM.LoadOrStore(key, nil)
+					backfill.BackfillM.Store(key, nil)
 				}()
 			}
 
