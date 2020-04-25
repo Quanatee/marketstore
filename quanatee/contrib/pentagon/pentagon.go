@@ -207,11 +207,11 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 		from = time.Unix(epoch[len(epoch)-1], 0)
 		to := from.AddDate(0, 0, 7)
 		log.Info("%s from csm %v to %v", symbol, from, to)
-	}
-	
-	// request & write the missing bars
-	if err = backfill.Bars(symbol, from, to); err != nil {
-		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
+		// request & write the missing bars
+		if err = backfill.Bars(symbol, from, to); err != nil {
+			log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
+			return false
+		}
 	} else {
 		return false
 	}
