@@ -79,7 +79,7 @@ func (qf *QuanateeFetcher) Run() {
 				err  error
 				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 			)
-			if err = livefill.Bars(symbol, qf.config.PolygonApiKey, from, to); err != nil {
+			if err = livefill.Bars(symbol, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}
 
@@ -188,7 +188,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	}
 
 	// request & write the missing bars
-	if err = backfill.Bars(symbol, qf.config.PolygonApiKey, from, time.Time{}); err != nil {
+	if err = backfill.Bars(symbol, from, time.Time{}); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
 }
