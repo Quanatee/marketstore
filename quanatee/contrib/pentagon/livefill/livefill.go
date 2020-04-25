@@ -28,7 +28,7 @@ func SetMarketType(marketType string) {
 	MarketType = marketType
 }
 
-func Bars(symbol, apiKey string, from, to time.Time) (err error) {
+func Bars(symbol string, from, to time.Time) (err error) {
 	if from.IsZero() {
 		from = time.Date(2017, 1, 1, 0, 0, 0, 0, NY)
 	}
@@ -37,7 +37,7 @@ func Bars(symbol, apiKey string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	ohlcv, err := api4polygon.GetLiveAggregates(PolygonPrefix[MarketType]+symbol, apiKey, "1", "minute", from, to)
+	ohlcv, err := api4polygon.GetLiveAggregates(PolygonPrefix[MarketType]+symbol, "1", "minute", from, to)
 	if err != nil {
 		return err
 	}
