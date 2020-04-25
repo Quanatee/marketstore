@@ -186,7 +186,7 @@ func GetPastAggregates(
 	if agg["resultsCount"] == 0 {
 		return NewOHLCV(0), nil
 	}
-	
+
 	ohlcv := NewOHLCV(len(agg.PriceData))
 
     for bar := 0; bar < len(agg.PriceData); bar++ {
@@ -200,6 +200,7 @@ func GetPastAggregates(
 			ohlcv.Close[bar] = agg.PriceData[bar].Close
 			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
 			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
+		}
 			
 	return ohlcv, nil
 }
