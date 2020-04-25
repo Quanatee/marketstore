@@ -203,7 +203,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 		from = time.Unix(epoch[len(epoch)-1], 0)
 		to := from.AddDate(0, 0, 7)
 		log.Info("%s from csm %v to %v", symbol, from, to)
-		if from >= endEpoch {
+		if from.Unix() >= endEpoch {
 			log.Info("%s exiting from csm %v to %v", symbol, from, to)
 			return true
 		}
