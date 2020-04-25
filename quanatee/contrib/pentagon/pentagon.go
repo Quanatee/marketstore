@@ -181,19 +181,19 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 	parsed, err := q.Parse()
 	if err != nil {
 		log.Error("[polygon] query parse failure (%v)", err)
-		return
+		return true
 	}
 
 	scanner, err := executor.NewReader(parsed)
 	if err != nil {
 		log.Error("[polygon] new scanner failure (%v)", err)
-		return
+		return true
 	}
 
 	csm, err := scanner.Read()
 	if err != nil {
 		log.Error("[polygon] scanner read failure (%v)", err)
-		return
+		return true
 	}
 
 	epoch := csm[*tbk].GetEpoch()
