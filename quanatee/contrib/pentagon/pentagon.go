@@ -26,7 +26,7 @@ type QuanateeFetcher struct {
 type FetcherConfig struct {
     PolygonApiKey  string   `yaml:"polygon_api_key"`
     TiingoApiKey   string   `yaml:"tiingo_api_key"`
-	twelveApiKey   string   `yaml:"twelve_api_key"`
+	TwelveApiKey   string   `yaml:"twelve_api_key"`
 	MarketType     string   `yaml:"market_type"`
 	QueryStart     string   `yaml:"query_start"`
 	Symbols        []string `yaml:"symbols"`
@@ -53,10 +53,11 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
 
+	log.Info("Polygon Key: %s", qf.config.PolygonApiKey)
+	log.Info("Market Type: %s", qf.config.MarketType)
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	livefill.SetMarketType(qf.config.MarketType)
 	backfill.SetMarketType(qf.config.MarketType)
-	log.Info("%s", qf.config.PolygonApiKey)
 
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
