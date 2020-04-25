@@ -66,13 +66,16 @@ func (qf *QuanateeFetcher) Run() {
 				break
 			} else {
 				oneMinuteAhead := time.Now().Add(time.Minute)
-				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 1, 0, time.UTC)
-				time.Sleep(oneMinuteAheadSub(time.Now().UTC()))
+				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 0, 0, time.UTC)
+				time.Sleep(oneMinuteAhead.UTC().Sub(time.Now()))
 			}
 		}
 		
 		for _, symbol := range qf.config.Symbols {
-		
+			var (
+				err  error
+				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
+			)
 			if err = livefill.Bars(symbol, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}
