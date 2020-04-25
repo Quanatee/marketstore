@@ -127,8 +127,10 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					// backfill the symbol in parallel
 					stop := qf.backfillBars(symbol, value.(int64))
 					if stop == true {
+						log.Info("%s backfill complete", symbol)
 						backfill.BackfillM.Store(key, nil)
 					} else {
+						log.Info("%s backfill from: ", symbol, time.Unix(value.(int64), 0))
 						backfill.BackfillM.LoadOrStore(key, nil)
 					}
 				}()
@@ -197,24 +199,27 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 	}
 
 	epoch := csm[*tbk].GetEpoch()
+	stop := false
 
 	// has gap to fill
 	if len(epoch) != 0 {
-		if epoch[len(epoch)-1] >= endEpoch {
-			log.Info("%s exiting from backfill")
-			return true
-		}
 		from = time.Unix(epoch[len(epoch)-1], 0)
 	} else {
 		from = start
 	}
+
 	to := from.AddDate(0, 0, 7)
-	log.Info("%s from csm %v to %v", symbol, from, to)
+	if to.Unix() >= time.Now().Unix() {
+		to = time.Now().Unix()
+		stop = true
+	}
+	
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
-	return false
+	
+	return stop
 }
 
 func main() {}
