@@ -152,10 +152,12 @@ func GetLiveAggregates(
 	agg := &Aggv2{}
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	if err != nil {
-		return NewOHLCV(0), err
+		ohlcv := NewOHLCV(0)
+		return ohlcv, err
 	}
 	if agg.resultsCount == 0 {
-		return NewOHLCV(0), nil
+		ohlcv := NewOHLCV(0)
+		return ohlcv, nil
 	}
 
 	ohlcv := NewOHLCV(len(agg.PriceData))
@@ -196,15 +198,15 @@ func GetPastAggregates(
 
 	agg := &Aggv2{}
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
-	
 	if err != nil {
-		return NewOHLCV(0), err
+		ohlcv := NewOHLCV(0)
+		return ohlcv, err
 	}
-
 	if agg.resultsCount == 0 {
-		return NewOHLCV(0), nil
+		ohlcv := NewOHLCV(0)
+		return ohlcv, nil
 	}
-
+	
 	ohlcv := NewOHLCV(len(agg.PriceData))
 
     for bar := 0; bar < len(agg.PriceData); bar++ {
