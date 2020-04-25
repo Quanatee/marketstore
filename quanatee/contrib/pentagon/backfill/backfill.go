@@ -17,7 +17,17 @@ var (
 	NY, _     = time.LoadLocation("America/New_York")
 	ErrRetry  = fmt.Errorf("retry error")
 	BackfillM *sync.Map
+	MarketType string
+	PolygonPrefix := map[string]string{
+		"forex": "C:",
+		"crypto": "X:",
+		"stocks": "",
+	}
 )
+
+func SetMarketType(marketType string) {
+	MarketType = marketType
+}
 
 func Bars(symbol string, from, to time.Time) (err error) {
 	if from.IsZero() {
@@ -27,8 +37,8 @@ func Bars(symbol string, from, to time.Time) (err error) {
 	if to.IsZero() {
 		to = time.Now()
 	}
-
-	ohlcv, err := api4polygon.GetPastAggregates(symbol, "1", "minute", from, to)
+	
+	ohlcv, err := api4polygon.GetPastAggregates(PolygonPrefix[MarketType]+symbol, "1", "minute", from, to)
 	if err != nil {
 		return err
 	}

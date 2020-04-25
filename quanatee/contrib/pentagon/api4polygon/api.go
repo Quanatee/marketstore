@@ -29,17 +29,12 @@ const (
 	
 var (
 	baseURL = "https://api.polygon.io"
-	servers = "ws://socket.polygon.io:30328" // default
 	apiKey  string
 	NY, _   = time.LoadLocation("America/New_York")
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
-}
-
-func SetBaseURL(url string) {
-	baseURL = url
 }
 
 type ListTickersResponse struct {
