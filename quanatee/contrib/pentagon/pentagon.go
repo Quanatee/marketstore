@@ -33,6 +33,9 @@ type FetcherConfig struct {
 	Symbols        []string `yaml:"symbols"`
 }
 
+var firstLoop bool
+firstLoop = true
+
 // NewBgWorker returns a new instances of QuanateeFetcher. See FetcherConfig
 // for more details about configuring QuanateeFetcher.
 func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
@@ -64,8 +67,6 @@ func (qf *QuanateeFetcher) Run() {
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
 	
-	first_loop := true
-
 	for {
 
 		for {
@@ -87,9 +88,9 @@ func (qf *QuanateeFetcher) Run() {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}
 			
-			if first_loop == true {
+			if firstLoop == true {
 				log.Info("First loop")
-				first_loop = false
+				firstLoop = false
 				backfill.BackfillM.LoadOrStore(symbol, from.Unix())
 				go qf.workBackfillBars()
 			}
@@ -151,24 +152,24 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 	log.Info("backfillBars(%s)", symbol)
 
 	var (
-		// start time.Time
+		start time.Time
 		from time.Time
 		err  error
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 	)
 	
-	// for _, layout := range []string{
-	// 	"2006-01-02 03:04:05",
-	// 	"2006-01-02T03:04:05",
-	// 	"2006-01-02 03:04",
-	// 	"2006-01-02T03:04",
-	// 	"2006-01-02",
-	// } {
-	// 	start, err = time.Parse(layout, qf.config.QueryStart)
-	// 	if err == nil {
-	// 		break
-	// 	}
-	// }
+	for _, layout := range []string{
+		"2006-01-02 03:04:05",
+		"2006-01-02T03:04:05",
+		"2006-01-02 03:04",
+		"2006-01-02T03:04",
+		"2006-01-02",
+	} {
+		start, err = time.Parse(layout, qf.config.QueryStart)
+		if err == nil {
+			break
+		}
+	}
 
 	// query the latest entry prior to the streamed record	
 	instance := executor.ThisInstance
@@ -205,15 +206,16 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 			return true
 		}
 		from = time.Unix(epoch[len(epoch)-1], 0)
-		to := from.AddDate(0, 0, 7)
-		log.Info("%s from csm %v to %v", symbol, from, to)
-		// request & write the missing bars
-		if err = backfill.Bars(symbol, from, to); err != nil {
-			log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
-			return false
-		}
+	} else {
+		from = start
 	}
-	return false
+	to := from.AddDate(0, 0, 7)
+	log.Info("%s from csm %v to %v", symbol, from, to)
+	// request & write the missing bars
+	if err = backfill.Bars(symbol, from, to); err != nil {
+		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
+		return false
+	}
 }
 
 func main() {}
