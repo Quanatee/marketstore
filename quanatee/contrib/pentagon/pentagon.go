@@ -64,7 +64,7 @@ func (qf *QuanateeFetcher) Run() {
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
 	
-	// first_loop := true
+	first_loop := true
 
 	for {
 
@@ -126,7 +126,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 					// backfill the symbol in parallel
 					qf.backfillBars(symbol, value.(int64))
-					backfill.BackfillM.Store(key, nil)
+					backfill.BackfillM.LoadOrStore(key, nil)
 				}()
 			}
 
