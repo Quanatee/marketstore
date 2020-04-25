@@ -13,8 +13,6 @@ import (
 )
 
 var (
-	// NY timezone
-	NY, _     = time.LoadLocation("America/New_York")
 	ErrRetry  = fmt.Errorf("retry error")
 	MarketType string
 	PolygonPrefix = map[string]string{
