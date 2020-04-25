@@ -46,8 +46,8 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		return err
 	}
 
-	log.Info("backfill.Bars(%s) len()", symbol, len(ohlcv.Epoch))
-	
+	log.Info("backfill.Bars(%s) len(%v)", symbol, len(ohlcv.Epoch))
+
 	if len(ohlcv.Epoch) == 0 {
 		return
 	}
