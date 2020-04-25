@@ -154,8 +154,9 @@ func GetLiveAggregates(
 	if err != nil {
 		return nil, err
 	}
-	if agg["resultsCount"] == 0:
+	if agg["resultsCount"] == 0 {
 		return nil, nil
+	}
 
 	return agg, nil
 }
@@ -182,8 +183,9 @@ func GetPastAggregates(
 		return NewOHLCV(0), err
 	}
 
-	if agg["resultsCount"] == 0:
+	if agg["resultsCount"] == 0 {
 		return NewOHLCV(0), nil
+	}
 	
 	ohlcv := NewOHLCV(len(agg.PriceData))
 
