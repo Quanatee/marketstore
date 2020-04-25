@@ -19,8 +19,13 @@ RUN if [ "$INCLUDE_PLUGINS" = "true" ] ; then make build plugins ; else make bui
 #
 # Create final image
 #
-FROM debian:10.3
-WORKDIR /
+FROM ubuntu:18.04
+RUN apt update
+RUN apt install -y ca-certificates tzdata
+# set your timezone
+RUN ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
 COPY --from=builder /go/src/github.com/alpacahq/marketstore/marketstore /bin/
 # copy plugins if any
 COPY --from=builder /go/bin /bin/
