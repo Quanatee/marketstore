@@ -193,13 +193,14 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 
 	epoch := csm[*tbk].GetEpoch()
 
-	// no gap to fill
-	if len(epoch) == 0 {
-		log.Error("[]polygon() no gap to fill ")
-		return
-	}
-	
-	from = time.Unix(epoch[len(epoch)-1], 0)
+	// has gap to fill
+	if len(epoch) != 0 {
+		from = time.Unix(epoch[len(epoch)-1], 0)
+	} 
+	// else {
+		// log.Error("[]polygon() no gap to fill ")
+		// return
+	// }
 
 	
 	// request & write the missing bars
