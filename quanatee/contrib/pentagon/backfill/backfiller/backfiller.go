@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"runtime"
 	"runtime/debug"
-	"strconv"
+	//"strconv"
 	"strings"
 	"time"
 
@@ -79,7 +79,7 @@ func main() {
 		log.Fatal("[polygon] api key is required")
 	}
 
-	api.SetAPIKey(apiKey)
+	api4polygon.SetAPIKey(apiKey)
 
 	start, err := time.Parse(format, from)
 	if err != nil {
@@ -94,7 +94,7 @@ func main() {
 	var symbolList []string
 	if symbols == "*" {
 		log.Info("[polygon] listing symbols")
-		resp, err := api.ListTickers()
+		resp, err := api4polygon.ListTickers()
 		if err != nil {
 			log.Fatal("[polygon] failed to list symbols (%v)", err)
 		}
