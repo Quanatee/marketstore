@@ -64,7 +64,7 @@ func (qf *QuanateeFetcher) Run() {
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
 	
-	first_loop := true
+	// first_loop := true
 
 	for {
 
@@ -85,13 +85,16 @@ func (qf *QuanateeFetcher) Run() {
 			)
 			if err = livefill.Bars(symbol, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
-			}
-			if first_loop == true {
-				log.Info("First loop")
-				first_loop = false
+			} else {
 				backfill.BackfillM.LoadOrStore(symbol, from.Unix())
 				go qf.workBackfillBars()
 			}
+			// if first_loop == true {
+			// 	log.Info("First loop")
+			// 	first_loop = false
+			// 	backfill.BackfillM.LoadOrStore(symbol, from.Unix())
+			// 	go qf.workBackfillBars()
+			// }
 
 		}
 		
