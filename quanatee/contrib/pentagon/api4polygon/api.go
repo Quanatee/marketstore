@@ -216,6 +216,7 @@ func GetPastAggregates(
         High: make([]float32, length),
         Low: make([]float32, length),
         Close: make([]float32, length),
+        HLC: make([]float32, length),
         Volume: make([]float32, length),
 	}
 	
