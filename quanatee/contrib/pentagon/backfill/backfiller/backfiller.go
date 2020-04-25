@@ -131,57 +131,6 @@ func main() {
 			}
 		}
 	}
-
-	if quotes {
-		log.Info("[polygon] backfilling quotes from %v to %v", start, end)
-
-		for _, sym := range symbolList {
-			s := start
-			e := end
-
-			log.Info("[polygon] backfilling quotes for %v", sym)
-
-			for e.After(s) {
-				if calendar.Nasdaq.IsMarketDay(e) {
-					sem <- struct{}{}
-					go func(t time.Time) {
-						defer func() { <-sem }()
-
-						if err = backfill.Quotes(sym, t.Add(-24*time.Hour), t, batchSize); err != nil {
-							log.Warn("[polygon] failed to backfill quotes for %v (%v)", sym, err)
-						}
-					}(e)
-				}
-				e = e.Add(-24 * time.Hour)
-			}
-		}
-	}
-
-	if trades {
-		log.Info("[polygon] backfilling trades from %v to %v", start, end)
-
-		for _, sym := range symbolList {
-			s := start
-			e := end
-
-			log.Info("[polygon] backfilling trades for %v", sym)
-
-			for e.After(s) {
-				if calendar.Nasdaq.IsMarketDay(e) {
-					sem <- struct{}{}
-					go func(t time.Time) {
-						defer func() { <-sem }()
-
-						if err = backfill.Trades(sym, t, batchSize); err != nil {
-							log.Warn("[polygon] failed to backfill trades for %v @ %v (%v)", sym, t, err)
-						}
-					}(e)
-				}
-				e = e.Add(-24 * time.Hour)
-			}
-		}
-	}
-
 	// make sure all goroutines finish
 	for i := 0; i < cap(sem); i++ {
 		sem <- struct{}{}
