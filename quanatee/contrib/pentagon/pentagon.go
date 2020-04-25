@@ -87,7 +87,8 @@ func (qf *QuanateeFetcher) Run() {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			} else {
 				if first_loop == true {
-					backfill.BackfillM.LoadOrStore(symbol, from.Unix())
+					log.Info("First loop")
+					backfill.BackfillM.LoadOrStore(symbol, &from.Unix())
 					first_loop = false
 				}
 			}
