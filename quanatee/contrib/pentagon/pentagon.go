@@ -127,7 +127,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					// backfill the symbol in parallel
 					stop := qf.backfillBars(symbol, value.(int64))
 					if stop == true {
-						log.Info("%s backfill complete", symbol)
+						log.Info("%s backfill is complete", symbol)
 						backfill.BackfillM.Store(key, nil)
 					} else {
 						backfill.BackfillM.LoadOrStore(key, nil)
@@ -148,8 +148,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 // Backfill bars from start
 func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
-
-	log.Info("backfillBars(%s)", symbol)
 
 	var (
 		start time.Time
@@ -216,8 +214,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 		stop = true
 	}
 	
-	log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
-
+	// log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
+	
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)

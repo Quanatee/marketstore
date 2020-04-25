@@ -31,8 +31,6 @@ func SetMarketType(marketType string) {
 
 func Bars(symbol string, from, to time.Time) (err error) {
 
-	log.Info("backfill.Bars(%s, %v, %v)", symbol, from, to)
-
 	if from.IsZero() {
 		from = time.Date(2017, 1, 1, 0, 0, 0, 0, NY)
 	}
@@ -46,7 +44,7 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		return err
 	}
 
-	log.Info("backfill.Bars(%s) len(%v)", symbol, len(ohlcv.Epoch))
+	// log.Info("backfill.Bars(%s) len(%v)", symbol, len(ohlcv.Epoch))
 
 	if len(ohlcv.Epoch) == 0 {
 		return

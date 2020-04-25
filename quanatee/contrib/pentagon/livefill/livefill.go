@@ -42,7 +42,7 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		return err
 	}
 
-	log.Info("livefill.Bars(%s) len(%v)", symbol, len(ohlcv.Epoch))
+	// log.Info("livefill.Bars(%s) len(%v)", symbol, len(ohlcv.Epoch))
 
 	if len(ohlcv.Epoch) == 0 {
 		return
