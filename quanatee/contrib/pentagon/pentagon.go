@@ -143,7 +143,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 // Backfill bars from start
 func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
-	
+
 	var (
 		from time.Time
 		err  error
@@ -204,8 +204,10 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	
 	log.Info("backfillBars() %s from %v", symbol, from)
 	
+	to := time.Unix(endEpoch, 0)
+	
 	// request & write the missing bars
-	if err = backfill.Bars(symbol, from, time.Time{}); err != nil {
+	if err = backfill.Bars(symbol, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
 }
