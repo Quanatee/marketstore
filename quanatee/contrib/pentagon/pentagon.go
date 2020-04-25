@@ -129,7 +129,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					defer wg.Done()
 
 					// backfill the symbol in parallel
-					qf.backfillBars(symbol, value)
+					qf.backfillBars(symbol, value.(int64))
 					backfill.BackfillM.Store(key, nil)
 				}()
 			}
