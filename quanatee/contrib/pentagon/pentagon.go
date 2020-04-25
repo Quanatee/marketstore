@@ -17,6 +17,7 @@ import (
 	//"github.com/alpacahq/marketstore/utils"
 	"github.com/alpacahq/marketstore/utils/io"
 	"github.com/alpacahq/marketstore/utils/log"
+	"gopkg.in/yaml.v2"
 )
 
 type QuanateeFetcher struct {
@@ -35,9 +36,9 @@ type FetcherConfig struct {
 // NewBgWorker returns a new instances of QuanateeFetcher. See FetcherConfig
 // for more details about configuring QuanateeFetcher.
 func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
-	data, _ := json.Marshal(conf)
+	data, _ := yaml.Marshal(conf)
 	config := FetcherConfig{}
-	err = json.Unmarshal(data, &config)
+	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		return
     }
