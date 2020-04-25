@@ -54,8 +54,8 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
 
-	log.Info("Polygon Key: %s", qf.config.PolygonApiKey)
-	log.Info("Market Type: %s", qf.config.MarketType)
+	//log.Info("Polygon Key: %s", qf.config.PolygonApiKey)
+	//log.Info("Market Type: %s", qf.config.MarketType)
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	livefill.SetMarketType(qf.config.MarketType)
 	backfill.SetMarketType(qf.config.MarketType)
