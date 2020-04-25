@@ -144,8 +144,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 // Backfill bars from start
 func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) {
 	
-	log.Info("backfillBars() %s endEpoch %v", symbol, endEpoch)
-
 	var (
 		from time.Time
 		err  error
