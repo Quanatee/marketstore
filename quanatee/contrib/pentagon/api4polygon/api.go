@@ -136,7 +136,7 @@ func ListTickers() (*ListTickersResponse, error) {
 
 func GetLiveAggregates(
 	symbol, multiplier, resolution string,
-	from, to time.Time) (*Aggv2, error) {
+	from, to time.Time) (*OHLCV, error) {
 	
 		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.AddDate(0, 0, -1).Format(time.RFC3339), to.AddDate(0, 0, 1).Format(time.RFC3339)))
 	if err != nil {
@@ -181,7 +181,7 @@ func GetLiveAggregates(
 
 func GetPastAggregates(
 	symbol, multiplier, resolution string,
-	from, to time.Time) (*Aggv2, error) {
+	from, to time.Time) (*OHLCV, error) {
 	
 		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.Format(time.RFC3339), to.Format(time.RFC3339)))
 	if err != nil {
