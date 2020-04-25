@@ -212,7 +212,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 
 	to := from.AddDate(0, 0, 7)
 	if to.Unix() >= end.Unix() {
-		to = end.Unix()
+		to = end
 		stop = true
 	}
 	
