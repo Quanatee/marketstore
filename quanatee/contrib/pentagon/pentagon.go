@@ -130,7 +130,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 						log.Info("%s backfill complete", symbol)
 						backfill.BackfillM.Store(key, nil)
 					} else {
-						log.Info("%s backfill from: ", symbol, time.Unix(value.(int64), 0))
+						log.Info("%s backfill from: ", symbol, time.Unix(value, 0))
 						backfill.BackfillM.LoadOrStore(key, nil)
 					}
 				}()
