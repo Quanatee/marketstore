@@ -130,7 +130,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 						log.Info("%s backfill complete", symbol)
 						backfill.BackfillM.Store(key, nil)
 					} else {
-						log.Info("%s backfill from: ", symbol, time.Unix(value, 0))
 						backfill.BackfillM.LoadOrStore(key, nil)
 					}
 				}()
@@ -154,6 +153,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 
 	var (
 		start time.Time
+		end   time.Time
 		from time.Time
 		err  error
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
@@ -171,6 +171,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 			break
 		}
 	}
+
+	end = time.Unix(endEpoch, 0)
 
 	// query the latest entry prior to the streamed record	
 	instance := executor.ThisInstance
@@ -209,11 +211,13 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 	}
 
 	to := from.AddDate(0, 0, 7)
-	if to.Unix() >= time.Now().Unix() {
-		to = time.Now().Unix()
+	if to.Unix() >= end.Unix() {
+		to = end.Unix()
 		stop = true
 	}
 	
+	log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
+
 	// request & write the missing bars
 	if err = backfill.Bars(symbol, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
