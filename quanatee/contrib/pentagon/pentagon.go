@@ -33,9 +33,6 @@ type FetcherConfig struct {
 	Symbols        []string `yaml:"symbols"`
 }
 
-var firstLoop bool
-firstLoop = true
-
 // NewBgWorker returns a new instances of QuanateeFetcher. See FetcherConfig
 // for more details about configuring QuanateeFetcher.
 func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
@@ -67,6 +64,8 @@ func (qf *QuanateeFetcher) Run() {
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
 	
+	firstLoop := true
+
 	for {
 
 		for {
