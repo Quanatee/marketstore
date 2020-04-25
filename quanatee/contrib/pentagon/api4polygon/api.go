@@ -158,7 +158,7 @@ func GetLiveAggregates(
 		return &OHLCV{}, nil
 	}
 
-	length = len(agg.PriceData)
+	length := len(agg.PriceData)
     ohlcv := &OHLCV{
         Epoch: make([]int64, length),
         Open: make([]float32, length),
@@ -211,7 +211,7 @@ func GetPastAggregates(
 		return &OHLCV{}, nil
 	}
 	
-	length = len(agg.PriceData)
+	length := len(agg.PriceData)
     ohlcv := &House{
         Epoch: make([]int64, length),
         Open: make([]float32, length),
