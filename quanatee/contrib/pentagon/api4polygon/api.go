@@ -150,6 +150,11 @@ func GetLiveAggregates(
 	}
 
 	length := len(agg.PriceData)
+
+	if length == 0 {
+		return &OHLCV{}, nil
+	}
+	
     ohlcv := &OHLCV{
         Epoch: make([]int64, length),
         Open: make([]float32, length),
