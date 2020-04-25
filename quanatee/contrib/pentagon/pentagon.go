@@ -87,7 +87,7 @@ func (qf *QuanateeFetcher) Run() {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			} else {
 				if first_loop == true {
-					backfill.BackfillM.LoadOrStore(symbol, from)
+					backfill.BackfillM.LoadOrStore(symbol, from.Unix())
 					first_loop = false
 				}
 			}
@@ -103,9 +103,15 @@ func (qf *QuanateeFetcher) Run() {
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
+
+	log.Info("workBackfillBars()")
+
 	ticker := time.NewTicker(30 * time.Second)
 
 	for range ticker.C {
+		
+		log.Info("workBackfillBars() %v", ticker.C)
+		
 		wg := sync.WaitGroup{}
 		count := 0
 
