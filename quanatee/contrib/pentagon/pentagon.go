@@ -53,9 +53,9 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 func (qf *QuanateeFetcher) Run() {
 
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
-	
+
 	for _, symbol := range qf.config.Symbols {
-		backfill.BackfillM.LoadOrStore(bar.Symbol, time.Now().Unix())
+		backfill.BackfillM.LoadOrStore(symbol, time.Now().Unix())
 	}
 
 	select {}
