@@ -152,38 +152,9 @@ func GetLiveAggregates(
 	agg := &Aggv2{}
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	if err != nil {
-		return nil, err
-	}
-	if agg["resultsCount"] == 0 {
-		return nil, nil
-	}
-
-	return agg, nil
-}
-
-func GetPastAggregates(
-	symbol, multiplier, resolution string,
-	from, to time.Time) (*Aggv2, error) {
-	
-		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.AddDate(0, 0, -1).Format(time.RFC3339), to.AddDate(0, 0, 1).Format(time.RFC3339)))
-	if err != nil {
-		return nil, err
-	}
-
-	q := u.Query()
-	q.Set("apiKey", apiKey)
-	q.Set("unadjusted", "true")
-
-	u.RawQuery = q.Encode()
-
-	agg := &Aggv2{}
-	err = downloadAndUnmarshal(u.String(), retryCount, agg)
-	
-	if err != nil {
 		return NewOHLCV(0), err
 	}
-
-	if agg["resultsCount"] == 0 {
+	if agg.resultsCount == 0 {
 		return NewOHLCV(0), nil
 	}
 
@@ -202,7 +173,54 @@ func GetPastAggregates(
 			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
 
 		}
-		
+
+	}
+	
+	return ohlcv, nil
+}
+
+func GetPastAggregates(
+	symbol, multiplier, resolution string,
+	from, to time.Time) (*Aggv2, error) {
+	
+		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.Format(time.RFC3339), to.Format(time.RFC3339)))
+	if err != nil {
+		return nil, err
+	}
+
+	q := u.Query()
+	q.Set("apiKey", apiKey)
+	q.Set("unadjusted", "true")
+
+	u.RawQuery = q.Encode()
+
+	agg := &Aggv2{}
+	err = downloadAndUnmarshal(u.String(), retryCount, agg)
+	
+	if err != nil {
+		return NewOHLCV(0), err
+	}
+
+	if agg.resultsCount == 0 {
+		return NewOHLCV(0), nil
+	}
+
+	ohlcv := NewOHLCV(len(agg.PriceData))
+
+    for bar := 0; bar < len(agg.PriceData); bar++ {
+
+		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
+
+			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
+			ohlcv.Open[bar] = agg.PriceData[bar].Open
+			ohlcv.High[bar] = agg.PriceData[bar].High
+			ohlcv.Low[bar] = agg.PriceData[bar].Low
+			ohlcv.Close[bar] = agg.PriceData[bar].Close
+			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
+			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
+
+		}
+
 	}
 			
 	return ohlcv, nil
