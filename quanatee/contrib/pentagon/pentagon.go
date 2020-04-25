@@ -26,7 +26,7 @@ type QuanateeFetcher struct {
 type FetcherConfig struct {
     PolygonApiKey  string   `yaml:"polygon_api_key"`
     TiingoApiKey   string   `yaml:"tiingo_api_key"`
-	twelveApiKey   string   `yaml:"polygon_api_key"`
+	twelveApiKey   string   `yaml:"twelve_api_key"`
 	MarketType     string   `yaml:"market_type"`
 	QueryStart     string   `yaml:"query_start"`
 	Symbols        []string `yaml:"symbols"`
