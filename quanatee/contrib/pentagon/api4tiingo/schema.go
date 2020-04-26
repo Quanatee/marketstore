@@ -20,7 +20,7 @@ type AggCrypto1 struct {
 }
 
 type AggCrypto struct {
-	PriceData	[]AggCrypto1
+	CryptoData	[]AggCrypto1
 }
 
 // Forex and Stocks
