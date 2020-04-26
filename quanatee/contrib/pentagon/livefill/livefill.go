@@ -45,7 +45,15 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		// return err
 	} else {
 		if len(ohlcv_polygon.HLC) > 0 {
-			ohlcvs = append(ohlcvs, OHLCV_map(ohlcv_polygon))
+			reconstruct := OHLCV_map{
+				Open: ohlcv_polygon.Open,
+				High: ohlcv_polygon.High,
+				Low: ohlcv_polygon.Low,
+				Close: ohlcv_polygon.Close,
+				HLC: ohlcv_polygon.HLC,
+				Volume: ohlcv_polygon.Volume,
+			}
+			ohlcvs = append(ohlcvs, reconstruct)
 		}
 	}
 	ohlcv_tiingo, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
@@ -54,7 +62,15 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		// return err
 	} else {
 		if len(ohlcv_tiingo.HLC) > 0 {
-			ohlcvs = append(ohlcvs, OHLCV_map(ohlcv_tiingo))
+			reconstruct := OHLCV_map{
+				Open: ohlcv_polygon.Open,
+				High: ohlcv_polygon.High,
+				Low: ohlcv_polygon.Low,
+				Close: ohlcv_polygon.Close,
+				HLC: ohlcv_polygon.HLC,
+				Volume: ohlcv_polygon.Volume,
+			}
+			ohlcvs = append(ohlcvs, reconstruct)
 		}
 	}
 
