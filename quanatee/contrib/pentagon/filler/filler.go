@@ -118,11 +118,11 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
-	cs.AddColumn("Open", Open)
-	cs.AddColumn("High", High)
-	cs.AddColumn("Low", Low)
-	cs.AddColumn("HLC", HLC)
-	cs.AddColumn("Volume", Volume)
+	cs.AddColumn("Open", Opens)
+	cs.AddColumn("High", Highs)
+	cs.AddColumn("Low", Lows)
+	cs.AddColumn("HLC", HLCs)
+	cs.AddColumn("Volume", Volumes)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
 	csm := io.NewColumnSeriesMap()
