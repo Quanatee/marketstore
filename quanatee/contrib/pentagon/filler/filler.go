@@ -3,7 +3,7 @@ package livefill
 import (
 	"fmt"
 	//"math"
-	//"sync"
+	"sync"
 	"time"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
