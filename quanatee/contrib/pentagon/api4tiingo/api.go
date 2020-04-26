@@ -83,7 +83,11 @@ func GetAggregates(
 	if err != nil {
 		return &OHLCV_map{}, err
 	}
-	
+
+	if len(aggCrypto) == 0 {
+		return &OHLCV_map{}, nil
+	}
+
 	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto[0].PriceData)
 	} else {
