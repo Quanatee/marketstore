@@ -19,7 +19,11 @@ import (
 )
 
 const (
-	aggURL     = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
+	aggURL = map[string]string{
+		"crypto": "%v/tiingo/crypto/prices",
+		"forex": "%v/fx/%v/prices",
+		"stocks": "%v/iex/%v/prices",
+	}
 	tickersURL = "%v/v2/reference/tickers"
 	retryCount = 10
 )
@@ -28,10 +32,6 @@ var (
 	baseURL = "https://api.tiingo.com"
 	apiKey 	 string
 	marketType  string
-	aggURL = map[string]string{
-		"crypto": "%v/tiingo/crypto/prices",
-		"forex": "%v/fx/%v/prices",
-		"stocks": "%v/iex/%v/prices",
 	u *URL
 	err error
 	}

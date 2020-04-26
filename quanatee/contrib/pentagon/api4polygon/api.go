@@ -22,17 +22,17 @@ const (
 	aggURL     = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
 	tickersURL = "%v/v2/reference/tickers"
 	retryCount = 10
+	symbolPrefix = map[string]string{
+		"crypto": "X:",
+		"forex": "C:",
+		"stocks": "",
+	}
 )
 	
 var (
 	baseURL = "https://api.polygon.io"
 	apiKey  	string
 	marketType  string
-	symbolPrefix = map[string]string{
-		"crypto": "X:",
-		"forex": "C:",
-		"stocks": "",
-	}
 )
 
 func SetAPIKey(key string) {
