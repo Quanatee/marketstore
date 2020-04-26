@@ -71,10 +71,11 @@ func (qf *QuanateeFetcher) Run() {
 	for {
 		
 		for {
-			if time.Now().Unix() > to.Unix() {
+			if time.Now().Unix() >= to.Unix() {
 				break
 			} else {
 				time.Sleep(to.Sub(time.Now()))
+				time.Sleep(1*time.Millisecond)
 			}
 		}
 		
