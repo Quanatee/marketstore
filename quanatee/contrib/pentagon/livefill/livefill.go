@@ -74,12 +74,12 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		return
 	}
 
-	Open := make([]float32, length)
-	High := make([]float32, length)
-	Low := make([]float32, length)
-	Close := make([]float32, length)
-	HLC := make([]float32, length)
-	Volume := make([]float32, length)
+	Open := make([]float32, len(Epochs))
+	High := make([]float32, len(Epochs))
+	Low := make([]float32, len(Epochs))
+	Close := make([]float32, len(Epochs))
+	HLC := make([]float32, len(Epochs))
+	Volume := make([]float32, len(Epochs))
 	
 	for _, Epoch := range Epochs {
 		var open, high, low, close, hlc, volume float32
