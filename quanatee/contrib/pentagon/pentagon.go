@@ -80,7 +80,7 @@ func (qf *QuanateeFetcher) Run() {
 		for _, symbol := range qf.config.Symbols {
 			var (
 				err  error
-				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
+				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 			)
 			if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
@@ -155,7 +155,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 		end   time.Time
 		from time.Time
 		err  error
-		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
+		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 	)
 	
 	for _, layout := range []string{
