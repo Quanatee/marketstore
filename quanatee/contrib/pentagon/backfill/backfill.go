@@ -10,7 +10,7 @@ import (
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/utils/io"
-	//"github.com/alpacahq/marketstore/utils/log"
+	"github.com/alpacahq/marketstore/utils/log"
 )
 
 var (
@@ -34,7 +34,7 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		return err
 	}
 
-	// log.Info("backfill.Bars(%s) len(%v)", symbol, len(ohlcv.Epoch))
+	log.Info("backfill.Bars(%s) ohlcv1(%v) ohlcv2(%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch))
 
 	if len(ohlcv.Epoch) == 0 {
 		return
