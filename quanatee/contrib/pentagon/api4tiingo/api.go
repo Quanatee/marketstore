@@ -83,7 +83,7 @@ func GetAggregates(
 	}
 	
 	if strings.Compare(marketType, "crypto") == 0 {
-		length = len(aggCrypto.CryptoData[0].PriceData)
+		length = len(aggCrypto[0].PriceData)
 	} else {
 		length = len(agg.PriceData)
 	}
@@ -110,20 +110,20 @@ func GetAggregates(
 		
 		if strings.Compare(marketType, "crypto") == 0 {
 			log.Info("%s: unchecked %v", symbol, bar)
-			if aggCrypto.CryptoData[0].PriceData[bar].Open != 0 && aggCrypto.CryptoData[0].PriceData[bar].High != 0 && aggCrypto.CryptoData[0].PriceData[bar].Low != 0 && aggCrypto.CryptoData[0].PriceData[bar].Close != 0 {
+			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
 				if startOfSlice == -1 {
 					startOfSlice = bar
 				}
                 endOfSlice = bar
 				log.Info("%s: checked %v", symbol, bar)
-				dt, _ := time.Parse(time.RFC3339, aggCrypto.CryptoData[0].PriceData[bar].Date)
+				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 				ohlcv.Epoch[bar] = dt.Unix()
-				ohlcv.Open[bar] = aggCrypto.CryptoData[0].PriceData[bar].Open
-				ohlcv.High[bar] = aggCrypto.CryptoData[0].PriceData[bar].High
-				ohlcv.Low[bar] = aggCrypto.CryptoData[0].PriceData[bar].Low
-				ohlcv.Close[bar] = aggCrypto.CryptoData[0].PriceData[bar].Close
-				ohlcv.HLC[bar] = (aggCrypto.CryptoData[0].PriceData[bar].High + aggCrypto.CryptoData[0].PriceData[bar].Low + aggCrypto.CryptoData[0].PriceData[bar].Close)/3
-				ohlcv.Volume[bar] = aggCrypto.CryptoData[0].PriceData[bar].Volume
+				ohlcv.Open[bar] = aggCrypto[0].PriceData[bar].Open
+				ohlcv.High[bar] = aggCrypto[0].PriceData[bar].High
+				ohlcv.Low[bar] = aggCrypto[0].PriceData[bar].Low
+				ohlcv.Close[bar] = aggCrypto[0].PriceData[bar].Close
+				ohlcv.HLC[bar] = (aggCrypto[0].PriceData[bar].High + aggCrypto[0].PriceData[bar].Low + aggCrypto[0].PriceData[bar].Close)/3
+				ohlcv.Volume[bar] = aggCrypto[0].PriceData[bar].Volume
 			}
 		} else {
 			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
