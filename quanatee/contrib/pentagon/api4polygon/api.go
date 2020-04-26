@@ -162,8 +162,14 @@ func GetAggregates(
 		return &OHLCV_map{}, nil
 	}
 	
-    ohlcv := &OHLCV_map{}
-	
+	ohlcv := &OHLCV_map{
+		Open: make(map[int64]float32),
+		High: make(map[int64]float32),
+		Low: make(map[int64]float32),
+		Close: make(map[int64]float32),
+		HLC: make(map[int64]float32),
+		Volume: make(map[int64]float32),
+	}
 	// Polygon candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
