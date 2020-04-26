@@ -119,6 +119,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	
 	if len(Epochs) <= 3 {
 		log.Info("filler.Bars(%s) livefill from %v to %v with %v sources | Epochs(%v) HLCs(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), Epochs, HLCs)
+	} else {
+		log.Info("filler.Bars(%s) backfill from %v to %v with %v sources | Length(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), len(Epochs))
 	}
 
 	cs := io.NewColumnSeries()
