@@ -112,10 +112,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Volumes = append(Volumes, volume)
 	}
 	
-	log.Info("filler.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
-	log.Info("filler.Bars(%s) Epochs(%v)", symbol, Epochs)
-	log.Info("filler.Bars(%s) HLC(%v)", symbol, HLC)
-	
+	if len(Epochs) <= 3 {
+		log.Info("filler.Bars(%s) livefill from %v to %v with %v sources | Epochs(%v) HLCs(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), Epochs, HLCs)
+	}
+
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
 	cs.AddColumn("Open", Opens)
