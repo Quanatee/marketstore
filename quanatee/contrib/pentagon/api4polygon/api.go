@@ -176,6 +176,10 @@ func GetAggregates(
     startOfSlice := -1
 	endOfSlice := -1
 	
+	// Polygon candle formula
+	// Requested at 14:05:01
+	// Candle built from 14:04 to 14:05
+	// Timestamped at 14:04
     for bar := 0; bar < length; bar++ {
 		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {

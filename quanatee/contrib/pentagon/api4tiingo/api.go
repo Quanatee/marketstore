@@ -108,37 +108,48 @@ func GetAggregates(
     startOfSlice := -1
     endOfSlice := -1
 	
+	// Tiingo candle formula
+	// Requested at 14:05:01
+	// Candle built from 14:04 to 14:05
+	// Timestamped at 14:05
+	// To align with polygon, we subract one minute from the timestamp
     for bar := 0; bar < length; bar++ {
 		
 		if strings.Compare(marketType, "crypto") == 0 {
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
-				if startOfSlice == -1 {
-					startOfSlice = bar
+				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
+				corrected_epoch = dt.Unix() - 60
+				if dt.Unix() - 60 >= from.Unix() {
+					if startOfSlice == -1 {
+						startOfSlice = bar
+					}
+					endOfSlice = bar
+					ohlcv.Epoch[bar] = corrected_epoch
+					ohlcv.Open[bar] = aggCrypto[0].PriceData[bar].Open
+					ohlcv.High[bar] = aggCrypto[0].PriceData[bar].High
+					ohlcv.Low[bar] = aggCrypto[0].PriceData[bar].Low
+					ohlcv.Close[bar] = aggCrypto[0].PriceData[bar].Close
+					ohlcv.HLC[bar] = (aggCrypto[0].PriceData[bar].High + aggCrypto[0].PriceData[bar].Low + aggCrypto[0].PriceData[bar].Close)/3
+					ohlcv.Volume[bar] = aggCrypto[0].PriceData[bar].Volume
 				}
-                endOfSlice = bar
-				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
-				ohlcv.Epoch[bar] = dt.Unix()
-				ohlcv.Open[bar] = aggCrypto[0].PriceData[bar].Open
-				ohlcv.High[bar] = aggCrypto[0].PriceData[bar].High
-				ohlcv.Low[bar] = aggCrypto[0].PriceData[bar].Low
-				ohlcv.Close[bar] = aggCrypto[0].PriceData[bar].Close
-				ohlcv.HLC[bar] = (aggCrypto[0].PriceData[bar].High + aggCrypto[0].PriceData[bar].Low + aggCrypto[0].PriceData[bar].Close)/3
-				ohlcv.Volume[bar] = aggCrypto[0].PriceData[bar].Volume
 			}
 		} else {
 			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-				if startOfSlice == -1 {
-					startOfSlice = bar
+				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
+				corrected_epoch = dt.Unix() - 60
+				if dt.Unix() - 60 >= from.Unix() {
+					if startOfSlice == -1 {
+						startOfSlice = bar
+					}
+					endOfSlice = bar
+					ohlcv.Epoch[bar] = corrected_epoch
+					ohlcv.Open[bar] = agg.PriceData[bar].Open
+					ohlcv.High[bar] = agg.PriceData[bar].High
+					ohlcv.Low[bar] = agg.PriceData[bar].Low
+					ohlcv.Close[bar] = agg.PriceData[bar].Close
+					ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
+					ohlcv.Volume[bar] = 0
 				}
-                endOfSlice = bar
-				dt, _ := time.Parse(time.RFC3339, agg.PriceData[bar].Date)
-				ohlcv.Epoch[bar] = dt.Unix()
-				ohlcv.Open[bar] = agg.PriceData[bar].Open
-				ohlcv.High[bar] = agg.PriceData[bar].High
-				ohlcv.Low[bar] = agg.PriceData[bar].Low
-				ohlcv.Close[bar] = agg.PriceData[bar].Close
-				ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-				ohlcv.Volume[bar] = 0
 			}
 		}
 	}

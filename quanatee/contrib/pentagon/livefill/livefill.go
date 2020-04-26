@@ -26,19 +26,11 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	// Polygon candle formula
-	// Requested at 14:05:01
-	// Candle built from 14:04 to 14:05
-	// Timestamped at 14:04
 	ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
 		return err
 	}
 	
-	// Tiingo candle formula
-	// Requested at 14:05:01
-	// Candle built from 14:04 to 14:05
-	// Timestamped at 14:05
 	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 	if err2 != nil {
 		return err2
