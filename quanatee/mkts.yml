@@ -11,7 +11,7 @@ timezone: "UTC"
 triggers:
   - module: stream.so
     on: "*/*/*"
-  - module: ondiskagg.so
+  - module: pentaggregation.so
     on: "*/1Min/*"
     config:
       destinations:
