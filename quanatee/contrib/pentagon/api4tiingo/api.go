@@ -23,37 +23,72 @@ const (
 	tickersURL = "%v/v2/reference/tickers"
 	retryCount = 10
 )
-	
+
 var (
-	baseURL = "https://api.polygon.io"
-	apiKey  string
+	baseURL = "https://api.tiingo.com"
+	apiKey 	 string
+	marketType  string
+	aggURL = map[string]string{
+		"crypto": "%v/tiingo/crypto/prices",
+		"forex": "%v/fx/%v/prices",
+		"stocks": "%v/iex/%v/prices",
+	u *URL
+	err error
+	}
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
 }
 
+func SetMarketType(marketType string) {
+	marketType = marketType
+}
+
 func GetAggregates(
 	symbol, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
-		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
+
+	if marketType == "crypto" {
+		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL))
+	} else {
+		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol))
+	}
 	if err != nil {
 		return nil, err
 	}
 	
 	q := u.Query()
-	q.Set("apiKey", apiKey)
-	q.Set("unadjusted", "true")
+	q.Set("token", apiKey)
+	q.Set("resampleFreq", "1min")
+	q.Set("startDate", from.RFC3339)
+	q.Set("endDate", to.RFC3339)
+	if marketType == "crypto" {
+		q.Set("tickers", symbol)
+	} else if marketType == "stocks" {
+		q.Set("afterHours", "false")
+		q.Set("forceFill", "false")
+	}
 
 	u.RawQuery = q.Encode()
 
-	agg := &Aggv2{}
+	if marketType == "crypto" {
+		agg := &AggCrypto{}
+	else {
+		agg := &Agg{}
+	}
+
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	if err != nil {
 		return &OHLCV{}, err
 	}
 
-	length := len(agg.PriceData)
+	if marketType == "crypto" {
+		agg := &AggCrypto{}
+		length := len(agg[0].PriceData)
+	else {
+		length := len(agg)
+	}
 
 	if length == 0 {
 		return &OHLCV{}, nil
@@ -71,18 +106,27 @@ func GetAggregates(
 	
     for bar := 0; bar < length; bar++ {
 		
-		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-
-			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
-			ohlcv.Open[bar] = agg.PriceData[bar].Open
-			ohlcv.High[bar] = agg.PriceData[bar].High
-			ohlcv.Low[bar] = agg.PriceData[bar].Low
-			ohlcv.Close[bar] = agg.PriceData[bar].Close
-			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
-
+		if marketType == "crypto" {
+			if agg[0].PriceData[bar].Open != 0 && agg[0].PriceData[bar].High != 0 && agg[0].PriceData[bar].Low != 0 && agg[0].PriceData[bar].Close != 0 {
+				ohlcv.Epoch[bar] = time.Parse(time.RFC3339, agg[0].PriceData[bar].Date).Unix()
+				ohlcv.Open[bar] = agg[0].PriceData[bar].Open
+				ohlcv.High[bar] = agg[0].PriceData[bar].High
+				ohlcv.Low[bar] = agg[0].PriceData[bar].Low
+				ohlcv.Close[bar] = agg[0].PriceData[bar].Close
+				ohlcv.HLC[bar] = (agg[0].PriceData[bar].High + agg[0].PriceData[bar].Low + agg[0].PriceData[bar].Close)/3
+				ohlcv.Volume[bar] = agg[0].PriceData[bar].Volume
+			}
+		else {
+			if agg[bar].Open != 0 && agg[bar].High != 0 && agg[bar].Low != 0 && agg[bar].Close != 0 {
+				ohlcv.Epoch[bar] = time.Parse(time.RFC3339, agg[bar].Date).Unix()
+				ohlcv.Open[bar] = agg[bar].Open
+				ohlcv.High[bar] = agg[bar].High
+				ohlcv.Low[bar] = agg[bar].Low
+				ohlcv.Close[bar] = agg[bar].Close
+				ohlcv.HLC[bar] = (agg[bar].High + agg[bar].Low + agg[bar].Close)/3
+				ohlcv.Volume[bar] = 0
+			}
 		}
-
 	}
 	
 	return ohlcv, nil

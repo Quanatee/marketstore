@@ -1,24 +1,32 @@
 package api4tiingo
 
-type AggData struct {
-	Ticker         string  `json:"T"`
-	Volume         float32 `json:"v"`
-	VolumeWeighted float32 `json:"vw"`
-	Open           float32 `json:"o"`
-	High           float32 `json:"h"`
-	Low            float32 `json:"l"`
-	Close          float32 `json:"c"`
-	Timestamp      int64   `json:"t"`
-	Ticks          int64   `json:"n"`
+// Crypto
+type cryptoData struct {
+	TradesDone     float32 `json:"tradesDone"`
+	Close          float32 `json:"close"`
+	VolumeNotional float32 `json:"volumeNotional"`
+	Low            float32 `json:"low"`
+	Open           float32 `json:"open"`
+	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
+	High           float32 `json:"high"`
+	Volume         float32 `json:"volume"`
 }
 
-type Aggv2 struct {
-	Symbol          string        `json:"ticker"`
-	Status          string        `json:"status"`
-	Adjusted        bool          `json:"adjusted"`
-	queryCount      int64         `json:"queryCount"`
-	resultsCount    int64         `json:"resultsCount"`
-	PriceData       []AggData     `json:"results"`
+type AggCrypto struct {
+	Ticker        string      `json:"ticker"`
+	BaseCurrency  string      `json:"baseCurrency"`
+	QuoteCurrency string      `json:"quoteCurrency"`
+	PriceData     []priceData `json:"priceData"`
+}
+
+// Forex and Stocks
+type Agg struct {
+	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
+	Ticker         string  `json:"ticker"`
+	Open           float32 `json:"open"`
+	Low            float32 `json:"low"`
+	High           float32 `json:"high"`
+	Close          float32 `json:"close"`
 }
 
 type OHLCV struct {

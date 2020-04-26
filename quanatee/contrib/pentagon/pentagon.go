@@ -57,8 +57,9 @@ func (qf *QuanateeFetcher) Run() {
 	//log.Info("Polygon Key: %s", qf.config.PolygonApiKey)
 	//log.Info("Market Type: %s", qf.config.MarketType)
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
-	livefill.SetMarketType(qf.config.MarketType)
-	backfill.SetMarketType(qf.config.MarketType)
+	api4polygon.SetMarketType(qf.config.MarketType)
+	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
+	api4tiingo.SetMarketType(qf.config.MarketType)
 
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)

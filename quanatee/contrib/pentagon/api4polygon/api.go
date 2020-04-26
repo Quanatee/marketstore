@@ -26,11 +26,21 @@ const (
 	
 var (
 	baseURL = "https://api.polygon.io"
-	apiKey  string
+	apiKey  	string
+	marketType  string
+	symbolPrefix = map[string]string{
+		"crypto": "X:",
+		"forex": "C:",
+		"stocks": "",
+	}
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
+}
+
+func SetMarketType(marketType string) {
+	marketType = marketType
 }
 
 type ListTickersResponse struct {
@@ -128,7 +138,8 @@ func ListTickers() (*ListTickersResponse, error) {
 func GetAggregates(
 	symbol, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
-		u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
+		
+	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
 	if err != nil {
 		return nil, err
 	}

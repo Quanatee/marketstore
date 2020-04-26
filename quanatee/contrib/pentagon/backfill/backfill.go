@@ -15,17 +15,7 @@ import (
 var (
 	ErrRetry  = fmt.Errorf("retry error")
 	BackfillM *sync.Map
-	MarketType string
-	PolygonPrefix = map[string]string{
-		"forex": "C:",
-		"crypto": "X:",
-		"stocks": "",
-	}
 )
-
-func SetMarketType(marketType string) {
-	MarketType = marketType
-}
 
 func Bars(symbol string, from, to time.Time) (err error) {
 
@@ -37,8 +27,9 @@ func Bars(symbol string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	ohlcv, err := api4polygon.GetAggregates(PolygonPrefix[MarketType]+symbol, "1", "minute", from, to)
-	if err != nil {
+	ohlcv, err := api4polygon.GetAggregates(symbol, "1", "minute", from, to)
+	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, "1", "minute", from, to)
+	if err != nil && err2 != nil {
 		return err
 	}
 
