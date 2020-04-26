@@ -144,13 +144,13 @@ func GetAggregates(
 	}
 
     if startOfSlice > -1 && endOfSlice > -1 {
-        ohlcv.Epoch = ohlcv.Epoch[startOfSlice+1:endOfSlice+1]
-        ohlcv.Open = ohlcv.Open[startOfSlice+1:endOfSlice+1]
-        ohlcv.High = ohlcv.High[startOfSlice+1:endOfSlice+1]
-        ohlcv.Low = ohlcv.Low[startOfSlice+1:endOfSlice+1]
-        ohlcv.Close = ohlcv.Close[startOfSlice+1:endOfSlice+1]
-        ohlcv.HLC = ohlcv.HLC[startOfSlice+1:endOfSlice+1]
-        ohlcv.Volume = ohlcv.Volume[startOfSlice+1:endOfSlice+1]
+        ohlcv.Epoch = ohlcv.Epoch[startOfSlice:endOfSlice+1]
+        ohlcv.Open = ohlcv.Open[startOfSlice:endOfSlice+1]
+        ohlcv.High = ohlcv.High[startOfSlice:endOfSlice+1]
+        ohlcv.Low = ohlcv.Low[startOfSlice:endOfSlice+1]
+        ohlcv.Close = ohlcv.Close[startOfSlice:endOfSlice+1]
+        ohlcv.HLC = ohlcv.HLC[startOfSlice:endOfSlice+1]
+        ohlcv.Volume = ohlcv.Volume[startOfSlice:endOfSlice+1]
 		return ohlcv, nil
 	}
 
