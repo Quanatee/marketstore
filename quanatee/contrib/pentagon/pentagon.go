@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/backfill"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/livefill"
 	//"github.com/alpacahq/marketstore/contrib/polygon/handlers"
