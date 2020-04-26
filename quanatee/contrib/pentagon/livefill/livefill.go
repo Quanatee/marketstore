@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/utils/io"
 	"github.com/alpacahq/marketstore/utils/log"
