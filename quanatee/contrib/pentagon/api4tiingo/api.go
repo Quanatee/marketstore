@@ -73,7 +73,7 @@ func GetAggregates(
 
 	if marketType == "crypto" {
 		agg := &AggCrypto{}
-	else {
+	} else {
 		agg := &Agg{}
 	}
 
