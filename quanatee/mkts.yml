@@ -11,15 +11,15 @@ timezone: "UTC"
 triggers:
   - module: stream.so
     on: "*/*/*"
-  # - module: pentaggregation.so
-  #   on: "*/1Min/Price"
-  #   config:
-  #     destinations:
-  #       - 6Min
-  #       - 12Min
-  #       - 15Min
-  #       - 1H
-  #       - 4H
+  - module: pentaggregation.so
+    on: "*/1Min/Price"
+    config:
+      destinations:
+        - 6Min
+        - 12Min
+        - 15Min
+        - 1H
+        - 4H
 bgworkers:
   - module: pentagon.so
     config:

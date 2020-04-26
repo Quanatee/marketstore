@@ -121,6 +121,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	cs.AddColumn("Open", Opens)
 	cs.AddColumn("High", Highs)
 	cs.AddColumn("Low", Lows)
+	cs.AddColumn("Close", Closes)
 	cs.AddColumn("HLC", HLCs)
 	cs.AddColumn("Volume", Volumes)
 
