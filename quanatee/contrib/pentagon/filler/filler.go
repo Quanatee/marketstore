@@ -1,9 +1,9 @@
-package backfill
+package livefill
 
 import (
 	"fmt"
 	//"math"
-	"sync"
+	//"sync"
 	"time"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
@@ -119,10 +119,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	
 	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
-	log.Info("livefill.Bars(%s) HLC(%v)", symbol, len(HLC))
-	
-	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/OHLCV")
-	csm := io.NewColumnSeriesMap()
+	log.Info("livefill.Bars(%s) Epochs(%v)", symbol, Epochs)
+	log.Info("livefill.Bars(%s) HLC(%v)", symbol, HLC)
 	
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
@@ -131,6 +129,9 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	cs.AddColumn("Low", Low)
 	cs.AddColumn("HLC", HLC)
 	cs.AddColumn("Volume", Volume)
+
+	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
+	csm := io.NewColumnSeriesMap()
 	csm.AddColumnSeries(*tbk, cs)
 
 	return executor.WriteCSM(csm, false)

@@ -12,7 +12,7 @@ triggers:
   - module: stream.so
     on: "*/*/*"
   - module: pentaggregation.so
-    on: "*/1Min/*"
+    on: "*/1Min/Price"
     config:
       destinations:
         - 6Min

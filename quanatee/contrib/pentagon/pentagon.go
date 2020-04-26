@@ -9,8 +9,7 @@ import (
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
-	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/backfill"
-	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/livefill"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/filler"
 	//"github.com/alpacahq/marketstore/contrib/polygon/handlers"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/planner"
@@ -44,7 +43,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 		return
     }
     
-	backfill.BackfillM = &sync.Map{}
+	filler.BackfillM = &sync.Map{}
 	
 	return &QuanateeFetcher{
 		config: config,
@@ -83,13 +82,13 @@ func (qf *QuanateeFetcher) Run() {
 				err  error
 				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/OHLCV", symbol))
 			)
-			if err = livefill.Bars(symbol, qf.config.MarketType, from, to); err != nil {
+			if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
 				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
 			}
 			
 			if firstLoop == true {
 				log.Info("")
-				//backfill.BackfillM.LoadOrStore(symbol, from.Unix())
+				//filler.BackfillM.LoadOrStore(symbol, from.Unix())
 				//go qf.workBackfillBars()
 			}
 
@@ -117,7 +116,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
-		backfill.BackfillM.Range(func(key, value interface{}) bool {
+		filler.BackfillM.Range(func(key, value interface{}) bool {
 			symbol := key.(string)
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
@@ -130,9 +129,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					stop := qf.backfillBars(symbol, value.(int64))
 					if stop == true {
 						log.Info("%s backfill is complete", symbol)
-						backfill.BackfillM.Store(key, nil)
+						filler.BackfillM.Store(key, nil)
 					} else {
-						backfill.BackfillM.LoadOrStore(key, nil)
+						filler.BackfillM.LoadOrStore(key, nil)
 					}
 				}()
 			}
@@ -219,7 +218,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 	// log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
 	
 	// request & write the missing bars
-	if err = backfill.Bars(symbol, qf.config.MarketType, from, to); err != nil {
+	if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
 		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
 	
