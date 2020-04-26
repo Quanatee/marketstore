@@ -68,6 +68,7 @@ func GetAggregates(
 		q.Set("afterHours", "false")
 		q.Set("forceFill", "false")
 	}
+	log.Info("%v", u)
 
 	u.RawQuery = q.Encode()
 
