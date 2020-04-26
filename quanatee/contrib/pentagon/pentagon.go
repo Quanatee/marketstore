@@ -63,7 +63,7 @@ func (qf *QuanateeFetcher) Run() {
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
-	// to = to.Add(30*time.Second)
+	to = to.Add(1*time.Second)
 	// from = from.Add(-1*time.Second)
 	
 	firstLoop := true
@@ -88,7 +88,7 @@ func (qf *QuanateeFetcher) Run() {
 			}
 			
 			if firstLoop == true {
-				log.Info("First loop")
+				log.Info("")
 				//backfill.BackfillM.LoadOrStore(symbol, from.Unix())
 				//go qf.workBackfillBars()
 			}
