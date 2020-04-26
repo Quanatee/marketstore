@@ -53,7 +53,7 @@ func GetAggregates(
 	if err != nil {
 		return nil, err
 	}
-	log.Info("api: %s", apiKey)
+	
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", multiplier+resolution)
@@ -72,7 +72,7 @@ func GetAggregates(
 	aggCrypto := &AggCrypto{}
 	
 	if strings.Compare(marketType, "crypto") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, aggCrypto)
+		err = downloadAndUnmarshal(u.String(), retryCount, aggCrypto.CryptoData)
 	} else {
 		err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	}
