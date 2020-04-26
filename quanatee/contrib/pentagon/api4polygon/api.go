@@ -149,8 +149,9 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	agg := &Aggv2{}
-	err = downloadAndUnmarshal(u.String(), retryCount, agg)
+	//agg := &Aggv2{}
+	var agg Aggv2
+	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
 	if err != nil {
 		return &OHLCV{}, err
 	}

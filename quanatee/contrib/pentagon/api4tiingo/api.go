@@ -68,15 +68,16 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	agg := &Agg{}
+	// agg := &Agg{}
 	// aggCrypto := &AggCrypto{}
 	// aggCrypto := &[]AggCrypto{}
+	var agg Agg
 	var aggCrypto []AggCrypto
 
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
 	} else {
-		err = downloadAndUnmarshal(u.String(), retryCount, agg)
+		err = downloadAndUnmarshal(u.String(), retryCount, &agg)
 	}
 
 	if err != nil {
@@ -84,7 +85,7 @@ func GetAggregates(
 	}
 	
 	if strings.Compare(marketType, "crypto") == 0 {
-		length = len((aggCrypto)[0].PriceData)
+		length = len(aggCrypto[0].PriceData)
 	} else {
 		length = len(agg.PriceData)
 	}
@@ -110,21 +111,19 @@ func GetAggregates(
     for bar := 0; bar < length; bar++ {
 		
 		if strings.Compare(marketType, "crypto") == 0 {
-			log.Info("%s: unchecked %v", symbol, bar)
-			if (aggCrypto)[0].PriceData[bar].Open != 0 && (aggCrypto)[0].PriceData[bar].High != 0 && (aggCrypto)[0].PriceData[bar].Low != 0 && (aggCrypto)[0].PriceData[bar].Close != 0 {
+			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
 				if startOfSlice == -1 {
 					startOfSlice = bar
 				}
                 endOfSlice = bar
-				log.Info("%s: checked %v", symbol, bar)
-				dt, _ := time.Parse(time.RFC3339, (aggCrypto)[0].PriceData[bar].Date)
+				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 				ohlcv.Epoch[bar] = dt.Unix()
-				ohlcv.Open[bar] = (aggCrypto)[0].PriceData[bar].Open
-				ohlcv.High[bar] = (aggCrypto)[0].PriceData[bar].High
-				ohlcv.Low[bar] = (aggCrypto)[0].PriceData[bar].Low
-				ohlcv.Close[bar] = (aggCrypto)[0].PriceData[bar].Close
-				ohlcv.HLC[bar] = ((aggCrypto)[0].PriceData[bar].High + (aggCrypto)[0].PriceData[bar].Low + (aggCrypto)[0].PriceData[bar].Close)/3
-				ohlcv.Volume[bar] = (aggCrypto)[0].PriceData[bar].Volume
+				ohlcv.Open[bar] = aggCrypto[0].PriceData[bar].Open
+				ohlcv.High[bar] = aggCrypto[0].PriceData[bar].High
+				ohlcv.Low[bar] = aggCrypto[0].PriceData[bar].Low
+				ohlcv.Close[bar] = aggCrypto[0].PriceData[bar].Close
+				ohlcv.HLC[bar] = (aggCrypto[0].PriceData[bar].High + aggCrypto[0].PriceData[bar].Low + aggCrypto[0].PriceData[bar].Close)/3
+				ohlcv.Volume[bar] = aggCrypto[0].PriceData[bar].Volume
 			}
 		} else {
 			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
@@ -145,13 +144,13 @@ func GetAggregates(
 	}
 
     if startOfSlice > -1 && endOfSlice > -1 {
-        ohlcv.Epoch = ohlcv.Epoch[startOfSlice:endOfSlice+1]
-        ohlcv.Open = ohlcv.Open[startOfSlice:endOfSlice+1]
-        ohlcv.High = ohlcv.High[startOfSlice:endOfSlice+1]
-        ohlcv.Low = ohlcv.Low[startOfSlice:endOfSlice+1]
-        ohlcv.Close = ohlcv.Close[startOfSlice:endOfSlice+1]
-        ohlcv.HLC = ohlcv.HLC[startOfSlice:endOfSlice+1]
-        ohlcv.Volume = ohlcv.Volume[startOfSlice:endOfSlice+1]
+        ohlcv.Epoch = ohlcv.Epoch[startOfSlice+1:endOfSlice+1]
+        ohlcv.Open = ohlcv.Open[startOfSlice+1:endOfSlice+1]
+        ohlcv.High = ohlcv.High[startOfSlice+1:endOfSlice+1]
+        ohlcv.Low = ohlcv.Low[startOfSlice+1:endOfSlice+1]
+        ohlcv.Close = ohlcv.Close[startOfSlice+1:endOfSlice+1]
+        ohlcv.HLC = ohlcv.HLC[startOfSlice+1:endOfSlice+1]
+        ohlcv.Volume = ohlcv.Volume[startOfSlice+1:endOfSlice+1]
 		return ohlcv, nil
 	}
 
