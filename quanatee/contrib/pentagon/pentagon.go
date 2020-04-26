@@ -63,7 +63,7 @@ func (qf *QuanateeFetcher) Run() {
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
-	to := from.Add(time.Second)
+	to = to.Add(time.Second)
 	
 	firstLoop := true
 
