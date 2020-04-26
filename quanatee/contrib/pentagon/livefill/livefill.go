@@ -29,12 +29,12 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// Is always one candle behind:
 	// Time = 14:00
 	// Candle requested
-	ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
+	ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to.Add(3*time.Second))
 	if err != nil {
 		return err
 	}
 	
-	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
+	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to.Add(3*time.Second))
 	if err2 != nil {
 		return err2
 	}
@@ -46,7 +46,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
 	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v) ohlcv2[-1](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Epoch[0], ohlcv2.Epoch[0], ohlcv2.Epoch[len(ohlcv2.Epoch)-1])
 	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v) ohlcv2[-1](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Close[0], ohlcv2.Close[0], ohlcv2.Close[len(ohlcv2.Epoch)-1])
-	
+
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/OHLCV")
 	csm := io.NewColumnSeriesMap()
 	

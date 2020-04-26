@@ -60,18 +60,18 @@ func (qf *QuanateeFetcher) Run() {
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
 
-	from := time.Now()
+	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
 	// to = to.Add(30*time.Second)
-	from = from.Add(-1*time.Second)
+	// from = from.Add(-1*time.Second)
 	
 	firstLoop := true
 
 	for {
-
+		
 		for {
-			if time.Now().Unix() > to.Add(3*time.Second).Unix() {
+			if time.Now().Unix() > to.Unix() {
 				break
 			} else {
 				time.Sleep(to.Sub(time.Now()))
@@ -89,7 +89,6 @@ func (qf *QuanateeFetcher) Run() {
 			
 			if firstLoop == true {
 				log.Info("First loop")
-				firstLoop = false
 				//backfill.BackfillM.LoadOrStore(symbol, from.Unix())
 				//go qf.workBackfillBars()
 			}
@@ -99,6 +98,9 @@ func (qf *QuanateeFetcher) Run() {
 		from = from.Add(time.Minute)
 		to = to.Add(time.Minute)
 		
+		if firstLoop == true {
+			firstLoop = false
+		}
 	}
 
 	select {}
