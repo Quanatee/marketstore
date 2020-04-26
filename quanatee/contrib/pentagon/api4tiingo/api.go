@@ -48,13 +48,11 @@ func GetAggregates(
 	from, to time.Time) (*OHLCV, error) {
 
 	fullURL := ""
-	if marketType == "crypto" {
-		fullURL = aggURL[marketType] + baseURL
+	if strings.Compare(marketType, "crypto") == 0 {
+		fullURL = fmt.Sprintf(aggURL[marketType], baseURL)
 	} else {
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL, symbol)
 	}
-
-	log.Info("%s %s", marketType, fullURL)
 	
 	u, err := url.Parse(fullURL)
 	if err != nil {
@@ -66,7 +64,7 @@ func GetAggregates(
 	q.Set("resampleFreq", multiplier+resolution)
 	q.Set("startDate", from.Format(time.RFC3339))
 	q.Set("endDate", to.Format(time.RFC3339))
-	if marketType == "crypto" {
+	if strings.Compare(marketType, "crypto") == 0 {
 		q.Set("tickers", symbol)
 	} else if marketType == "stocks" {
 		q.Set("afterHours", "false")
@@ -89,7 +87,7 @@ func GetAggregates(
 		return &OHLCV{}, err
 	}
 	
-	if marketType == "crypto" {
+	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto.CryptoData[0].PriceData)
 	} else {
 		length = len(agg.PriceData)
@@ -115,7 +113,7 @@ func GetAggregates(
 	
     for bar := 0; bar < length; bar++ {
 		
-		if marketType == "crypto" {
+		if strings.Compare(marketType, "crypto") == 0 {
 			log.Info("%s: unchecked %v", symbol, bar)
 			if aggCrypto.CryptoData[0].PriceData[bar].Open != 0 && aggCrypto.CryptoData[0].PriceData[bar].High != 0 && aggCrypto.CryptoData[0].PriceData[bar].Low != 0 && aggCrypto.CryptoData[0].PriceData[bar].Close != 0 {
 				if startOfSlice == -1 {
