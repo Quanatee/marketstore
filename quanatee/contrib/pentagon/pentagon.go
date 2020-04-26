@@ -63,13 +63,15 @@ func (qf *QuanateeFetcher) Run() {
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
-		
+	// to = to.Add(30*time.Second)
+	from = from.Add(-1*time.Second)
+	
 	firstLoop := true
 
 	for {
 
 		for {
-			if time.Now().Unix() > to.Unix() {
+			if time.Now().Unix() > to.Add(3*time.Second).Unix() {
 				break
 			} else {
 				time.Sleep(to.Sub(time.Now()))
