@@ -54,6 +54,8 @@ func GetAggregates(
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL, symbol)
 	}
 
+	log.Info("%s", fullURL)
+	
 	u, err := url.Parse(fullURL)
 	if err != nil {
 		return nil, err
