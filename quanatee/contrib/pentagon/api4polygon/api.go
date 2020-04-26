@@ -176,6 +176,9 @@ func GetAggregates(
     startOfSlice := -1
 	endOfSlice := -1
 	
+	if length > 1 {
+		log.Info(length)
+	}
     for bar := 0; bar < length; bar++ {
 		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
