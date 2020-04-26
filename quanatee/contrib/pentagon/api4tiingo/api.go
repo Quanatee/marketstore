@@ -70,10 +70,11 @@ func GetAggregates(
 
 	agg := &Agg{}
 	// aggCrypto := &AggCrypto{}
-	aggCrypto := &[]AggCrypto{}
+	// aggCrypto := &[]AggCrypto{}
+	var aggCrypto []AggCrypto
 
 	if strings.Compare(marketType, "crypto") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, aggCrypto)
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
 	} else {
 		err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	}
