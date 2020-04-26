@@ -10,31 +10,29 @@ import (
 
 	"net/http"
 	"net/url"
-	"strconv"
+	//"strconv"
 	"time"
 
 	//"github.com/alpacahq/marketstore/utils/log"
-	"github.com/valyala/fasthttp"
+	//"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )
 
 const (
-	aggURL = map[string]string{
-		"crypto": "%v/tiingo/crypto/prices",
-		"forex": "%v/fx/%v/prices",
-		"stocks": "%v/iex/%v/prices",
-	}
 	tickersURL = "%v/v2/reference/tickers"
 	retryCount = 10
 )
 
 var (
+	aggURL = map[string]string{
+		"crypto": "%v/tiingo/crypto/prices",
+		"forex": "%v/fx/%v/prices",
+		"stocks": "%v/iex/%v/prices",
+	}
 	baseURL = "https://api.tiingo.com"
 	apiKey 	 string
 	marketType  string
-	u *URL
-	err error
-)
+}
 
 func SetAPIKey(key string) {
 	apiKey = key
