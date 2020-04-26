@@ -13,7 +13,7 @@ import (
 	//"strconv"
 	"time"
 
-	//"github.com/alpacahq/marketstore/utils/log"
+	"github.com/alpacahq/marketstore/utils/log"
 	//"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )
@@ -153,7 +153,7 @@ func GetAggregates(
         ohlcv.Volume = ohlcv.Volume[startOfSlice:endOfSlice+1]
 		return ohlcv, nil
 	}
-	
+
 	return &OHLCV{}, nil
 	
 }
