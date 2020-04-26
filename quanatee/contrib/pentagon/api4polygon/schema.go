@@ -1,6 +1,6 @@
 package api4polygon
 
-type AggData struct {
+type Agg1 struct {
 	Ticker         string  `json:"T"`
 	Volume         float32 `json:"v"`
 	VolumeWeighted float32 `json:"vw"`
@@ -18,7 +18,7 @@ type Aggv2 struct {
 	Adjusted        bool          `json:"adjusted"`
 	queryCount      int64         `json:"queryCount"`
 	resultsCount    int64         `json:"resultsCount"`
-	PriceData       []AggData     `json:"results"`
+	PriceData       []Agg1	      `json:"results"`
 }
 
 type OHLCV struct {

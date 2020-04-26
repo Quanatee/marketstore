@@ -49,9 +49,9 @@ func GetAggregates(
 	from, to time.Time) (*OHLCV, error) {
 
 	if marketType == "crypto" {
-		u, err = url.Parse(fmt.Sprintf(aggURL[marketType], baseURL))
+		u, err := url.Parse(fmt.Sprintf(aggURL[marketType], baseURL))
 	} else {
-		u, err = url.Parse(fmt.Sprintf(aggURL[marketType], baseURL, symbol))
+		u, err := url.Parse(fmt.Sprintf(aggURL[marketType], baseURL, symbol))
 	}
 	if err != nil {
 		return nil, err
@@ -60,8 +60,8 @@ func GetAggregates(
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", "1min")
-	q.Set("startDate", from.RFC3339())
-	q.Set("endDate", to.RFC3339())
+	q.Set("startDate", from.Format(time.RFC3339))
+	q.Set("endDate", to.Format(time.RFC3339))
 	if marketType == "crypto" {
 		q.Set("tickers", symbol)
 	} else if marketType == "stocks" {
@@ -81,7 +81,7 @@ func GetAggregates(
 		return &OHLCV{}, err
 	}
 
-	length := len(agg)
+	length := len(agg.PriceData)
 	if marketType == "crypto" {
 		length := len(agg[0].PriceData)
 	}
@@ -113,13 +113,13 @@ func GetAggregates(
 				ohlcv.Volume[bar] = agg[0].PriceData[bar].Volume
 			}
 		} else {
-			if agg[bar].Open != 0 && agg[bar].High != 0 && agg[bar].Low != 0 && agg[bar].Close != 0 {
-				ohlcv.Epoch[bar] = time.Parse(time.RFC3339, agg[bar].Date).Unix()
-				ohlcv.Open[bar] = agg[bar].Open
-				ohlcv.High[bar] = agg[bar].High
-				ohlcv.Low[bar] = agg[bar].Low
-				ohlcv.Close[bar] = agg[bar].Close
-				ohlcv.HLC[bar] = (agg[bar].High + agg[bar].Low + agg[bar].Close)/3
+			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
+				ohlcv.Epoch[bar] = time.Parse(time.RFC3339, agg.PriceData[bar].Date).Unix()
+				ohlcv.Open[bar] = agg.PriceData[bar].Open
+				ohlcv.High[bar] = agg.PriceData[bar].High
+				ohlcv.Low[bar] = agg.PriceData[bar].Low
+				ohlcv.Close[bar] = agg.PriceData[bar].Close
+				ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
 				ohlcv.Volume[bar] = 0
 			}
 		}
