@@ -41,7 +41,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 
 	ohlcv_polygon, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
-		log.Error("[polygon] bars livefill failure for: [%s] (%v)", symbol, err)
+		log.Error("[polygon] bars filler failure for: [%s] (%v)", symbol, err)
 		// return err
 	} else {
 		if len(ohlcv_polygon.HLC) > 0 {
@@ -58,7 +58,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	ohlcv_tiingo, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 	if err != nil {
-		log.Error("[tiingo] bars livefill failure for: [%s] (%v)", symbol, err)
+		log.Error("[tiingo] bars filler failure for: [%s] (%v)", symbol, err)
 		// return err
 	} else {
 		if len(ohlcv_tiingo.HLC) > 0 {
@@ -90,13 +90,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	if len(Epochs) == 0 {
 		return
 	}
-
-	Open := make([]float32, len(Epochs))
-	High := make([]float32, len(Epochs))
-	Low := make([]float32, len(Epochs))
-	Close := make([]float32, len(Epochs))
-	HLC := make([]float32, len(Epochs))
-	Volume := make([]float32, len(Epochs))
+	var Opens, Highs, Lows, Closes, HLCs, Volumes []float32
 	
 	for _, Epoch := range Epochs {
 		var open, high, low, close, hlc, volume float32
@@ -110,17 +104,17 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				volume += float32(ohlcv_.Volume[Epoch])
 			}
 		}
-		Open = append(Open, open / float32(len(ohlcvs)))
-		High = append(High, high / float32(len(ohlcvs)))
-		Low = append(Low, low / float32(len(ohlcvs)))
-		Close = append(Close, close / float32(len(ohlcvs)))
-		HLC = append(HLC, hlc / float32(len(ohlcvs)))
-		Volume = append(Volume, volume)
+		Opens = append(Opens, open / float32(len(ohlcvs)))
+		Highs = append(Highs, high / float32(len(ohlcvs)))
+		Lows = append(Lows, low / float32(len(ohlcvs)))
+		Closes = append(Closes, close / float32(len(ohlcvs)))
+		HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
+		Volumes = append(Volumes, volume)
 	}
 	
-	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
-	log.Info("livefill.Bars(%s) Epochs(%v)", symbol, Epochs)
-	log.Info("livefill.Bars(%s) HLC(%v)", symbol, HLC)
+	log.Info("filler.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
+	log.Info("filler.Bars(%s) Epochs(%v)", symbol, Epochs)
+	log.Info("filler.Bars(%s) HLC(%v)", symbol, HLC)
 	
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
