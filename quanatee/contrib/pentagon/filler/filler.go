@@ -24,6 +24,7 @@ type OHLCV_map struct {
 	Low       map[int64]float32
 	Close     map[int64]float32
 	HLC       map[int64]float32
+	Spread    map[int64]float32
 	Volume    map[int64]float32
 }
 
@@ -51,6 +52,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				Low: ohlcv_polygon.Low,
 				Close: ohlcv_polygon.Close,
 				HLC: ohlcv_polygon.HLC,
+				Spread: ohlcv_polygon.Spread,
 				Volume: ohlcv_polygon.Volume,
 			}
 			ohlcvs = append(ohlcvs, reconstruct)
@@ -63,12 +65,13 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	} else {
 		if len(ohlcv_tiingo.HLC) > 0 {
 			reconstruct := OHLCV_map{
-				Open: ohlcv_polygon.Open,
-				High: ohlcv_polygon.High,
-				Low: ohlcv_polygon.Low,
-				Close: ohlcv_polygon.Close,
-				HLC: ohlcv_polygon.HLC,
-				Volume: ohlcv_polygon.Volume,
+				Open: ohlcv_tiingo.Open,
+				High: ohlcv_tiingo.High,
+				Low: ohlcv_tiingo.Low,
+				Close: ohlcv_tiingo.Close,
+				HLC: ohlcv_tiingo.HLC,
+				Spread: ohlcv_tiingo.Spread,
+				Volume: ohlcv_tiingo.Volume,
 			}
 			ohlcvs = append(ohlcvs, reconstruct)
 		}
@@ -90,10 +93,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	if len(Epochs) == 0 {
 		return
 	}
-	var Opens, Highs, Lows, Closes, HLCs, Volumes []float32
+	var Opens, Highs, Lows, Closes, HLCs, Spreads, Volumes []float32
 	
 	for _, Epoch := range Epochs {
-		var open, high, low, close, hlc, volume float32
+		var open, high, low, close, hlc, spread, volume float32
 		for _, ohlcv_ := range ohlcvs {
 			if _, ok := ohlcv_.HLC[Epoch]; ok {
 				open += float32(ohlcv_.Open[Epoch])
@@ -101,6 +104,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				low += float32(ohlcv_.Low[Epoch])
 				close += float32(ohlcv_.Close[Epoch])
 				hlc += float32(ohlcv_.HLC[Epoch])
+				spread += float32(ohlcv_.Spread[Epoch])
 				volume += float32(ohlcv_.Volume[Epoch])
 			}
 		}
@@ -109,6 +113,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Lows = append(Lows, low / float32(len(ohlcvs)))
 		Closes = append(Closes, close / float32(len(ohlcvs)))
 		HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
+		Spreads = append(Spreads, spread / float32(len(ohlcvs)))
 		Volumes = append(Volumes, volume)
 	}
 	
@@ -123,6 +128,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	cs.AddColumn("Low", Lows)
 	cs.AddColumn("Close", Closes)
 	cs.AddColumn("HLC", HLCs)
+	cs.AddColumn("Spread", Spreads)
 	cs.AddColumn("Volume", Volumes)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")

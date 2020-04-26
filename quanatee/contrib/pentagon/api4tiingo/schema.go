@@ -33,21 +33,12 @@ type Agg struct {
 	PriceData	[]AggData
 }
 
-type OHLCV struct {
-	Epoch     []int64     `json:"epoch"`
-	Open      []float32   `json:"open"`
-	High      []float32   `json:"high"`
-	Low       []float32   `json:"low"`
-	Close     []float32   `json:"close"`
-	HLC       []float32   `json:"HLC"`
-	Volume    []float32   `json:"volume"`
-}
-
 type OHLCV_map struct {
 	Open      map[int64]float32
 	High      map[int64]float32
 	Low       map[int64]float32
 	Close     map[int64]float32
 	HLC       map[int64]float32
+	Spread    map[int64]float32
 	Volume    map[int64]float32
 }

@@ -168,6 +168,7 @@ func GetAggregates(
 		Low: make(map[int64]float32),
 		Close: make(map[int64]float32),
 		HLC: make(map[int64]float32),
+		Spread: make(map[int64]float32),
 		Volume: make(map[int64]float32),
 	}
 	// Polygon candle formula (Timestamp on open)
@@ -184,6 +185,7 @@ func GetAggregates(
 			ohlcv.Low[Epoch] = agg.PriceData[bar].Low
 			ohlcv.Close[Epoch] = agg.PriceData[bar].Close
 			ohlcv.HLC[Epoch] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
+			ohlcv.Spread[Epoch] = agg.PriceData[bar].High - agg.PriceData[bar].Low
 			ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
 
 		}

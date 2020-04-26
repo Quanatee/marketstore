@@ -287,6 +287,9 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	if cs.Exists("HLC") {
 		params = append(params, accumParam{"HLC", "avg", "HLC"})
     }
+	if cs.Exists("Spread") {
+		params = append(params, accumParam{"Spread", "avg", "Spread"})
+    }
 	if cs.Exists("Volume") {
 		params = append(params, accumParam{"Volume", "sum", "Volume"})
 	}

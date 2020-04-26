@@ -101,6 +101,7 @@ func GetAggregates(
 		Low: make(map[int64]float32),
 		Close: make(map[int64]float32),
 		HLC: make(map[int64]float32),
+		Spread: make(map[int64]float32),
 		Volume: make(map[int64]float32),
 	}
 	// Tiingo candle formula (Timestamp on close)
@@ -120,6 +121,7 @@ func GetAggregates(
 					ohlcv.Low[Epoch] = aggCrypto[0].PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggCrypto[0].PriceData[bar].Close
 					ohlcv.HLC[Epoch] = (aggCrypto[0].PriceData[bar].High + aggCrypto[0].PriceData[bar].Low + aggCrypto[0].PriceData[bar].Close)/3
+					ohlcv.Spread[Epoch] = aggCrypto[0].PriceData[bar].High - aggCrypto[0].PriceData[bar].Low
 					ohlcv.Volume[Epoch] = aggCrypto[0].PriceData[bar].Volume
 				}
 			}
@@ -133,7 +135,8 @@ func GetAggregates(
 					ohlcv.Low[Epoch] = agg.PriceData[bar].Low
 					ohlcv.Close[Epoch] = agg.PriceData[bar].Close
 					ohlcv.HLC[Epoch] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-					ohlcv.Volume[Epoch] = 0
+					ohlcv.Spread[Epoch] = agg.PriceData[bar].High - agg.PriceData[bar].Low
+					ohlcv.Volume[Epoch] = 1.0
 				}
 			}
 		}
