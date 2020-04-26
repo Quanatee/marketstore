@@ -91,6 +91,7 @@ func GetAggregates(
 	}
 
 	if length == 0 {
+		log.Info("%s: len %v", symbol, length)
 		return &OHLCV{}, nil
 	}
 	
