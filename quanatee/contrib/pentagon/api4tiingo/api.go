@@ -110,12 +110,13 @@ func GetAggregates(
     for bar := 0; bar < length; bar++ {
 		
 		if marketType == "crypto" {
+			log.Info("%s: unchecked %v", symbol, bar)
 			if aggCrypto.CryptoData[0].PriceData[bar].Open != 0 && aggCrypto.CryptoData[0].PriceData[bar].High != 0 && aggCrypto.CryptoData[0].PriceData[bar].Low != 0 && aggCrypto.CryptoData[0].PriceData[bar].Close != 0 {
 				if startOfSlice == -1 {
 					startOfSlice = bar
 				}
                 endOfSlice = bar
-				log.Info("%s: %v", symbol, bar)
+				log.Info("%s: checked %v", symbol, bar)
 				dt, _ := time.Parse(time.RFC3339, aggCrypto.CryptoData[0].PriceData[bar].Date)
 				ohlcv.Epoch[bar] = dt.Unix()
 				ohlcv.Open[bar] = aggCrypto.CryptoData[0].PriceData[bar].Open
