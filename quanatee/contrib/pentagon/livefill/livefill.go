@@ -27,9 +27,12 @@ func Bars(symbol string, from, to time.Time) (err error) {
 	}
 	
 	ohlcv, err := api4polygon.GetAggregates(symbol, "1", "minute", from, to)
-	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, "1", "min", from, to)
-	if err != nil && err2 != nil {
+	if err != nil {
 		return err
+	}
+	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, "1", "min", from, to)
+	if err2 != nil {
+		return err2
 	}
 	
 	log.Info("backfill.Bars(%s) ohlcv1(%v) ohlcv2(%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch))
