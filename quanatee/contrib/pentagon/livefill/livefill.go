@@ -36,8 +36,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	var ohlcvs []OHLCV_map
-	
+	ohlcvs := make([]OHLCV_map, 0)
+
 	ohlcv_polygon, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
 		log.Error("[polygon] bars livefill failure for: [%s] (%v)", symbol, err)
@@ -58,8 +58,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 
 	// Get the Epoch slice of the largest OHLCV set
-	var Epochs []int64
-	
+	Epochs := make([]int64, 0)
+
     for index, ohlcv_ := range ohlcvs {
 		if len(ohlcv_.HLC) > len(Epochs) {
 			// Epochs = make([]string, 0, len(len(ohlcv_.HLC)))
@@ -93,12 +93,12 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				volume += ohlcv_.Volume[Epoch]
 			}
 		}
-		Open = append(Open, open / len(ohlcvs))
-		High = append(High, high / len(ohlcvs))
-		Low = append(Low, low / len(ohlcvs))
-		Close = append(Close, close / len(ohlcvs))
-		HLC = append(HLC, hlc / len(ohlcvs))
-		Volume = append(Volume, volume)
+		Open = append(Open, float32(open) / len(ohlcvs))
+		High = append(High, float32(high) / len(ohlcvs))
+		Low = append(Low, float32(low) / len(ohlcvs))
+		Close = append(Close, float32(close) / len(ohlcvs))
+		HLC = append(HLC, float32(hlc) / len(ohlcvs))
+		Volume = append(float32(volume), volume)
 	}
 	
 	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
@@ -108,7 +108,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	csm := io.NewColumnSeriesMap()
 	
 	cs := io.NewColumnSeries()
-	cs.AddColumn("Epoch", Epoch)
+	cs.AddColumn("Epoch", Epochs)
 	cs.AddColumn("Open", Open)
 	cs.AddColumn("High", High)
 	cs.AddColumn("Low", Low)
