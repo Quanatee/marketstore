@@ -32,8 +32,6 @@ var (
 	baseURL = "https://api.tiingo.com"
 	apiKey 	 string
 	marketType  string
-	u url.URL
-	err error
 	length = 0
 )
 
@@ -49,11 +47,12 @@ func GetAggregates(
 	symbol, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
 
-	if marketType == "crypto" {
-		u, err = url.Parse(fmt.Sprintf(aggURL[marketType], baseURL))
-	} else {
-		u, err = url.Parse(fmt.Sprintf(aggURL[marketType], baseURL, symbol))
+	fullURL := fmt.Sprintf(aggURL[marketType], baseURL)
+	if marketType != "crypto" {
+		fullURL = fmt.Sprintf(aggURL[marketType], baseURL, symbol)
 	}
+
+	u, err := url.Parse(fullURL)
 	if err != nil {
 		return nil, err
 	}
