@@ -115,7 +115,7 @@ func GetAggregates(
 				ohlcv.HLC[bar] = (agg[0].PriceData[bar].High + agg[0].PriceData[bar].Low + agg[0].PriceData[bar].Close)/3
 				ohlcv.Volume[bar] = agg[0].PriceData[bar].Volume
 			}
-		else {
+		} else {
 			if agg[bar].Open != 0 && agg[bar].High != 0 && agg[bar].Low != 0 && agg[bar].Close != 0 {
 				ohlcv.Epoch[bar] = time.Parse(time.RFC3339, agg[bar].Date).Unix()
 				ohlcv.Open[bar] = agg[bar].Open
