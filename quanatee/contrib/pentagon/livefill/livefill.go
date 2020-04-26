@@ -26,6 +26,9 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
+	// Is always one candle behind:
+	// Time = 14:00
+	// Candle requested
 	ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
 		return err
@@ -35,11 +38,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	if err2 != nil {
 		return err2
 	}
-
+	log.info("livefill.Bars(%s) from %v to %v", from.Unix(), to.Unix())
 	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v) ohlcv2[-1](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Epoch[0], ohlcv2.Epoch[0], ohlcv2.Epoch[len(ohlcv2.Epoch)-1])
-
 	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v) ohlcv2[-1](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Close[0], ohlcv2.Close[0], ohlcv2.Close[len(ohlcv2.Epoch)-1])
-	
+
 	if len(ohlcv.Epoch) == 0 {
 		return
 	}
