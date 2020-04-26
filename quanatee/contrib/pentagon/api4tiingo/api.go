@@ -50,11 +50,11 @@ func GetAggregates(
 	fullURL := ""
 	if strings.Compare(marketType, "crypto") == 0 {
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL)
+		log.Info("c %s", fullURL)
 	} else {
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL, symbol)
+		log.Info("nc %s", fullURL)
 	}
-	
-	log.Info("%s", fullURL)
 
 	u, err := url.Parse(fullURL)
 	if err != nil {
