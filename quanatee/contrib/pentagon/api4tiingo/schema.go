@@ -16,7 +16,7 @@ type AggCrypto struct {
 	Ticker        string     	  `json:"ticker"`
 	BaseCurrency  string    	  `json:"baseCurrency"`
 	QuoteCurrency string  	      `json:"quoteCurrency"`
-	PriceData     []AggCrypto2	  `json:"priceData"`
+	PriceData     []AggCrypto1	  `json:"priceData"`
 }
 
 // Forex and Stocks
