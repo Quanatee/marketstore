@@ -88,8 +88,8 @@ func (qf *QuanateeFetcher) Run() {
 			
 			if firstLoop == true {
 				log.Info("")
-				//filler.BackfillM.LoadOrStore(symbol, from.Unix())
-				//go qf.workBackfillBars()
+				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+				go qf.workBackfillBars()
 			}
 
 		}
@@ -107,7 +107,7 @@ func (qf *QuanateeFetcher) Run() {
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(30 * time.Second)
 
 	for range ticker.C {
 		
