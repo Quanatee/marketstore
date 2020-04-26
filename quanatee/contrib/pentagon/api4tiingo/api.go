@@ -81,7 +81,7 @@ func GetAggregates(
 	}
 
 	if err != nil {
-		return &OHLCV{}, err
+		return &OHLCV_map{}, err
 	}
 	
 	if strings.Compare(marketType, "crypto") == 0 {
@@ -92,7 +92,7 @@ func GetAggregates(
 
 	if length == 0 {
 		log.Info("%s: len %v", symbol, length)
-		return &OHLCV{}, nil
+		return &OHLCV_map{}, nil
 	}
 	
     ohlcv := &OHLCV_map{}
