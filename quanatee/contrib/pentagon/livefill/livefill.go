@@ -28,22 +28,24 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	
 	ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
-		return err
+		log.Error("[polygon] bars livefill failure for: [%v] (%v)", tbk.String(), err)
+		// return err
 	}
 	
 	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 	if err2 != nil {
-		return err2
+		log.Error("[tiingo] bars livefill failure for: [%v] (%v)", tbk.String(), err2)
+		// return err2
 	}
 	
-	if len(ohlcv.Epoch) == 0 {
+	if len(ohlcv.Epoch) == 0 && len(ohlcv2.Epoch) == 0 {
 		return
 	}
 
 	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
-	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v) ohlcv2[-1](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Epoch[0], ohlcv2.Epoch[0], ohlcv2.Epoch[len(ohlcv2.Epoch)-1])
-	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v) ohlcv2[-1](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Close[0], ohlcv2.Close[0], ohlcv2.Close[len(ohlcv2.Epoch)-1])
-
+	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Epoch[0], ohlcv2.Epoch[0])
+	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2[0](%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Close[0], ohlcv2.Close[0])
+	
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/OHLCV")
 	csm := io.NewColumnSeriesMap()
 	

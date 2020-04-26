@@ -30,17 +30,19 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	
 	ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
-		return err
+		log.Error("[polygon] bars livefill failure for: [%v] (%v)", tbk.String(), err)
+		// return err
 	}
 	
 	ohlcv2, err2 := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 	if err2 != nil {
-		return err2
+		log.Error("[tiingo] bars livefill failure for: [%v] (%v)", tbk.String(), err2)
+		// return err2
 	}
 	
 	log.Info("backfill.Bars(%s) ohlcv1(%v) ohlcv2(%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch))
 
-	if len(ohlcv.Epoch) == 0 {
+	if len(ohlcv.Epoch) == 0 && len(ohlcv2.Epoch) == 0 {
 		return
 	}
 	
