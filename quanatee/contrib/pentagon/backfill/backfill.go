@@ -110,12 +110,12 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				volume += float32(ohlcv_.Volume[Epoch])
 			}
 		}
-		Open = append(Open, float32(open) / len(ohlcvs))
-		High = append(High, float32(high) / len(ohlcvs))
-		Low = append(Low, float32(low) / len(ohlcvs))
-		Close = append(Close, float32(close) / len(ohlcvs))
-		HLC = append(HLC, float32(hlc) / len(ohlcvs))
-		Volume = append(float32(volume), volume)
+		Open = append(Open, open / float32(len(ohlcvs)))
+		High = append(High, high / float32(len(ohlcvs)))
+		Low = append(Low, low / float32(len(ohlcvs)))
+		Close = append(Close, close / float32(len(ohlcvs)))
+		HLC = append(HLC, hlc / float32(len(ohlcvs)))
+		Volume = append(volume), volume)
 	}
 	
 	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
