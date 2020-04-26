@@ -34,7 +34,6 @@ var (
 	marketType  string
 	u *URL
 	err error
-	}
 )
 
 func SetAPIKey(key string) {
