@@ -53,7 +53,7 @@ func GetAggregates(
 	if err != nil {
 		return nil, err
 	}
-	log.Info(apiKey)
+	log.Info("api: %s", apiKey)
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", multiplier+resolution)
