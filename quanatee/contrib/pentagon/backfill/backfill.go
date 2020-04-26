@@ -77,7 +77,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// Get the Epoch slice of the largest OHLCV set
 	Epochs := make([]int64, 0)
 
-    for index, ohlcv_ := range ohlcvs {
+    for _, ohlcv_ := range ohlcvs {
 		if len(ohlcv_.HLC) > len(Epochs) {
 			// Epochs = make([]string, 0, len(len(ohlcv_.HLC)))
 			for key := range ohlcv_.HLC {
