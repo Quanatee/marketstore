@@ -32,7 +32,7 @@ var (
 	baseURL = "https://api.tiingo.com"
 	apiKey 	 string
 	marketType  string
-}
+)
 
 func SetAPIKey(key string) {
 	apiKey = key
