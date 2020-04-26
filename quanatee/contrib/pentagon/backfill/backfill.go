@@ -18,6 +18,16 @@ var (
 	BackfillM *sync.Map
 )
 
+type OHLCV struct {
+	Epoch     []int64     `json:"epoch"`
+	Open      []float32   `json:"open"`
+	High      []float32   `json:"high"`
+	Low       []float32   `json:"low"`
+	Close     []float32   `json:"close"`
+	HLC       []float32   `json:"HLC"`
+	Volume    []float32   `json:"volume"`
+}
+
 func Bars(symbol, marketType string, from, to time.Time) (err error) {
 
 	if from.IsZero() {

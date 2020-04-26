@@ -136,7 +136,7 @@ func ListTickers() (*ListTickersResponse, error) {
 
 func GetAggregates(
 	symbol, marketType, multiplier, resolution string,
-	from, to time.Time) (*OHLCV, error) {
+	from, to time.Time) (*OHLCV_map, error) {
 		
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
 	if err != nil {
@@ -153,28 +153,16 @@ func GetAggregates(
 	var agg Aggv2
 	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
 	if err != nil {
-		return &OHLCV{}, err
+		return &OHLCV_map{}, err
 	}
 
 	length := len(agg.PriceData)
 
 	if length == 0 {
-		return &OHLCV{}, nil
+		return &OHLCV_map{}, nil
 	}
 	
-    ohlcv := &OHLCV{
-        Epoch: make([]int64, length),
-        Open: make([]float32, length),
-        High: make([]float32, length),
-        Low: make([]float32, length),
-        Close: make([]float32, length),
-        HLC: make([]float32, length),
-        Volume: make([]float32, length),
-	}
-	
-    // Pointers to help slice into just the relevent datas
-    startOfSlice := -1
-	endOfSlice := -1
+    ohlcv := &OHLCV_map{}
 	
 	// Polygon candle formula (Timestamp on open)
 	// Requested at 14:05:01
@@ -183,34 +171,19 @@ func GetAggregates(
     for bar := 0; bar < length; bar++ {
 		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-			if startOfSlice == -1 {
-				startOfSlice = bar
-			}
-			endOfSlice = bar
-			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
-			ohlcv.Open[bar] = agg.PriceData[bar].Open
-			ohlcv.High[bar] = agg.PriceData[bar].High
-			ohlcv.Low[bar] = agg.PriceData[bar].Low
-			ohlcv.Close[bar] = agg.PriceData[bar].Close
-			ohlcv.HLC[bar] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-			ohlcv.Volume[bar] = agg.PriceData[bar].Volume
+
+			Epoch := agg.PriceData[bar].Timestamp / 1000
+			ohlcv.Open[Epoch] = agg.PriceData[bar].Open
+			ohlcv.High[Epoch] = agg.PriceData[bar].High
+			ohlcv.Low[Epoch] = agg.PriceData[bar].Low
+			ohlcv.Close[Epoch] = agg.PriceData[bar].Close
+			ohlcv.HLC[Epoch] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
+			ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
 
 		}
-
 	}
 
-    if startOfSlice > -1 && endOfSlice > -1 {
-        ohlcv.Epoch = ohlcv.Epoch[startOfSlice:endOfSlice+1]
-        ohlcv.Open = ohlcv.Open[startOfSlice:endOfSlice+1]
-        ohlcv.High = ohlcv.High[startOfSlice:endOfSlice+1]
-        ohlcv.Low = ohlcv.Low[startOfSlice:endOfSlice+1]
-        ohlcv.Close = ohlcv.Close[startOfSlice:endOfSlice+1]
-        ohlcv.HLC = ohlcv.HLC[startOfSlice:endOfSlice+1]
-        ohlcv.Volume = ohlcv.Volume[startOfSlice:endOfSlice+1]
-		return ohlcv, nil
-	}
-	
-	return &OHLCV{}, nil
+	return ohlcv, nil
 	
 }
 

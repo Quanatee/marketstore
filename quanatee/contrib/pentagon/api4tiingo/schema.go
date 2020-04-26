@@ -42,3 +42,12 @@ type OHLCV struct {
 	HLC       []float32   `json:"HLC"`
 	Volume    []float32   `json:"volume"`
 }
+
+type OHLCV_map struct {
+	Open      map[int64]float32
+	High      map[int64]float32
+	Low       map[int64]float32
+	Close     map[int64]float32
+	HLC       map[int64]float32
+	Volume    map[int64]float32
+}
