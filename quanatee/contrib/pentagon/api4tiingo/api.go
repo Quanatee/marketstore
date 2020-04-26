@@ -47,11 +47,11 @@ func GetAggregates(
 	symbol, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
 
-	fullURL := ""
+	fullURL := aggURL[marketType].(string)
 	if marketType == "crypto" {
-		fullURL = fmt.Sprintf(aggURL[marketType].(string), baseURL)
+		fullURL = fmt.Sprintf(fullURL, baseURL)
 	} else {
-		fullURL = fmt.Sprintf(aggURL[marketType].(string), baseURL, symbol)
+		fullURL = fmt.Sprintf(fullURL, baseURL, symbol)
 	}
 
 	log.Info("%s", fullURL)
