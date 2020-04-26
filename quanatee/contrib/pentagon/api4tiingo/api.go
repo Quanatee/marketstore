@@ -118,7 +118,7 @@ func GetAggregates(
 		if strings.Compare(marketType, "crypto") == 0 {
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
 				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
-				corrected_epoch = dt.Unix() - 60
+				corrected_epoch := dt.Unix() - 60
 				if dt.Unix() - 60 >= from.Unix() {
 					if startOfSlice == -1 {
 						startOfSlice = bar
@@ -136,7 +136,7 @@ func GetAggregates(
 		} else {
 			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
 				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
-				corrected_epoch = dt.Unix() - 60
+				corrected_epoch := dt.Unix() - 60
 				if dt.Unix() - 60 >= from.Unix() {
 					if startOfSlice == -1 {
 						startOfSlice = bar
