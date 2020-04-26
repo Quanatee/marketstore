@@ -172,10 +172,17 @@ func GetAggregates(
         Volume: make([]float32, length),
 	}
 	
+    // Pointers to help slice into just the relevent datas
+    startOfSlice := -1
+	endOfSlice := -1
+	
     for bar := 0; bar < length; bar++ {
 		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-
+			if startOfSlice == -1 {
+				startOfSlice = bar
+			}
+			endOfSlice = bar
 			ohlcv.Epoch[bar] = agg.PriceData[bar].Timestamp / 1000
 			ohlcv.Open[bar] = agg.PriceData[bar].Open
 			ohlcv.High[bar] = agg.PriceData[bar].High
@@ -187,8 +194,20 @@ func GetAggregates(
 		}
 
 	}
+
+    if startOfSlice > -1 && endOfSlice > -1 {
+        ohlcv.Epoch = ohlcv.Epoch[startOfSlice:endOfSlice+1]
+        ohlcv.Open = ohlcv.Open[startOfSlice:endOfSlice+1]
+        ohlcv.High = ohlcv.High[startOfSlice:endOfSlice+1]
+        ohlcv.Low = ohlcv.Low[startOfSlice:endOfSlice+1]
+        ohlcv.Close = ohlcv.Close[startOfSlice:endOfSlice+1]
+        ohlcv.HLC = ohlcv.HLC[startOfSlice:endOfSlice+1]
+        ohlcv.Volume = ohlcv.Volume[startOfSlice:endOfSlice+1]
+		return ohlcv, nil
+	}
 	
-	return ohlcv, nil
+	return &OHLCV{}, nil
+	
 }
 
 func downloadAndUnmarshal(url string, retryCount int, data interface{}) error {
