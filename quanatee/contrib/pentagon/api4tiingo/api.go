@@ -40,7 +40,7 @@ func SetAPIKey(key string) {
 
 func GetAggregates(
 	symbol, marketType, multiplier, resolution string,
-	from, to time.Time) (*OHLCV, error) {
+	from, to time.Time) (*OHLCV_map, error) {
 
 	fullURL := ""
 	if strings.Compare(marketType, "crypto") == 0 {
