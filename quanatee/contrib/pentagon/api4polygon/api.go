@@ -27,7 +27,6 @@ const (
 var (
 	baseURL = "https://api.polygon.io"
 	apiKey  	string
-	marketType  string
 	symbolPrefix = map[string]string{
 		"crypto": "X:",
 		"forex": "C:",
@@ -136,7 +135,7 @@ func ListTickers() (*ListTickersResponse, error) {
 }
 
 func GetAggregates(
-	symbol, multiplier, resolution string,
+	symbol, marketType, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
 		
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))

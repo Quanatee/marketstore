@@ -31,7 +31,6 @@ var (
 	}
 	baseURL = "https://api.tiingo.com"
 	apiKey 	 string
-	marketType2  string
 	length = 0
 )
 
@@ -39,22 +38,18 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func SetMarketType(marketType string) {
-	marketType2 = marketType2
-}
-
 func GetAggregates(
-	symbol, multiplier, resolution string,
+	symbol, marketType, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
 
-	log.Info("%s %v", marketType2, strings.Compare(marketType2, "crypto"))
+	log.Info("%s %v", marketType, strings.Compare(marketType, "crypto"))
 
 	fullURL := ""
-	if strings.Compare(marketType2, "crypto") == 0 {
-		fullURL = fmt.Sprintf(aggURL[marketType2], baseURL)
+	if strings.Compare(marketType, "crypto") == 0 {
+		fullURL = fmt.Sprintf(aggURL[marketType], baseURL)
 		log.Info("c %s", fullURL)
 	} else {
-		fullURL = fmt.Sprintf(aggURL[marketType2], baseURL, symbol)
+		fullURL = fmt.Sprintf(aggURL[marketType], baseURL, symbol)
 		log.Info("nc %s", fullURL)
 	}
 
@@ -68,9 +63,9 @@ func GetAggregates(
 	q.Set("resampleFreq", multiplier+resolution)
 	q.Set("startDate", from.Format(time.RFC3339))
 	q.Set("endDate", to.Format(time.RFC3339))
-	if strings.Compare(marketType2, "crypto") == 0 {
+	if strings.Compare(marketType, "crypto") == 0 {
 		q.Set("tickers", symbol)
-	} else if strings.Compare(marketType2, "stocks") == 0 {
+	} else if strings.Compare(marketType, "stocks") == 0 {
 		q.Set("afterHours", "false")
 		q.Set("forceFill", "false")
 	}
@@ -81,7 +76,7 @@ func GetAggregates(
 	agg := &Agg{}
 	aggCrypto := &AggCrypto{}
 	
-	if strings.Compare(marketType2, "crypto") == 0 {
+	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	} else {
 		err = downloadAndUnmarshal(u.String(), retryCount, aggCrypto)
@@ -91,7 +86,7 @@ func GetAggregates(
 		return &OHLCV{}, err
 	}
 	
-	if strings.Compare(marketType2, "crypto") == 0 {
+	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto.CryptoData[0].PriceData)
 	} else {
 		length = len(agg.PriceData)
@@ -117,7 +112,7 @@ func GetAggregates(
 	
     for bar := 0; bar < length; bar++ {
 		
-		if strings.Compare(marketType2, "crypto") == 0 {
+		if strings.Compare(marketType, "crypto") == 0 {
 			log.Info("%s: unchecked %v", symbol, bar)
 			if aggCrypto.CryptoData[0].PriceData[bar].Open != 0 && aggCrypto.CryptoData[0].PriceData[bar].High != 0 && aggCrypto.CryptoData[0].PriceData[bar].Low != 0 && aggCrypto.CryptoData[0].PriceData[bar].Close != 0 {
 				if startOfSlice == -1 {
