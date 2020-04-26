@@ -115,7 +115,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Low = append(Low, low / float32(len(ohlcvs)))
 		Close = append(Close, close / float32(len(ohlcvs)))
 		HLC = append(HLC, hlc / float32(len(ohlcvs)))
-		Volume = append(float32(volume), volume)
+		Volume = append(Volume, volume)
 	}
 	
 	log.Info("livefill.Bars(%s) from %v to %v", symbol, from.Unix(), to.Unix())
