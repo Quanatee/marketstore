@@ -60,8 +60,8 @@ func GetAggregates(
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", "1min")
-	q.Set("startDate", from.RFC3339)
-	q.Set("endDate", to.RFC3339)
+	q.Set("startDate", from.RFC3339())
+	q.Set("endDate", to.RFC3339())
 	if marketType == "crypto" {
 		q.Set("tickers", symbol)
 	} else if marketType == "stocks" {
@@ -71,10 +71,9 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
+	agg := &Agg{}
 	if marketType == "crypto" {
 		agg := &AggCrypto{}
-	} else {
-		agg := &Agg{}
 	}
 
 	err = downloadAndUnmarshal(u.String(), retryCount, agg)
@@ -82,11 +81,9 @@ func GetAggregates(
 		return &OHLCV{}, err
 	}
 
+	length := len(agg)
 	if marketType == "crypto" {
-		agg := &AggCrypto{}
 		length := len(agg[0].PriceData)
-	} else {
-		length := len(agg)
 	}
 
 	if length == 0 {
@@ -197,4 +194,6 @@ func unmarshal(resp *http.Response, data interface{}) (err error) {
 	}
 
 	return json.Unmarshal(body, data)
+}
+y, data)
 }
