@@ -42,15 +42,11 @@ func GetAggregates(
 	symbol, marketType, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
 
-	log.Info("%s %v", marketType, strings.Compare(marketType, "crypto"))
-
 	fullURL := ""
 	if strings.Compare(marketType, "crypto") == 0 {
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL)
-		log.Info("c %s", fullURL)
 	} else {
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL, symbol)
-		log.Info("nc %s", fullURL)
 	}
 
 	u, err := url.Parse(fullURL)
@@ -69,17 +65,16 @@ func GetAggregates(
 		q.Set("afterHours", "false")
 		q.Set("forceFill", "false")
 	}
-	log.Info("%v", u)
 
 	u.RawQuery = q.Encode()
-
+	
 	agg := &Agg{}
 	aggCrypto := &AggCrypto{}
 	
 	if strings.Compare(marketType, "crypto") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, agg)
-	} else {
 		err = downloadAndUnmarshal(u.String(), retryCount, aggCrypto)
+	} else {
+		err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	}
 
 	if err != nil {
