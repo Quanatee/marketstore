@@ -176,7 +176,7 @@ func GetAggregates(
     startOfSlice := -1
 	endOfSlice := -1
 	
-	// Polygon candle formula
+	// Polygon candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04

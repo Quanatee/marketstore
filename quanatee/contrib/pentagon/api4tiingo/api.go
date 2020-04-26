@@ -108,11 +108,11 @@ func GetAggregates(
     startOfSlice := -1
     endOfSlice := -1
 	
-	// Tiingo candle formula
+	// Tiingo candle formula (Timestamp on close)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:05
-	// To align with polygon, we subract one minute from the timestamp
+	// We use Timestamp on open, so we substract 60s from the timetamp
     for bar := 0; bar < length; bar++ {
 		
 		if strings.Compare(marketType, "crypto") == 0 {
