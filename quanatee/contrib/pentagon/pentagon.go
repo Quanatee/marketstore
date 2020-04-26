@@ -75,7 +75,7 @@ func (qf *QuanateeFetcher) Run() {
 				break
 			} else {
 				time.Sleep(to.Sub(time.Now()))
-				time.Sleep(1*time.Millisecond)
+				time.Sleep(1*time.Second)
 			}
 		}
 		
