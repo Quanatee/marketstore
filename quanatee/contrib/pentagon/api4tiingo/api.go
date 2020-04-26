@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alpacahq/marketstore/utils/log"
+	//"github.com/alpacahq/marketstore/utils/log"
 	"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )

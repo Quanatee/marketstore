@@ -18,7 +18,7 @@ var (
 
 func Bars(symbol string, from, to time.Time) (err error) {
 	if from.IsZero() {
-		from = time.Date(2017, 1, 1, 0, 0, 0, 0, NY)
+		from = time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC
 	}
 
 	if to.IsZero() {
