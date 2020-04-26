@@ -36,7 +36,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	ohlcvs := make([]OHLCV_map, 0)
+	// ohlcvs := make([]OHLCV_map, 0)
+	var ohlcvs []OHLCV_map
 
 	ohlcv_polygon, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
