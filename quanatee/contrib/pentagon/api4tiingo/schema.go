@@ -1,7 +1,7 @@
 package api4tiingo
 
 // Crypto
-type AggCrypto2 struct {
+type AggCrypto1 struct {
 	TradesDone     float32 `json:"tradesDone"`
 	Close          float32 `json:"close"`
 	VolumeNotional float32 `json:"volumeNotional"`
@@ -12,15 +12,11 @@ type AggCrypto2 struct {
 	Volume         float32 `json:"volume"`
 }
 
-type AggCrypto1 struct {
+type AggCrypto struct {
 	Ticker        string     	  `json:"ticker"`
 	BaseCurrency  string    	  `json:"baseCurrency"`
 	QuoteCurrency string  	      `json:"quoteCurrency"`
 	PriceData     []AggCrypto2	  `json:"priceData"`
-}
-
-type AggCrypto struct {
-	CryptoData	[]AggCrypto1
 }
 
 // Forex and Stocks

@@ -69,10 +69,11 @@ func GetAggregates(
 	u.RawQuery = q.Encode()
 
 	agg := &Agg{}
-	aggCrypto := &AggCrypto{}
-	
+	// aggCrypto := &AggCrypto{}
+	aggCrypto := []AggCrypto
+
 	if strings.Compare(marketType, "crypto") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, *aggCrypto.CryptoData)
+		err = downloadAndUnmarshal(u.String(), retryCount, aggCrypto)
 	} else {
 		err = downloadAndUnmarshal(u.String(), retryCount, agg)
 	}
