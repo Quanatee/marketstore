@@ -22,7 +22,7 @@ type OHLCV_map struct {
 	Open      map[int64]float32
 	High      map[int64]float32
 	Low       map[int64]float32
-	HLC     map[int64]float32
+	Close     map[int64]float32
 	HLC       map[int64]float32
 	Volume    map[int64]float32
 }
@@ -36,11 +36,11 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	var ohlcvs []OHLCV
+	var ohlcvs []OHLCV_map
 	
 	ohlcv_polygon, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 	if err != nil {
-		log.Error("[polygon] bars livefill failure for: [%v] (%v)", tbk.String(), err)
+		log.Error("[polygon] bars livefill failure for: [%s] (%v)", symbol, err)
 		// return err
 	} else {
 		if len(ohlcv_polygon.HLC) > 0 {
@@ -49,7 +49,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	ohlcv_tiingo, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 	if err != nil {
-		log.Error("[tiingo] bars livefill failure for: [%v] (%v)", tbk.String(), err)
+		log.Error("[tiingo] bars livefill failure for: [%s] (%v)", symbol, err)
 		// return err
 	} else {
 		if len(ohlcv_tiingo.HLC) > 0 {
@@ -61,16 +61,16 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	var Epochs []int64
 	
     for index, ohlcv_ := range ohlcvs {
-		if len(ohlcv_.HLC) > len(Epoch) {
-			Epoch = make([]string, 0, len(len(ohlcv_.HLC)))
+		if len(ohlcv_.HLC) > len(Epochs) {
+			// Epochs = make([]string, 0, len(len(ohlcv_.HLC)))
 			for key := range ohlcv_.HLC {
-				Epoch = append(Epoch, key)
+				Epochs = append(Epochs, key)
 			}
 		}
 	}
 
 	// If length is 0, no data was returned
-	if len(Epoch) == 0 {
+	if len(Epochs) == 0 {
 		return
 	}
 
