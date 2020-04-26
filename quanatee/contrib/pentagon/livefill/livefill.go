@@ -101,13 +101,13 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	for _, Epoch := range Epochs {
 		var open, high, low, close, hlc, volume float32
 		for _, ohlcv_ := range ohlcvs {
-			if ohlcv_.HLC[Epoch] {
-				open += ohlcv_.Open[Epoch]
-				high += ohlcv_.High[Epoch]
-				low += ohlcv_.Low[Epoch]
-				close += ohlcv_.Close[Epoch]
-				hlc += ohlcv_.HLC[Epoch]
-				volume += ohlcv_.Volume[Epoch]
+			if _, ok := ohlcv_.HLC[Epoch]; ok {
+				open += float32(ohlcv_.Open[Epoch])
+				high += float32(ohlcv_.High[Epoch])
+				low += float32(ohlcv_.Low[Epoch])
+				close += float32(ohlcv_.Close[Epoch])
+				hlc += float32(ohlcv_.HLC[Epoch])
+				volume += float32(ohlcv_.Volume[Epoch])
 			}
 		}
 		Open = append(Open, float32(open) / len(ohlcvs))
