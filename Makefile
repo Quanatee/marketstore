@@ -30,15 +30,15 @@ update:
 	GOFLAGS=$(GOFLAGS) go mod tidy
 
 plugins:
-	$(MAKE) -C contrib/ondiskagg
-	$(MAKE) -C contrib/gdaxfeeder
-	$(MAKE) -C contrib/slait
+	# $(MAKE) -C contrib/ondiskagg
+	# $(MAKE) -C contrib/gdaxfeeder
+	# $(MAKE) -C contrib/slait
 	$(MAKE) -C contrib/stream
-	$(MAKE) -C contrib/polygon
-	$(MAKE) -C contrib/bitmexfeeder
-	$(MAKE) -C contrib/binancefeeder
-	$(MAKE) -C contrib/iex
-	$(MAKE) -C contrib/xignitefeeder
+	# $(MAKE) -C contrib/polygon
+	# $(MAKE) -C contrib/bitmexfeeder
+	# $(MAKE) -C contrib/binancefeeder
+	# $(MAKE) -C contrib/iex
+	# $(MAKE) -C contrib/xignitefeeder
 	$(MAKE) -C quanatee/contrib/pentagon
 	$(MAKE) -C quanatee/contrib/pentaggregation
 
