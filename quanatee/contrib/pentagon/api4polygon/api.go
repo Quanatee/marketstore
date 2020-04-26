@@ -177,7 +177,7 @@ func GetAggregates(
 	endOfSlice := -1
 	
 	if length > 1 {
-		log.Info(length)
+		log.Info("polygon len > 1: %v", length)
 	}
     for bar := 0; bar < length; bar++ {
 		
