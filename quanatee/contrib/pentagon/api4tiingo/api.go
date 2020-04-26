@@ -53,7 +53,7 @@ func GetAggregates(
 	if err != nil {
 		return nil, err
 	}
-	
+	log.Info(apikey)
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", multiplier+resolution)
@@ -67,7 +67,7 @@ func GetAggregates(
 	}
 
 	u.RawQuery = q.Encode()
-	
+
 	agg := &Agg{}
 	aggCrypto := &AggCrypto{}
 	
