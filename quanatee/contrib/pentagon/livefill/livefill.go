@@ -36,7 +36,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		return err2
 	}
 
-	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch))
+	log.Info("livefill.Bars(%s) ohlcv1(%v) ohlcv2(%v), ohlcv(%v) ohlcv2(%v)", symbol, len(ohlcv.Epoch), len(ohlcv2.Epoch), ohlcv.Epoch[0], ohlcv2.Epoch[0])
 
 	if len(ohlcv.Epoch) == 0 {
 		return
