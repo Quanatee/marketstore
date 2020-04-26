@@ -63,6 +63,7 @@ func (qf *QuanateeFetcher) Run() {
 	from := time.Now()
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
+	to := from.Add(time.Second)
 	
 	firstLoop := true
 
@@ -72,9 +73,7 @@ func (qf *QuanateeFetcher) Run() {
 			if time.Now().Unix() > to.Unix() {
 				break
 			} else {
-				oneMinuteAhead := time.Now().Add(time.Minute)
-				oneMinuteAhead = time.Date(oneMinuteAhead.Year(), oneMinuteAhead.Month(), oneMinuteAhead.Day(), oneMinuteAhead.Hour(), oneMinuteAhead.Minute(), 3, 0, time.UTC)
-				time.Sleep(oneMinuteAhead.Sub(time.Now()))
+				time.Sleep(to.Sub(time.Now()))
 			}
 		}
 		
