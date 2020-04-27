@@ -21,16 +21,6 @@ triggers:
         - 1H
         - 4H
 bgworkers:
-  - module: pentagon4crypto.so
-    config:
-      polygon_api_key: <polygon_api_key>
-      tiingo_api_key: <tiingo_api_key>
-      twelve_api_key: <twelve_api_key>
-      market_type: crypto
-      query_start: 2020-01-01 00:00
-      symbols:
-        - BTCUSD
-        - ETHUSD
   - module: pentagon4forex.so
     config:
       polygon_api_key: <polygon_api_key>
@@ -41,6 +31,16 @@ bgworkers:
       symbols:
         - EURUSD
         - GBPUSD
+  - module: pentagon4crypto.so
+    config:
+      polygon_api_key: <polygon_api_key>
+      tiingo_api_key: <tiingo_api_key>
+      twelve_api_key: <twelve_api_key>
+      market_type: crypto
+      query_start: 2020-01-01 00:00
+      symbols:
+        - BTCUSD
+        - ETHUSD
   - module: pentagon4etfs.so
     config:
       polygon_api_key: <polygon_api_key>
