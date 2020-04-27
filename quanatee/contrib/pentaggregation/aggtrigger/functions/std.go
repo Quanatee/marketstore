@@ -14,7 +14,7 @@ func StdFloat64(values []float64) float64 {
 
 	std, _ := StandardDeviation(values)
 
-	return values
+	return std
 }
 
 func convertFloat32ToFloat64(ar []float32) []float64 {
@@ -37,6 +37,10 @@ func convertFloat64ToFloat32(ar []float64) []float32 {
  }
 
 // adopted from https://github.com/montanaflynn/stats
+
+type statsError struct {
+	err string
+}
 
  var (
     EmptyInputErr = statsErr{"Input must not be empty."}
