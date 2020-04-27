@@ -79,9 +79,9 @@ func GetAggregates(
 	var aggCrypto AggCrypto
 
 	if strings.Compare(marketType, "equity") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &AggEquity)
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
 	} else if strings.Compare(marketType, "currency") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &AggCurrency)
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggCurrency)
 	} else if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
 	}
@@ -91,9 +91,9 @@ func GetAggregates(
 	}
 
 	if strings.Compare(marketType, "equity") == 0 {
-		length = len(AggEquity.PriceData)
+		length = len(aggEquity.PriceData)
 	} else if strings.Compare(marketType, "currency") == 0 {
-		length = len(AggCurrency.PriceData)
+		length = len(aggCurrency.PriceData)
 	} else if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto.PriceData)
 	}
