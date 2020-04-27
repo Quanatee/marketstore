@@ -203,24 +203,24 @@ func GetDataFromProvider(
 				return reconstruct, err
 			}
 		}
-	case "twelve":
-		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "minute", from, to)
-		if err != nil {
-			log.Error("[twelve] bars filler failure for: [%s] (%v)", symbol, err)
-		} else {
-			if len(ohlcv.HLC) > 0 {
-				reconstruct := OHLCV{
-					Open: ohlcv.Open,
-					High: ohlcv.High,
-					Low: ohlcv.Low,
-					Close: ohlcv.Close,
-					Volume: ohlcv.Volume,
-					HLC: ohlcv.HLC,
-					Spread: ohlcv.Spread,
-					VWAP: ohlcv.VWAP,
-				}
-				return reconstruct, err
-			}
+	// case "twelve":
+	// 	ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "minute", from, to)
+	// 	if err != nil {
+	// 		log.Error("[twelve] bars filler failure for: [%s] (%v)", symbol, err)
+	// 	} else {
+	// 		if len(ohlcv.HLC) > 0 {
+	// 			reconstruct := OHLCV{
+	// 				Open: ohlcv.Open,
+	// 				High: ohlcv.High,
+	// 				Low: ohlcv.Low,
+	// 				Close: ohlcv.Close,
+	// 				Volume: ohlcv.Volume,
+	// 				HLC: ohlcv.HLC,
+	// 				Spread: ohlcv.Spread,
+	// 				VWAP: ohlcv.VWAP,
+	// 			}
+	// 			return reconstruct, err
+	// 		}
 		}
 	}
 	return &OHLCV{}, err
