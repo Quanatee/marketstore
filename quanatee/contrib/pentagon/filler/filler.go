@@ -42,15 +42,6 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// ohlcvs := make([]OHLCV, 0)
 	var ohlcvs []OHLCV
 	
-	time.Now()
-	
-	// Check current task livefill
-	if (to.Add(time.Minute)).After(time.Now()) {
-
-	} else {
-		// Current task is ackfill
-	}
-	
 	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs = append(ohlcvs, ohlcv)
