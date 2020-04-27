@@ -280,8 +280,8 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 
 	params := []accumParam{
 		accumParam{"Open", "first", "Open"},
-		accumParam{"High", "max", "High"},
-		accumParam{"Low", "min", "Low"},
+		accumParam{"High", "avg", "High"},
+		accumParam{"Low", "avg", "Low"},
 		accumParam{"Close", "last", "Close"},
 	}
 	if cs.Exists("HLC") {
