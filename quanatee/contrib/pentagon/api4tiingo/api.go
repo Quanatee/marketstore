@@ -70,13 +70,16 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	var agg Agg
 	var aggCrypto []AggCrypto
+	var aggForex []AggForex
+	var aggEquity []AggEquity
 
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
-	} else {
-		err = downloadAndUnmarshal(u.String(), retryCount, &agg)
+	} else if strings.Compare(marketType, "forex") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex)
+	} else if strings.Compare(marketType, "equity") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
 	}
 
 	if err != nil {
@@ -89,8 +92,10 @@ func GetAggregates(
 		} else {
 			length = 0
 		}
-	} else {
-		length = len(agg.PriceData)
+	} else if strings.Compare(marketType, "forex") == 0 {
+		length = len(aggForex)
+	} else if strings.Compare(marketType, "equity") == 0 {
+		length = len(aggEquity)
 	}
 
 	if length == 0 {
@@ -134,16 +139,33 @@ func GetAggregates(
 					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
 				}
 			}
-		} else {
-			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, agg.PriceData[bar].Date)	
+		} else if strings.Compare(marketType, "forex") == 0 {
+			if aggForex[bar].PriceData.Open != 0 && aggForex[bar].PriceData.High != 0 && aggForex[bar].PriceData.Low != 0 && aggForex[bar].PriceData.Close != 0 {
+				dt, _ := time.Parse(time.RFC3339, aggForex[bar].PriceData.Date)	
 				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
-					ohlcv.High[Epoch] = agg.PriceData[bar].High
-					ohlcv.Low[Epoch] = agg.PriceData[bar].Low
-					ohlcv.Close[Epoch] = agg.PriceData[bar].Close
+					ohlcv.Open[Epoch] = aggForex[bar].PriceData.Open
+					ohlcv.High[Epoch] = aggForex[bar].PriceData.High
+					ohlcv.Low[Epoch] = aggForex[bar].PriceData.Low
+					ohlcv.Close[Epoch] = aggForex[bar].PriceData.Close
+					ohlcv.Volume[Epoch] = 1.0
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+				}
+			}
+		} else if strings.Compare(marketType, "equity") == 0 {
+			if aggEquity[bar].PriceData.Open != 0 && aggEquity[bar].PriceData.High != 0 && aggEquity[bar].PriceData.Low != 0 && aggEquity[bar].PriceData.Close != 0 {
+				dt, _ := time.Parse(time.RFC3339, aggEquity[bar].PriceData.Date)	
+				Epoch := dt.Unix() - 60
+				if Epoch >= from.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggEquity[bar].PriceData.Open
+					ohlcv.High[Epoch] = aggEquity[bar].PriceData.High
+					ohlcv.Low[Epoch] = aggEquity[bar].PriceData.Low
+					ohlcv.Close[Epoch] = aggEquity[bar].PriceData.Close
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3

@@ -20,17 +20,29 @@ type AggCrypto struct {
 }
 
 // Forex and Equity
-type AggData struct {
+type AggForexData struct {
 	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
 	Ticker         string  `json:"ticker"`
 	Open           float32 `json:"open"`
-	Low            float32 `json:"low"`
 	High           float32 `json:"high"`
+	Low            float32 `json:"low"`
 	Close          float32 `json:"close"`
 }
 
-type Agg struct {
-	PriceData	[]AggData
+type AggForex struct {
+	PriceData	AggForexData
+}
+
+type AggEquityData struct {
+	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
+	Open           float32 `json:"open"`
+	High           float32 `json:"high"`
+	Low            float32 `json:"low"`
+	Close          float32 `json:"close"`
+}
+
+type AggEquity struct {
+	PriceData	AggEquityData
 }
 
 type OHLCV struct {
