@@ -38,10 +38,6 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func SetMarketType(marketType string) {
-	marketType = marketType
-}
-
 type ListTickersResponse struct {
 	Page    int    `json:"page"`
 	PerPage int    `json:"perPage"`
@@ -136,7 +132,7 @@ func ListTickers() (*ListTickersResponse, error) {
 
 func GetAggregates(
 	symbol, marketType, multiplier, resolution string,
-	from, to time.Time) (*OHLCV_map, error) {
+	from, to time.Time) (*OHLCV, error) {
 		
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
 	if err != nil {
@@ -153,16 +149,16 @@ func GetAggregates(
 	var agg Aggv2
 	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
 	if err != nil {
-		return &OHLCV_map{}, err
+		return &OHLCV{}, err
 	}
 
 	length := len(agg.PriceData)
 
 	if length == 0 {
-		return &OHLCV_map{}, nil
+		return &OHLCV{}, nil
 	}
 	
-	ohlcv := &OHLCV_map{
+	ohlcv := &OHLCV{
 		Open: make(map[int64]float32),
 		High: make(map[int64]float32),
 		Low: make(map[int64]float32),

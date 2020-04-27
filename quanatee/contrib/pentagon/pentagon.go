@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rickar/cal"
+
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/filler"
@@ -58,6 +60,7 @@ func (qf *QuanateeFetcher) Run() {
 	//log.Info("Market Type: %s", qf.config.MarketType)
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
+	//api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
@@ -76,6 +79,18 @@ func (qf *QuanateeFetcher) Run() {
 				time.Sleep(1*time.Second)
 			}
 		}
+		
+		if calendar.Nasdaq.IsMarketOpen(from) {
+			
+		}
+		
+		// Market operating hours
+		// if strings.Compare(marketType, "forex") == 0 {
+		// } else if strings.Compare(marketType, "stocks") == 0 {
+		// 	if calendar.Nasdaq.IsMarketOpen(from) == false {
+		// 		continue;
+		// 	}
+		// }
 		
 		for _, symbol := range qf.config.Symbols {
 			var (

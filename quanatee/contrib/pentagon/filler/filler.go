@@ -3,6 +3,7 @@ package filler
 import (
 	"fmt"
 	//"math"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -18,7 +19,7 @@ var (
 	BackfillM *sync.Map
 )
 
-type OHLCV_map struct {
+type OHLCV struct {
 	Open      map[int64]float32
 	High      map[int64]float32
 	Low       map[int64]float32
@@ -38,46 +39,58 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	// ohlcvs := make([]OHLCV_map, 0)
-	var ohlcvs []OHLCV_map
+	// ohlcvs := make([]OHLCV, 0)
+	var ohlcvs []OHLCV
+	
+	time.Now()
+	
+	// Check current task livefill
+	if (to.Add(time.Minute)).After(time.Now()) {
 
-	ohlcv_polygon, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
-	if err != nil {
-		log.Error("[polygon] bars filler failure for: [%s] (%v)", symbol, err)
-		// return err
 	} else {
-		if len(ohlcv_polygon.HLC) > 0 {
-			reconstruct := OHLCV_map{
-				Open: ohlcv_polygon.Open,
-				High: ohlcv_polygon.High,
-				Low: ohlcv_polygon.Low,
-				Close: ohlcv_polygon.Close,
-				Volume: ohlcv_polygon.Volume,
-				HLC: ohlcv_polygon.HLC,
-				Spread: ohlcv_polygon.Spread,
-				VWAP: ohlcv_polygon.VWAP,
-			}
-			ohlcvs = append(ohlcvs, reconstruct)
-		}
+		// Current task is ackfill
 	}
-	ohlcv_tiingo, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
-	if err != nil {
-		log.Error("[tiingo] bars filler failure for: [%s] (%v)", symbol, err)
-		// return err
-	} else {
-		if len(ohlcv_tiingo.HLC) > 0 {
-			reconstruct := OHLCV_map{
-				Open: ohlcv_tiingo.Open,
-				High: ohlcv_tiingo.High,
-				Low: ohlcv_tiingo.Low,
-				Close: ohlcv_tiingo.Close,
-				Volume: ohlcv_tiingo.Volume,
-				HLC: ohlcv_tiingo.HLC,
-				Spread: ohlcv_tiingo.Spread,
-				VWAP: ohlcv_tiingo.VWAP,
+	
+	ohlcv, _ := GetDataFromProvider("polygon", symbol, marketType, from, to)
+	
+	if (to.Add(time.Minute)).After(time.Now()) {
+		// Current task livefill
+		if len(ohlcv.HLC) > 0 {
+			// Randomly run alt providers at 34% chance per alt provider
+			if rand.Intn(3) == 0 {
+				ohlcv, _ := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+				if len(ohlcv.HLC) > 0 {
+					ohlcvs = append(ohlcvs, ohlcv)
+				}
 			}
-			ohlcvs = append(ohlcvs, reconstruct)
+			// if rand.Intn(3) == 0 {
+			// 	ohlcv, _ := GetDataFromProvider("twelve", symbol, marketType, from, to)
+			// 	if len(ohlcv.HLC) > 0 {
+			// 		ohlcvs = append(ohlcvs, ohlcv)
+			// 	}
+			// }
+		} else {
+			// Run all alt providers since main provider  failed
+			ohlcv, _ := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+			if len(ohlcv.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv)
+			}
+			// ohlcv, _ := GetDataFromProvider("twelve", symbol, marketType, from, to)
+			// if len(ohlcv.HLC) > 0 {
+			// 	ohlcvs = append(ohlcvs, ohlcv)
+			// }
 		}
+	} else {
+		// Current task is backfill
+		// Run all alt providers
+		ohlcv, _ := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+		// ohlcv, _ := GetDataFromProvider("twelve", symbol, marketType, from, to)
+		// if len(ohlcv.HLC) > 0 {
+		// 	ohlcvs = append(ohlcvs, ohlcv)
+		// }
 	}
 
 	// Get the Epoch slice of the largest OHLCV set
@@ -144,4 +157,71 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	csm.AddColumnSeries(*tbk, cs)
 
 	return executor.WriteCSM(csm, false)
+}
+
+
+func GetDataFromProvider(
+	provider, symbol, marketType string,
+	from, to time.Time) (*OHLCV, error) {
+	
+	switch provider {
+	case "polygon":
+		ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
+		if err != nil {
+			log.Error("[polygon] bars filler failure for: [%s] (%v)", symbol, err)
+		} else {
+			if len(ohlcv.HLC) > 0 {
+				reconstruct := OHLCV{
+					Open: ohlcv.Open,
+					High: ohlcv.High,
+					Low: ohlcv.Low,
+					Close: ohlcv.Close,
+					Volume: ohlcv.Volume,
+					HLC: ohlcv.HLC,
+					Spread: ohlcv.Spread,
+					VWAP: ohlcv.VWAP,
+				}
+				return reconstruct, err
+			}
+		}
+	case "tiingo":
+		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
+		if err != nil {
+			log.Error("[tiingo] bars filler failure for: [%s] (%v)", symbol, err)
+		} else {
+			if len(ohlcv.HLC) > 0 {
+				reconstruct := OHLCV{
+					Open: ohlcv.Open,
+					High: ohlcv.High,
+					Low: ohlcv.Low,
+					Close: ohlcv.Close,
+					Volume: ohlcv.Volume,
+					HLC: ohlcv.HLC,
+					Spread: ohlcv.Spread,
+					VWAP: ohlcv.VWAP,
+				}
+				return reconstruct, err
+			}
+		}
+	case "twelve":
+		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "minute", from, to)
+		if err != nil {
+			log.Error("[twelve] bars filler failure for: [%s] (%v)", symbol, err)
+		} else {
+			if len(ohlcv.HLC) > 0 {
+				reconstruct := OHLCV{
+					Open: ohlcv.Open,
+					High: ohlcv.High,
+					Low: ohlcv.Low,
+					Close: ohlcv.Close,
+					Volume: ohlcv.Volume,
+					HLC: ohlcv.HLC,
+					Spread: ohlcv.Spread,
+					VWAP: ohlcv.VWAP,
+				}
+				return reconstruct, err
+			}
+		}
+	}
+	return &OHLCV{}, err
 }

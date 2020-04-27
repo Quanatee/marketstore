@@ -21,7 +21,7 @@ type Aggv2 struct {
 	PriceData       []Agg1	      `json:"results"`
 }
 
-type OHLCV_map struct {
+type OHLCV struct {
 	Open      map[int64]float32
 	High      map[int64]float32
 	Low       map[int64]float32

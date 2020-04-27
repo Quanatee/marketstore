@@ -40,7 +40,7 @@ func SetAPIKey(key string) {
 
 func GetAggregates(
 	symbol, marketType, multiplier, resolution string,
-	from, to time.Time) (*OHLCV_map, error) {
+	from, to time.Time) (*OHLCV, error) {
 
 	fullURL := ""
 	if strings.Compare(marketType, "crypto") == 0 {
@@ -81,11 +81,11 @@ func GetAggregates(
 	}
 
 	if err != nil {
-		return &OHLCV_map{}, err
+		return &OHLCV{}, err
 	}
 
 	if len(aggCrypto) == 0 {
-		return &OHLCV_map{}, nil
+		return &OHLCV{}, nil
 	}
 
 	if strings.Compare(marketType, "crypto") == 0 {
@@ -96,10 +96,10 @@ func GetAggregates(
 
 	if length == 0 {
 		log.Info("%s: len %v", symbol, length)
-		return &OHLCV_map{}, nil
+		return &OHLCV{}, nil
 	}
 	
-	ohlcv := &OHLCV_map{
+	ohlcv := &OHLCV{
 		Open: make(map[int64]float32),
 		High: make(map[int64]float32),
 		Low: make(map[int64]float32),
