@@ -26,7 +26,7 @@ const (
 var (
 	aggURL = map[string]string{
 		"crypto": "%v/tiingo/crypto/prices",
-		"forex": "%v/fx/%v/prices",
+		"forex": "%v/tiingo/fx/%v/prices",
 		"equity": "%v/iex/%v/prices",
 	}
 	baseURL = "https://api.tiingo.com"
