@@ -21,7 +21,7 @@ triggers:
         - 1H
         - 4H
 bgworkers:
-  - module: pentagon.so
+  - module: pentagon4crypto.so
     config:
       polygon_api_key: <polygon_api_key>
       tiingo_api_key: <tiingo_api_key>
