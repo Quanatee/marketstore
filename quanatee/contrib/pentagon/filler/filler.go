@@ -236,9 +236,9 @@ func IsMarketOpen(
 		return true
 	case "forex":
 		if ( 
-			( from.Weekday() == 0 && from.Hour() >= 22 ) || // Sunday night Australia opens
-			( from.Weekday() >= 1 && from.Weekday() <= 4 ) || // Monday to Thursday
-			( from.Weekday() == 5 && from.Hour() < 21 ) // Friday before 9PM UTC
+			( from.Weekday() == 0 && from.Hour() >= 22 ) ||
+			( from.Weekday() >= 1 && from.Weekday() <= 4 ) ||
+			( from.Weekday() == 5 && from.Hour() < 21 )
 		) {
 			return true
 		} else {
@@ -246,8 +246,8 @@ func IsMarketOpen(
 		}
 	case "stocks":
 		if ( 
-			( from.Weekday() >= 1 && from.Weekday() <= 5 ) && // Monday to Friday
-			( from.Hour() >= 13 && from.Hour() < 21 ) // Between 1pm and before 9pm UTC (Actually 2.30pm but we start early to counter DST)
+			( from.Weekday() >= 1 && from.Weekday() <= 5 ) &&
+			( from.Hour() >= 13 && from.Hour() < 21 )
 		) {
 			return true
 		} else {
