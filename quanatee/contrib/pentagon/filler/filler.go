@@ -52,6 +52,9 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	
 	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
+	if len(ohlcv.HLC) > 0 {
+		ohlcvs = append(ohlcvs, ohlcv)
+	}
 	
 	if (to.Add(time.Minute)).After(time.Now()) {
 		// Current task livefill
