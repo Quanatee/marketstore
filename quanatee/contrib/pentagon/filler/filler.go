@@ -50,7 +50,6 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		log.Debug("Adding Polygon %s A %v", symbol, len(ohlcvs))
 	}
 	
-	
 	if (to.Add(time.Minute)).After(time.Now()) {
 		// Current task livefill
 		if len(ohlcv.HLC) > 0 {
