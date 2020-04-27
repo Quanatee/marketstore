@@ -28,12 +28,13 @@ type QuanateeFetcher struct {
 }
 
 type FetcherConfig struct {
-    PolygonApiKey  string   `yaml:"polygon_api_key"`
-    TiingoApiKey   string   `yaml:"tiingo_api_key"`
-	TwelveApiKey   string   `yaml:"twelve_api_key"`
-	MarketType     string   `yaml:"market_type"`
-	QueryStart     string   `yaml:"query_start"`
-	Symbols        []string `yaml:"symbols"`
+    PolygonApiKey   string   `yaml:"polygon_api_key"`
+    TiingoApiKey    string   `yaml:"tiingo_api_key"`
+	TwelveApiKey    string   `yaml:"twelve_api_key"`
+	QueryStart      string   `yaml:"query_start"`
+	CryptoSymbols	[]string `yaml:"crypto_symbols"`
+	ForexSymbols 	[]string `yaml:"forex_symbols"`
+	EquitySymbols   []string `yaml:"equity_symbols"`
 }
 
 // NewBgWorker returns a new instances of QuanateeFetcher. See FetcherConfig
@@ -80,46 +81,75 @@ func (qf *QuanateeFetcher) Run() {
 				time.Sleep(1*time.Second)
 			}
 		}
-		
-		if filler.IsMarketOpen(qf.config.MarketType, from) == true {
-			// Market is open
-			for _, symbol := range qf.config.Symbols {
-				var err error
-				if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
+		// Loop Crypto Symbols
+		for _, symbol := range qf.config.CryptoSymbols {
+			var err error
+			if filler.IsMarketOpen("crypto", from) == true {
+				// Market is open
+				if err = filler.Bars(symbol, "crypto", from, to); err != nil {
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+				}
+			} else if firstLoop == true {
+				// Market is closed but we just started pentagon
+				if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -7), to); err != nil {
 					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			}
-
-		} else {
-			// Market is closed but we just started pentagon
 			if firstLoop == true {
-				for _, symbol := range qf.config.Symbols {
-					var err error
-					if err = filler.Bars(symbol, qf.config.MarketType, from.AddDate(0, 0, -7), to); err != nil {
-						log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
-					}
-				}
-			}
-		}
-
-		if firstLoop == true {
-			for _, symbol := range qf.config.Symbols {
 				filler.BackfillM.LoadOrStore(symbol, from.Unix())
 			}
+		}
+		// Loop Forex Symbols
+		for _, symbol := range qf.config.ForexSymbols {
+			var err error
+			if filler.IsMarketOpen("forex", from) == true {
+				// Market is open
+				if err = filler.Bars(symbol, "forex", from, to); err != nil {
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+				}
+			} else if firstLoop == true {
+				// Market is closed but we just started pentagon
+				if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -7), to); err != nil {
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+				}
+			}
+			if firstLoop == true {
+				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+			}
+		}
+		// Loop Equity Symbols
+		for _, symbol := range qf.config.EquitySymbols {
+			var err error
+			if filler.IsMarketOpen("equity", from) == true {
+				// Market is open
+				if err = filler.Bars(symbol, "equity", from, to); err != nil {
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+				}
+			} else if firstLoop == true {
+				// Market is closed but we just started pentagon
+				if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -7), to); err != nil {
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+				}
+			}
+			if firstLoop == true {
+				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+			}
+		}
+		// Start backfill and disable first loop
+		if firstLoop == true {
 			go qf.workBackfillBars()
 			firstLoop = false
 		}
-
+		// Update from and to dates
 		from = from.Add(time.Minute)
 		to = to.Add(time.Minute)
-		
 	}
 
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(99 * time.Second)
+	ticker := time.NewTicker(60 * time.Second)
 
 	for range ticker.C {
 		
