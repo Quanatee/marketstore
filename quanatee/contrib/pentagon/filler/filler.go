@@ -194,10 +194,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Vwaps = append(Vwaps, vwap / float32(len(ohlcvs)))
 	}
 	
-	if len(Epochs) <= 3 {
-		log.Debug("filler.Bars(%s) livefill from %v to %v with %v sources | Epochs(%v) HLCs(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), Epochs, HLCs)
+	if (to.Add(time.Minute)).After(time.Now()) {
+		log.Info("filler.Bars(%s) livefill from %v to %v with %v sources | Epochs(%v) HLCs(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), Epochs, HLCs)
 	} else {
-		log.Debug("filler.Bars(%s) backfill from %v to %v with %v sources | Length(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), len(Epochs))
+		log.Info("filler.Bars(%s) backfill from %v to %v with %v sources | Length(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), len(Epochs))
 	}
 
 	cs := io.NewColumnSeries()
