@@ -2,19 +2,19 @@ package api4twelve
 
 type AggOHLC struct {
 	Date           string  `json:"datetime"` // "2017-12-19T00:00:00"
-	Open           float32 `json:"open"`
-	Low            float32 `json:"low"`
-	High           float32 `json:"high"`
-	Close          float32 `json:"close"`
+	Open           float32 `json:"open,string"`
+	Low            float32 `json:"low,string"`
+	High           float32 `json:"high,string"`
+	Close          float32 `json:"close,string"`
 }
 
 type AggOHLCV struct {
 	Date           string  `json:"datetime"` // "2017-12-19T00:00:00"
-	Open           float32 `json:"open"`
-	Low            float32 `json:"low"`
-	High           float32 `json:"high"`
-	Close          float32 `json:"close"`
-	Volume         float32 `json:"volume"`
+	Open           float32 `json:"open,string"`
+	Low            float32 `json:"low,string"`
+	High           float32 `json:"high,string"`
+	Close          float32 `json:"close,string"`
+	Volume         float32 `json:"volume,string"`
 }
 
 // Equity
@@ -47,13 +47,13 @@ type AggCryptoMeta struct {
 
 type AggEquity struct {
 	PriceData       []AggOHLCV    		`json:"values"`
-	MetaData	    AggEquityMeta 	`json:"meta"`
+	MetaData	    AggEquityMeta	 	`json:"meta"`
 	Status			string				`json:"status"`
 }
 
 type AggCurrency struct {
 	PriceData       []AggOHLC    		`json:"values"`
-	MetaData	    AggCurrencyMeta	`json:"meta"`
+	MetaData	    AggCurrencyMeta		`json:"meta"`
 	Status			string				`json:"status"`
 }
 

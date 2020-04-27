@@ -42,10 +42,6 @@ type statsError struct {
 	err string
 }
 
-func (s statsError) Error() string {
-	return s.err
-}
-
 func (s statsError) String() string {
 	return s.err
 }

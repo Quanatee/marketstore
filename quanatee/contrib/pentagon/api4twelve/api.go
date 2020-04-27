@@ -89,7 +89,7 @@ func GetAggregates(
 	if err != nil {
 		return &OHLCV{}, err
 	}
-
+	
 	if strings.Compare(marketType, "equity") == 0 {
 		length = len(aggEquity.PriceData)
 	} else if strings.Compare(marketType, "currency") == 0 {
