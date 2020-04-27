@@ -45,8 +45,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	
 	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
-		log.Info("Adding Polygon %s A", symbol)
 		ohlcvs = append(ohlcvs, ohlcv)
+		log.Info("Adding Polygon %s A %v", symbol, len(ohlcvs))
 	}
 	
 	
@@ -56,31 +56,31 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			// Randomly run alt providers at 50% chance per alt provider to ease api usage
 			rand.Seed(time.Now().UnixNano())
 			if rand.Intn(2) == 0 {
-				log.Info("Adding Tiingo %s R", symbol)
 				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv_ti.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_ti)
+					log.Info("Adding Tiingo %s R %v", symbol, len(ohlcvs))
 				}
 			}
 			rand.Seed(time.Now().UnixNano())
 			if rand.Intn(2) == 0 {
-				log.Info("Adding Twelve %s R", symbol)
 				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 				if len(ohlcv_tw.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_tw)
+					log.Info("Adding Twelve %s R %v", symbol, len(ohlcvs))
 				}
 			}
 		} else {
 			// Run all alt providers since main provider failed to pull data
 			ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv_ti.HLC) > 0 {
-				log.Info("Adding Tiingo %s F", symbol)
 				ohlcvs = append(ohlcvs, ohlcv_ti)
+				log.Info("Adding Tiingo %s F %v", symbol, len(ohlcvs))
 			}
 			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv_tw.HLC) > 0 {
-				log.Info("Adding Tiingo %s F", symbol)
 				ohlcvs = append(ohlcvs, ohlcv_tw)
+				log.Info("Adding Tiingo %s F %v", symbol, len(ohlcvs))
 			}
 		}
 	} else {
@@ -88,13 +88,13 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		// Run all alt providers
 		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 		if len(ohlcv_ti.HLC) > 0 {
-			log.Info("Adding Tiingo %s B", symbol)
 			ohlcvs = append(ohlcvs, ohlcv_ti)
+			log.Info("Adding Tiingo %s B %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
-			log.Info("Adding Twelve %s B", symbol)
 			ohlcvs = append(ohlcvs, ohlcv_tw)
+			log.Info("Adding Twelve %s B %v", symbol, len(ohlcvs))
 		}
 	}
 
@@ -103,33 +103,33 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
 		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 		if len(ohlcv_pgt.HLC) > 0 {
-			log.Info("Adding Polygon USDT")
 			ohlcvs = append(ohlcvs, ohlcv_pgt)
+			log.Info("Adding Polygon USDT %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 		if len(ohlcv_tit.HLC) > 0 {
-			log.Info("Adding Tiingo USDT")
 			ohlcvs = append(ohlcvs, ohlcv_tit)
+			log.Info("Adding Tiingo USDT %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 		if len(ohlcv_twt.HLC) > 0 {
-			log.Info("Adding Twelve USDT")
 			ohlcvs = append(ohlcvs, ohlcv_twt)
+			log.Info("Adding Twelve USDT %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
 		if len(ohlcv_pgc.HLC) > 0 {
-			log.Info("Adding Polygon USDC")
 			ohlcvs = append(ohlcvs, ohlcv_pgc)
+			log.Info("Adding Polygon USDC %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 		if len(ohlcv_tic.HLC) > 0 {
-			log.Info("Adding Tiingo USDC")
 			ohlcvs = append(ohlcvs, ohlcv_tic)
+			log.Info("Adding Tiingo USDC %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 		if len(ohlcv_twc.HLC) > 0 {
-			log.Info("Adding Twelve USDC")
 			ohlcvs = append(ohlcvs, ohlcv_twc)
+			log.Info("Adding Twelve USDC %s %v", symbol, len(ohlcvs))
 		}
 	}
 
