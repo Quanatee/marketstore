@@ -103,8 +103,10 @@ func (qf *QuanateeFetcher) Run() {
 		}
 
 		if firstLoop == true {
-			filler.BackfillM.LoadOrStore(symbol, from.Unix())
-			go qf.workBackfillBars()
+			for _, symbol := range qf.config.Symbols {
+				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+				go qf.workBackfillBars()
+			}
 			firstLoop = false
 		}
 
