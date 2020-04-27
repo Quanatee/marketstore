@@ -6,9 +6,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
-	"strings"
-	// "github.com/rickar/cal"
-
+	
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4twelve"
@@ -47,7 +45,8 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 		return
     }
     
-	filler.BackfillM = &sync.Map{}
+	filler.BackfillFrom = &sync.Map{}
+	filler.BackfillMarket = &sync.Map{}
 	
 	return &QuanateeFetcher{
 		config: config,
