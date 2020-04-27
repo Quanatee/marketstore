@@ -252,4 +252,6 @@ func IsMarketOpen(
 			return false
 		}
 	}
+
+	return true
 }
