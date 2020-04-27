@@ -80,40 +80,42 @@ func (qf *QuanateeFetcher) Run() {
 			}
 		}
 		
-		// Market operating hours
-		// if strings.Compare(marketType, "forex") == 0 {
-		// } else if strings.Compare(marketType, "stocks") == 0 {
-		// 	if calendar.Nasdaq.IsMarketOpen(from) == false {
-		// 		continue;
-		// 	}
-		// }
-		
-		for _, symbol := range qf.config.Symbols {
-			var (
-				err  error
-				tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
-			)
-			if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
-				log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
-			}
-			
-			if firstLoop == true {
-				log.Info("")
-				filler.BackfillM.LoadOrStore(symbol, from.Unix())
-				go qf.workBackfillBars()
+		var (
+			err  error
+			tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
+		)
+
+		if filler.IsMarketOpen(qf.config.MarketType, from) == true {
+			// Market is open
+			for _, symbol := range qf.config.Symbols {
+				if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
+				}
 			}
 
+		} else {
+			// Market is closed but we just started pentagon
+			if firstLoop == true {
+				for _, symbol := range qf.config.Symbols {
+					if err = filler.Bars(symbol, qf.config.MarketType, from.AddDate(0, 0, -5), to); err != nil {
+						log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
+					}
+				}
+			}
+			
 		}
-				
+
+		if firstLoop == true {
+			filler.BackfillM.LoadOrStore(symbol, from.Unix())
+			go qf.workBackfillBars()
+			firstLoop = false
+		}
+
 		from = from.Add(time.Minute)
 		to = to.Add(time.Minute)
 		
-		if firstLoop == true {
-			firstLoop = false
-		}
 	}
 
-	select {}
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {

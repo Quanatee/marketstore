@@ -225,3 +225,32 @@ func GetDataFromProvider(
 	}
 	return OHLCV{}
 }
+
+func IsMarketOpen(
+	marketType string,
+	from time.Time) (bool) {
+
+	switch marketType {
+	case "crytpo":
+		return true
+	case "forex":
+		if ( 
+			( from.Weekday() == 0 && from.Hour() >= 22 ) || // Sunday night Australia opens
+			( from.Weekday() >= 1 && from.Weekday() <= 4 ) || // Monday to Thursday
+			( from.Weekday() == 5 && from.Hour() < 21 ) // Friday before 9PM UTC
+		) {
+			return true
+		} else {
+			return false
+		}
+	case "stocks":
+		if ( 
+			( from.Weekday() >= 1 && from.Weekday() <= 5 ) && // Monday to Friday
+			( from.Hour() >= 13 && from.Hour() < 21 ) // Between 1pm and before 9pm UTC (Actually 2.30pm but we start early to counter DST)
+		) {
+			return true
+		} else {
+			return false
+		}
+	}
+}
