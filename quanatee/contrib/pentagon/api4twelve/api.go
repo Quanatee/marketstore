@@ -13,7 +13,7 @@ import (
 	//"strconv"
 	"time"
 
-	"github.com/alpacahq/marketstore/utils/log"
+	//"github.com/alpacahq/marketstore/utils/log"
 	//"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )
@@ -95,7 +95,7 @@ func GetAggregates(
 		Spread: make(map[int64]float32),
 		VWAP: make(map[int64]float32),
 	}
-	
+
 	// Twelve candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
