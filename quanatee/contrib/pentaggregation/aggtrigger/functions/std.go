@@ -38,7 +38,7 @@ func convertFloat64ToFloat32(ar []float64) []float32 {
 
 // adopted from https://github.com/montanaflynn/stats
 
-type statsError struct {
+type statsErr struct {
 	err string
 }
 
@@ -117,6 +117,6 @@ func Mean(input []float64) (float64, error) {
 	for _, value := range input {
 		sum += value
 	}
-	
+
 	return sum / float64(len(input)), nil
 }
