@@ -57,10 +57,13 @@ func GetAggregates(
 			symbol = symbol[:3] + "/" + symbol[3:]
 		} else if strings.HasSuffix(symbol, "USD") {
 			symbol = symbol[:len(symbol)-3] + "/" + symbol[len(symbol)-3:]
-		}
-		if strings.HasPrefix(symbol, "USDT") {
+		} else if strings.HasPrefix(symbol, "USDT") {
 			symbol = symbol[:4] + "/" + symbol[4:]
 		} else if strings.HasSuffix(symbol, "USDT") {
+			symbol = symbol[:len(symbol)-4] + "/" + symbol[len(symbol)-4:]
+		} else if strings.HasPrefix(symbol, "USDC") {
+			symbol = symbol[:4] + "/" + symbol[4:]
+		} else if strings.HasSuffix(symbol, "USDC") {
 			symbol = symbol[:len(symbol)-4] + "/" + symbol[len(symbol)-4:]
 		}
 	}
