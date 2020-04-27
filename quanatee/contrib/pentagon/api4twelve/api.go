@@ -53,14 +53,22 @@ func GetAggregates(
 	q := u.Query()
 	q.Set("apikey", apiKey)
 	if strings.Compare(marketType, "equity") != 0 {
+		// USD
 		if strings.HasPrefix(symbol, "USD") {
 			symbol = symbol[:3] + "/" + symbol[3:]
 		} else if strings.HasSuffix(symbol, "USD") {
 			symbol = symbol[:len(symbol)-3] + "/" + symbol[len(symbol)-3:]
+		// BUSD
+		} else if strings.HasPrefix(symbol, "BUSD") {
+			symbol = symbol[:4] + "/" + symbol[4:]
+		} else if strings.HasSuffix(symbol, "BUSD") {
+			symbol = symbol[:len(symbol)-4] + "/" + symbol[len(symbol)-4:]
+		// USDT
 		} else if strings.HasPrefix(symbol, "USDT") {
 			symbol = symbol[:4] + "/" + symbol[4:]
 		} else if strings.HasSuffix(symbol, "USDT") {
 			symbol = symbol[:len(symbol)-4] + "/" + symbol[len(symbol)-4:]
+		// USDC
 		} else if strings.HasPrefix(symbol, "USDC") {
 			symbol = symbol[:4] + "/" + symbol[4:]
 		} else if strings.HasSuffix(symbol, "USDC") {

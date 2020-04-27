@@ -46,7 +46,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs = append(ohlcvs, ohlcv)
-		log.Info("Adding Polygon %s A %v", symbol, len(ohlcvs))
+		log.Debug("Adding Polygon %s A %v", symbol, len(ohlcvs))
 	}
 	
 	
@@ -59,7 +59,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv_ti.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_ti)
-					log.Info("Adding Tiingo %s R %v", symbol, len(ohlcvs))
+					log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
 				}
 			}
 			rand.Seed(time.Now().UnixNano())
@@ -67,7 +67,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 				if len(ohlcv_tw.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_tw)
-					log.Info("Adding Twelve %s R %v", symbol, len(ohlcvs))
+					log.Debug("Adding Twelve %s R %v", symbol, len(ohlcvs))
 				}
 			}
 		} else {
@@ -75,12 +75,12 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv_ti.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_ti)
-				log.Info("Adding Tiingo %s F %v", symbol, len(ohlcvs))
+				log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
 			}
 			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv_tw.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tw)
-				log.Info("Adding Tiingo %s F %v", symbol, len(ohlcvs))
+				log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
 			}
 		}
 	} else {
@@ -89,47 +89,65 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 		if len(ohlcv_ti.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_ti)
-			log.Info("Adding Tiingo %s B %v", symbol, len(ohlcvs))
+			log.Debug("Adding Tiingo %s B %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_tw)
-			log.Info("Adding Twelve %s B %v", symbol, len(ohlcvs))
+			log.Debug("Adding Twelve %s B %v", symbol, len(ohlcvs))
 		}
 	}
 
 	// If crypto, we mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	// This happens regardless of backfill and livefill
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
+		// BUSD
+		ohlcv_pgt := GetDataFromProvider("polygon", "B"+symbol, marketType, from, to)
+		if len(ohlcv_pgt.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_pgt)
+			log.Debug("Adding Polygon USDT %s %v", symbol, len(ohlcvs))
+		}
+		ohlcv_tit := GetDataFromProvider("tiingo", "B"+symbol, marketType, from, to)
+		if len(ohlcv_tit.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_tit)
+			log.Debug("Adding Tiingo USDT %s %v", symbol, len(ohlcvs))
+		}
+		ohlcv_twt := GetDataFromProvider("twelve", "B"+symbol, marketType, from, to)
+		if len(ohlcv_twt.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_twt)
+			log.Debug("Adding Twelve USDT %s %v", symbol, len(ohlcvs))
+		}
+		// USDT
 		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 		if len(ohlcv_pgt.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_pgt)
-			log.Info("Adding Polygon USDT %s %v", symbol, len(ohlcvs))
+			log.Debug("Adding Polygon USDT %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 		if len(ohlcv_tit.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_tit)
-			log.Info("Adding Tiingo USDT %s %v", symbol, len(ohlcvs))
+			log.Debug("Adding Tiingo USDT %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 		if len(ohlcv_twt.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_twt)
-			log.Info("Adding Twelve USDT %s %v", symbol, len(ohlcvs))
+			log.Debug("Adding Twelve USDT %s %v", symbol, len(ohlcvs))
 		}
+		// USDC
 		ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
 		if len(ohlcv_pgc.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_pgc)
-			log.Info("Adding Polygon USDC %s %v", symbol, len(ohlcvs))
+			log.Debug("Adding Polygon USDC %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 		if len(ohlcv_tic.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_tic)
-			log.Info("Adding Tiingo USDC %s %v", symbol, len(ohlcvs))
+			log.Debug("Adding Tiingo USDC %s %v", symbol, len(ohlcvs))
 		}
 		ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 		if len(ohlcv_twc.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_twc)
-			log.Info("Adding Twelve USDC %s %v", symbol, len(ohlcvs))
+			log.Debug("Adding Twelve USDC %s %v", symbol, len(ohlcvs))
 		}
 	}
 
@@ -177,9 +195,9 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	
 	if len(Epochs) <= 3 {
-		log.Info("filler.Bars(%s) livefill from %v to %v with %v sources | Epochs(%v) HLCs(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), Epochs, HLCs)
+		log.Debug("filler.Bars(%s) livefill from %v to %v with %v sources | Epochs(%v) HLCs(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), Epochs, HLCs)
 	} else {
-		log.Info("filler.Bars(%s) backfill from %v to %v with %v sources | Length(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), len(Epochs))
+		log.Debug("filler.Bars(%s) backfill from %v to %v with %v sources | Length(%v)", symbol, from.Unix(), to.Unix(), len(ohlcvs), len(Epochs))
 	}
 
 	cs := io.NewColumnSeries()
