@@ -4,7 +4,8 @@ all:
 	GOFLAGS=$(GOFLAGS) go build -o $(GOPATH0)/bin/pentagon.so -buildmode=plugin .
 	GOFLAGS=$(GOFLAGS) go build -o $(GOPATH0)/bin/pentagon4forex.so -buildmode=plugin .
 	GOFLAGS=$(GOFLAGS) go build -o $(GOPATH0)/bin/pentagon4crypto.so -buildmode=plugin .
-	GOFLAGS=$(GOFLAGS) go build -o $(GOPATH0)/bin/pentagon4equity.so -buildmode=plugin .
+	GOFLAGS=$(GOFLAGS) go build -o $(GOPATH0)/bin/pentagon4stocks.so -buildmode=plugin .
+	GOFLAGS=$(GOFLAGS) go build -o $(GOPATH0)/bin/pentagon4etfs.so -buildmode=plugin .
 	
 debug:
 	GOFLAGS=$(GOFLAGS) go build -gcflags="all=-N -l" -o $(GOPATH0)/bin/pentagon.so -buildmode=plugin .
