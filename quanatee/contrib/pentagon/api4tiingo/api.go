@@ -84,7 +84,11 @@ func GetAggregates(
 	}
 	
 	if strings.Compare(marketType, "crypto") == 0 {
-		length = len(aggCrypto[0].PriceData)
+		if len(aggCrypto) > 0 {
+			length = len(aggCrypto[0].PriceData)
+		} else {
+			length = 0
+		}
 	} else {
 		length = len(agg.PriceData)
 	}
