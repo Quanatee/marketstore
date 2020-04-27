@@ -100,7 +100,6 @@ func (qf *QuanateeFetcher) Run() {
 					}
 				}
 			}
-			
 		}
 
 		if firstLoop == true {
