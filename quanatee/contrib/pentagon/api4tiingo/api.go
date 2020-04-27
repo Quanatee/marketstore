@@ -104,9 +104,10 @@ func GetAggregates(
 		High: make(map[int64]float32),
 		Low: make(map[int64]float32),
 		Close: make(map[int64]float32),
+		Volume: make(map[int64]float32),
 		HLC: make(map[int64]float32),
 		Spread: make(map[int64]float32),
-		Volume: make(map[int64]float32),
+		VWAP: make(map[int64]float32),
 	}
 	// Tiingo candle formula (Timestamp on close)
 	// Requested at 14:05:01
