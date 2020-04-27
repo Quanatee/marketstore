@@ -80,16 +80,12 @@ func (qf *QuanateeFetcher) Run() {
 			}
 		}
 		
-		var (
-			err  error
-			tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
-		)
-
 		if filler.IsMarketOpen(qf.config.MarketType, from) == true {
 			// Market is open
 			for _, symbol := range qf.config.Symbols {
+				var err error
 				if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
+					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			}
 
@@ -97,8 +93,9 @@ func (qf *QuanateeFetcher) Run() {
 			// Market is closed but we just started pentagon
 			if firstLoop == true {
 				for _, symbol := range qf.config.Symbols {
+					var err error
 					if err = filler.Bars(symbol, qf.config.MarketType, from.AddDate(0, 0, -5), to); err != nil {
-						log.Error("[polygon] bars livefill failure for key: [%v] (%v)", tbk.String(), err)
+						log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
 					}
 				}
 			}
