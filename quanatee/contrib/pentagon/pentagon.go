@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rickar/cal"
+	// "github.com/rickar/cal"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
@@ -78,10 +78,6 @@ func (qf *QuanateeFetcher) Run() {
 				time.Sleep(to.Sub(time.Now()))
 				time.Sleep(1*time.Second)
 			}
-		}
-		
-		if calendar.Nasdaq.IsMarketOpen(from) {
-			
 		}
 		
 		// Market operating hours
