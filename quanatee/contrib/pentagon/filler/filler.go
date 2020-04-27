@@ -162,7 +162,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 
 func GetDataFromProvider(
 	provider, symbol, marketType string,
-	from, to time.Time) (*OHLCV, error) {
+	from, to time.Time) (OHLCV, error) {
 	
 	switch provider {
 	case "polygon":
