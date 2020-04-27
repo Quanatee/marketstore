@@ -221,7 +221,7 @@ func GetDataFromProvider(
 	// 			}
 	// 			return reconstruct, err
 	// 		}
-		}
+	// 	}
 	}
 	return &OHLCV{}, err
 }
