@@ -16,10 +16,10 @@ type AggCrypto struct {
 	Ticker        string     	  `json:"ticker"`
 	BaseCurrency  string    	  `json:"baseCurrency"`
 	QuoteCurrency string  	      `json:"quoteCurrency"`
-	PriceData     []AggCryptoData	  `json:"priceData"`
+	PriceData     []AggCryptoData `json:"priceData"`
 }
 
-// Forex and Stocks
+// Forex and Equity
 type AggData struct {
 	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
 	Ticker         string  `json:"ticker"`

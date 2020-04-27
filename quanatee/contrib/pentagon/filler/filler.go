@@ -283,7 +283,7 @@ func IsMarketOpen(
 		} else {
 			return false
 		}
-	case "stocks":
+	case "equity":
 		if ( 
 			( from.Weekday() >= 1 && from.Weekday() <= 5 ) &&
 			( from.Hour() >= 13 && from.Hour() < 21 ) ) {

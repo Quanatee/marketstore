@@ -30,7 +30,7 @@ var (
 	symbolPrefix = map[string]string{
 		"crypto": "X:",
 		"forex": "C:",
-		"stocks": "",
+		"equity": "",
 	}
 )
 
@@ -88,7 +88,7 @@ func ListTickers() (*ListTickersResponse, error) {
 		q.Set("apiKey", apiKey)
 		q.Set("sort", "ticker")
 		q.Set("perpage", "50")
-		q.Set("market", "stocks")
+		q.Set("market", "equity")
 		q.Set("locale", "us")
 		q.Set("active", "true")
 		q.Set("page", strconv.FormatInt(int64(page), 10))

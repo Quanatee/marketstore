@@ -27,7 +27,7 @@ var (
 	aggURL = map[string]string{
 		"crypto": "%v/tiingo/crypto/prices",
 		"forex": "%v/fx/%v/prices",
-		"stocks": "%v/iex/%v/prices",
+		"equity": "%v/iex/%v/prices",
 	}
 	baseURL = "https://api.tiingo.com"
 	apiKey 	 string
@@ -63,7 +63,7 @@ func GetAggregates(
 	q.Set("endDate", to.Format(time.RFC3339))
 	if strings.Compare(marketType, "crypto") == 0 {
 		q.Set("tickers", symbol)
-	} else if strings.Compare(marketType, "stocks") == 0 {
+	} else if strings.Compare(marketType, "equity") == 0 {
 		q.Set("afterHours", "false")
 		q.Set("forceFill", "false")
 	}
@@ -113,7 +113,6 @@ func GetAggregates(
 	// Timestamped at 14:05
 	// We use Timestamp on open, so we substract 60s from the timetamp
     for bar := 0; bar < length; bar++ {
-		
 		if strings.Compare(marketType, "crypto") == 0 {
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
 				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	

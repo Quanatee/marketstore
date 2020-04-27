@@ -27,7 +27,7 @@ var (
 	aggURL = map[string]string{
 		"crypto": "%v/time_series",
 		"forex": "%v/time_series",
-		"stocks": "%v/time_series",
+		"equity": "%v/time_series",
 	}
 	baseURL = "https://api.twelvedata.com"
 	apiKey 	 string
@@ -52,7 +52,7 @@ func GetAggregates(
 	
 	q := u.Query()
 	q.Set("apikey", apiKey)
-	if strings.Compare(marketType, "stocks") != 0 {
+	if strings.Compare(marketType, "equity") != 0 {
 		if strings.HasPrefix(symbol, "USD") {
 			symbol = symbol[:3] + "/" + symbol[3:]
 		} else if strings.HasSuffix(symbol, "USD") {
@@ -74,15 +74,29 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	var agg Agg
+	var aggEquity AggEquity
+	var aggCurrency AggCurrency
+	var aggCrypto AggCrypto
 
-	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
+	if strings.Compare(marketType, "equity") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &AggEquity)
+	} else if strings.Compare(marketType, "currency") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &AggCurrency)
+	} else if strings.Compare(marketType, "crypto") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
+	}
 
 	if err != nil {
 		return &OHLCV{}, err
 	}
-	
-	length = len(agg.PriceData)
+
+	if strings.Compare(marketType, "equity") == 0 {
+		length = len(AggEquity.PriceData)
+	} else if strings.Compare(marketType, "currency") == 0 {
+		length = len(AggCurrency.PriceData)
+	} else if strings.Compare(marketType, "crypto") == 0 {
+		length = len(aggCrypto.PriceData)
+	}
 
 	if length == 0 {
 		return &OHLCV{}, nil
@@ -98,27 +112,66 @@ func GetAggregates(
 		Spread: make(map[int64]float32),
 		VWAP: make(map[int64]float32),
 	}
-
+	
 	// Twelve candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04
     for bar := 0; bar < length; bar++ {
-	
-		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-			dt, _ := time.Parse(time.RFC3339, agg.PriceData[bar].Date)	
-			Epoch := dt.Unix()
-			if Epoch >= from.Unix() {
-				// OHLCV
-				ohlcv.Open[Epoch] = agg.PriceData[bar].Open
-				ohlcv.High[Epoch] = agg.PriceData[bar].High
-				ohlcv.Low[Epoch] = agg.PriceData[bar].Low
-				ohlcv.Close[Epoch] = agg.PriceData[bar].Close
-				ohlcv.Volume[Epoch] = 1.0
-				// Extra
-				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-				ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+		if strings.Compare(marketType, "equity") == 0 {
+			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
+				dt, _ := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)	
+				Epoch := dt.Unix()
+				if Epoch >= from.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
+					if aggEquity.PriceData[bar].Volume != 0 {
+						ohlcv.Volume[Epoch] = aggEquity.PriceData[bar].Volume
+					} else {
+						ohlcv.Volume[Epoch] = 1.0
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+				}
+			}
+		} else if strings.Compare(marketType, "currency") == 0 {
+			if aggCurrency.PriceData[bar].Open != 0 && aggCurrency.PriceData[bar].High != 0 && aggCurrency.PriceData[bar].Low != 0 && aggCurrency.PriceData[bar].Close != 0 {
+				dt, _ := time.Parse(time.RFC3339, aggCurrency.PriceData[bar].Date)	
+				Epoch := dt.Unix()
+				if Epoch >= from.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggCurrency.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggCurrency.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggCurrency.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggCurrency.PriceData[bar].Close
+					ohlcv.Volume[Epoch] = 1.0
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+				}
+			}
+		} else if strings.Compare(marketType, "crypto") == 0 {
+			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
+				dt, _ := time.Parse(time.RFC3339, aggCrypto.PriceData[bar].Date)	
+				Epoch := dt.Unix()
+				if Epoch >= from.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggCrypto.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggCrypto.PriceData[bar].Close
+					ohlcv.Volume[Epoch] = 1.0
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+				}
 			}
 		}
 		
