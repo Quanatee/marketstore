@@ -55,7 +55,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		if len(ohlcv.HLC) > 0 {
 			// Randomly run alt providers at 50% chance per alt provider to ease api usage
 			rand.Seed(time.Now().UnixNano())
-			if rand.Intn(2) == 0 {
+			if rand.Intn(2) == 1 {
 				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv_ti.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_ti)
@@ -63,7 +63,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				}
 			}
 			rand.Seed(time.Now().UnixNano())
-			if rand.Intn(2) == 0 {
+			if rand.Intn(2) == 1 {
 				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 				if len(ohlcv_tw.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_tw)
