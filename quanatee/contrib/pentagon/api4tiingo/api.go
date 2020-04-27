@@ -43,6 +43,7 @@ func GetAggregates(
 	from, to time.Time) (*OHLCV, error) {
 
 	fullURL := ""
+
 	if strings.Compare(marketType, "crypto") == 0 {
 		fullURL = fmt.Sprintf(aggURL[marketType], baseURL)
 	} else {
@@ -50,6 +51,7 @@ func GetAggregates(
 	}
 
 	u, err := url.Parse(fullURL)
+
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +70,6 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	// agg := &Agg{}
-	// aggCrypto := &AggCrypto{}
-	// aggCrypto := &[]AggCrypto{}
 	var agg Agg
 	var aggCrypto []AggCrypto
 
@@ -83,11 +82,7 @@ func GetAggregates(
 	if err != nil {
 		return &OHLCV{}, err
 	}
-
-	if len(aggCrypto) == 0 {
-		return &OHLCV{}, nil
-	}
-
+	
 	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto[0].PriceData)
 	} else {
@@ -95,7 +90,6 @@ func GetAggregates(
 	}
 
 	if length == 0 {
-		log.Info("%s: len %v", symbol, length)
 		return &OHLCV{}, nil
 	}
 	
@@ -139,9 +133,9 @@ func GetAggregates(
 			}
 		} else {
 			if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
+				dt, _ := time.Parse(time.RFC3339, agg.PriceData[bar].Date)	
 				Epoch := dt.Unix() - 60
-				if dt.Unix() - 60 >= from.Unix() {
+				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 					ohlcv.High[Epoch] = agg.PriceData[bar].High

@@ -42,38 +42,39 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// ohlcvs := make([]OHLCV, 0)
 	var ohlcvs []OHLCV
 	
-	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
+	ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs = append(ohlcvs, ohlcv)
 	}
 	
+	rand.Seed(time.Now().UnixNano())
+	
 	if (to.Add(time.Minute)).After(time.Now()) {
 		// Current task livefill
 		if len(ohlcv.HLC) > 0 {
-			rand.Seed(time.Now().UnixNano())
-			// Randomly run alt providers at 34% chance per alt provider
+			// Randomly run alt providers at 34% chance per alt provider to ease api usage
 			if rand.Intn(3) == 0 {
 				ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv)
 				}
 			}
-			// if rand.Intn(3) == 0 {
-			// 	ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
-			// 	if len(ohlcv.HLC) > 0 {
-			// 		ohlcvs = append(ohlcvs, ohlcv)
-			// 	}
-			// }
+			if rand.Intn(3) == 0 {
+				ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+				if len(ohlcv.HLC) > 0 {
+					ohlcvs = append(ohlcvs, ohlcv)
+				}
+			}
 		} else {
 			// Run all alt providers since main provider  failed
 			ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv)
 			}
-			// ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
-			// if len(ohlcv.HLC) > 0 {
-			// 	ohlcvs = append(ohlcvs, ohlcv)
-			// }
+			ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+			if len(ohlcv.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv)
+			}
 		}
 	} else {
 		// Current task is backfill
@@ -82,10 +83,39 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		// ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
-		// if len(ohlcv.HLC) > 0 {
-		// 	ohlcvs = append(ohlcvs, ohlcv)
-		// }
+		ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+	}
+
+	// If crypto, we mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
+	// This happens regardless of backfill and livefill
+	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
+		ohlcv := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+		ohlcv := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+		ohlcv := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+		ohlcv := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+		ohlcv := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
+		ohlcv := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv)
+		}
 	}
 
 	// Get the Epoch slice of the largest OHLCV set
@@ -104,6 +134,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	if len(Epochs) == 0 {
 		return
 	}
+
 	var Opens, Highs, Lows, Closes, Volumes, HLCs, Spreads, Vwaps []float32
 	
 	for _, Epoch := range Epochs {
@@ -198,25 +229,25 @@ func GetDataFromProvider(
 				return reconstruct
 			}
 		}
-	// case "twelve":
-	// 	ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "minute", from, to)
-	// 	if err != nil {
-	// 		log.Error("[twelve] bars filler failure for: [%s] (%v)", symbol, err)
-	// 	} else {
-	// 		if len(ohlcv.HLC) > 0 {
-	// 			reconstruct := OHLCV{
-	// 				Open: ohlcv.Open,
-	// 				High: ohlcv.High,
-	// 				Low: ohlcv.Low,
-	// 				Close: ohlcv.Close,
-	// 				Volume: ohlcv.Volume,
-	// 				HLC: ohlcv.HLC,
-	// 				Spread: ohlcv.Spread,
-	// 				VWAP: ohlcv.VWAP,
-	// 			}
-	// 			return reconstruct, err
-	// 		}
-	// 	}
+	case "twelve":
+		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
+		if err != nil {
+			log.Error("[twelve] bars filler failure for: [%s] (%v)", symbol, err)
+		} else {
+			if len(ohlcv.HLC) > 0 {
+				reconstruct := OHLCV{
+					Open: ohlcv.Open,
+					High: ohlcv.High,
+					Low: ohlcv.Low,
+					Close: ohlcv.Close,
+					Volume: ohlcv.Volume,
+					HLC: ohlcv.HLC,
+					Spread: ohlcv.Spread,
+					VWAP: ohlcv.VWAP,
+				}
+				return reconstruct, err
+			}
+		}
 	}
 	return OHLCV{}
 }

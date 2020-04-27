@@ -11,6 +11,7 @@ import (
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4twelve"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/filler"
 	//"github.com/alpacahq/marketstore/contrib/polygon/handlers"
 	"github.com/alpacahq/marketstore/executor"
@@ -60,7 +61,7 @@ func (qf *QuanateeFetcher) Run() {
 	//log.Info("Market Type: %s", qf.config.MarketType)
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
-	//api4twelve.SetAPIKey(qf.config.TwelveApiKey)
+	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)

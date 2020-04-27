@@ -135,6 +135,7 @@ func GetAggregates(
 	from, to time.Time) (*OHLCV, error) {
 		
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
+
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +146,10 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	//agg := &Aggv2{}
 	var agg Aggv2
+
 	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
+	
 	if err != nil {
 		return &OHLCV{}, err
 	}
