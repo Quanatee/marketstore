@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
-
+	"strings"
 	// "github.com/rickar/cal"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
@@ -87,16 +87,17 @@ func (qf *QuanateeFetcher) Run() {
 			if filler.IsMarketOpen("crypto", from) == true {
 				// Market is open
 				if err = filler.Bars(symbol, "crypto", from, to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			} else if firstLoop == true {
 				// Market is closed but we just started pentagon
 				if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -7), to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			}
 			if firstLoop == true {
-				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+				filler.BackfillFrom.LoadOrStore(symbol, from.Unix())
+				filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 			}
 		}
 		// Loop Forex Symbols
@@ -105,16 +106,17 @@ func (qf *QuanateeFetcher) Run() {
 			if filler.IsMarketOpen("forex", from) == true {
 				// Market is open
 				if err = filler.Bars(symbol, "forex", from, to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			} else if firstLoop == true {
 				// Market is closed but we just started pentagon
 				if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -7), to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			}
 			if firstLoop == true {
-				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+				filler.BackfillFrom.LoadOrStore(symbol, from.Unix())
+				filler.BackfillMarket.LoadOrStore(symbol, "forex")
 			}
 		}
 		// Loop Equity Symbols
@@ -123,16 +125,17 @@ func (qf *QuanateeFetcher) Run() {
 			if filler.IsMarketOpen("equity", from) == true {
 				// Market is open
 				if err = filler.Bars(symbol, "equity", from, to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			} else if firstLoop == true {
 				// Market is closed but we just started pentagon
 				if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -7), to); err != nil {
-					log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
+					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 				}
 			}
 			if firstLoop == true {
-				filler.BackfillM.LoadOrStore(symbol, from.Unix())
+				filler.BackfillFrom.LoadOrStore(symbol, from.Unix())
+				filler.BackfillMarket.LoadOrStore(symbol, "equity")
 			}
 		}
 		// Start backfill and disable first loop
@@ -158,8 +161,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
-		filler.BackfillM.Range(func(key, value interface{}) bool {
+		filler.BackfillFrom.Range(func(key, value interface{}) bool {
 			symbol := key.(string)
+			marketType, _ := filler.BackfillMarket.Load(key)
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
 			if value != nil {
@@ -168,12 +172,12 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					defer wg.Done()
 
 					// backfill the symbol in parallel
-					stop := qf.backfillBars(symbol, value.(int64))
+					stop := qf.backfillBars(symbol, marketType.(string), value.(int64))
 					if stop == true {
 						log.Info("%s backfill is complete", symbol)
-						filler.BackfillM.Store(key, nil)
+						filler.BackfillFrom.Store(key, nil)
 					} else {
-						filler.BackfillM.LoadOrStore(key, nil)
+						filler.BackfillFrom.LoadOrStore(key, nil)
 					}
 				}()
 			}
@@ -190,7 +194,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 }
 
 // Backfill bars from start
-func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
+func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, endEpoch int64) bool {
 
 	var (
 		start time.Time
@@ -225,19 +229,19 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 
 	parsed, err := q.Parse()
 	if err != nil {
-		log.Error("[polygon] query parse failure (%v)", err)
+		log.Error("query parse failure (%v)", err)
 		return true
 	}
 
 	scanner, err := executor.NewReader(parsed)
 	if err != nil {
-		log.Error("[polygon] new scanner failure (%v)", err)
+		log.Error("new scanner failure (%v)", err)
 		return true
 	}
 
 	csm, err := scanner.Read()
 	if err != nil {
-		log.Error("[polygon] scanner read failure (%v)", err)
+		log.Error("scanner read failure (%v)", err)
 		return true
 	}
 
@@ -256,12 +260,11 @@ func (qf *QuanateeFetcher) backfillBars(symbol string, endEpoch int64) bool {
 		to = end
 		stop = true
 	}
-	
 	// log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
 	
 	// request & write the missing bars
-	if err = filler.Bars(symbol, qf.config.MarketType, from, to); err != nil {
-		log.Error("[polygon] bars backfill failure for key: [%v] (%v)", tbk.String(), err)
+	if err = filler.Bars(symbol, marketType, from, to); err != nil {
+		log.Error("bars backfill failure for key: [%v] (%v)", tbk.String(), err)
 	}
 	
 	return stop

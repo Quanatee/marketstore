@@ -18,7 +18,8 @@ import (
 
 var (
 	ErrRetry  = fmt.Errorf("retry error")
-	BackfillM *sync.Map
+	BackfillFrom *sync.Map
+	BackfillMarket *sync.Map
 )
 
 type OHLCV struct {
