@@ -95,8 +95,10 @@ func GetAggregates(
 		Spread: make(map[int64]float32),
 		VWAP: make(map[int64]float32),
 	}
-	// Twelve candle formula (Timestamp on ???)
-	// We use Timestamp on open
+	// Twelve candle formula (Timestamp on open)
+	// Requested at 14:05:01
+	// Candle built from 14:04 to 14:05
+	// Timestamped at 14:04
     for bar := 0; bar < length; bar++ {
 	
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {

@@ -42,9 +42,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	
 	var ohlcvs []OHLCV
-	var ohlcv OHLCV
 	
-	ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
+	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs = append(ohlcvs, ohlcv)
 	}
@@ -56,67 +55,67 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		if len(ohlcv.HLC) > 0 {
 			// Randomly run alt providers at 34% chance per alt provider to ease api usage
 			if rand.Intn(3) == 0 {
-				ohlcv = GetDataFromProvider("tiingo", symbol, marketType, from, to)
-				if len(ohlcv.HLC) > 0 {
-					ohlcvs = append(ohlcvs, ohlcv)
+				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+				if len(ohlcv_ti.HLC) > 0 {
+					ohlcvs = append(ohlcvs, ohlcv_ti)
 				}
 			}
 			if rand.Intn(3) == 0 {
-				ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
-				if len(ohlcv.HLC) > 0 {
-					ohlcvs = append(ohlcvs, ohlcv)
+				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
+				if len(ohlcv_tw.HLC) > 0 {
+					ohlcvs = append(ohlcvs, ohlcv_tw)
 				}
 			}
 		} else {
-			// Run all alt providers since main provider failed
-			ohlcv = GetDataFromProvider("tiingo", symbol, marketType, from, to)
-			if len(ohlcv.HLC) > 0 {
-				ohlcvs = append(ohlcvs, ohlcv)
+			// Run all alt providers since main provider failed to pull data
+			ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+			if len(ohlcv_ti.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_ti)
 			}
-			ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
-			if len(ohlcv.HLC) > 0 {
-				ohlcvs = append(ohlcvs, ohlcv)
+			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
+			if len(ohlcv_tw.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_tw)
 			}
 		}
 	} else {
 		// Current task is backfill
 		// Run all alt providers
-		ohlcv = GetDataFromProvider("tiingo", symbol, marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+		if len(ohlcv_ti.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_ti)
 		}
-		ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
+		if len(ohlcv_tw.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_tw)
 		}
 	}
 
 	// If crypto, we mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	// This happens regardless of backfill and livefill
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
-		ohlcv = GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
+		if len(ohlcv_pgt.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_pgt)
 		}
-		ohlcv = GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
+		if len(ohlcv_tit.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_tit)
 		}
-		ohlcv = GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
+		if len(ohlcv_twt.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_twt)
 		}
-		ohlcv = GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
+		if len(ohlcv_pgc.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_pgc)
 		}
-		ohlcv = GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
+		if len(ohlcv_tic.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_tic)
 		}
-		ohlcv = GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv)
+		ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
+		if len(ohlcv_twc.HLC) > 0 {
+			ohlcvs = append(ohlcvs, ohlcv_twc)
 		}
 	}
 
