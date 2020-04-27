@@ -18,7 +18,7 @@ type AggOHLCV struct {
 }
 
 // Equity
-type AggEquitysMeta struct {
+type AggEquityMeta struct {
 	Symbol          string        `json:"symbol"`
 	Timeframe       string        `json:"interval"`
 	Currency        string        `json:"currency"`
@@ -47,19 +47,19 @@ type AggCryptoMeta struct {
 
 type AggEquity struct {
 	PriceData       []AggOHLCV    		`json:"values"`
-	MetaData	    []AggEquitysMeta 	`json:"meta"`
+	MetaData	    AggEquityMeta 	`json:"meta"`
 	Status			string				`json:"status"`
 }
 
 type AggCurrency struct {
 	PriceData       []AggOHLC    		`json:"values"`
-	MetaData	    []AggCurrencyMeta	`json:"meta"`
+	MetaData	    AggCurrencyMeta	`json:"meta"`
 	Status			string				`json:"status"`
 }
 
 type AggCrypto struct {
 	PriceData       []AggOHLC	  		`json:"values"`
-	MetaData	    []AggCryptoMeta   	`json:"meta"`
+	MetaData	    AggCryptoMeta   	`json:"meta"`
 	Status			string				`json:"status"`
 }
 
