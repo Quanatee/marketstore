@@ -51,7 +51,7 @@ func GetAggregates(
 	}
 	
 	q := u.Query()
-	q.Set("apiKey", apiKey)
+	q.Set("apikey", apiKey)
 	if strings.Compare(marketType, "stocks") != 0 {
 		if strings.HasPrefix(symbol, "USD") {
 			symbol = symbol[:3] + "/" + symbol[3:]
