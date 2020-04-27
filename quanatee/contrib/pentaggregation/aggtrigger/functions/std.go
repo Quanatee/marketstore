@@ -14,7 +14,7 @@ func StdFloat64(values []float64) float64 {
 
 	std, _ := StandardDeviation(values)
 
-	return result
+	return values
 }
 
 func convertFloat32ToFloat64(ar []float32) []float64 {
@@ -35,7 +35,20 @@ func convertFloat64ToFloat32(ar []float64) []float32 {
 	}
 	return newar
  }
- 
+
+// adopted from https://github.com/montanaflynn/stats
+
+ var (
+    EmptyInputErr = statsErr{"Input must not be empty."}
+    NaNErr        = statsErr{"Not a number."}
+    NegativeErr   = statsErr{"Must not contain negative values."}
+    ZeroErr       = statsErr{"Must not contain zero values."}
+    BoundsErr     = statsErr{"Input is outside of range."}
+    SizeErr       = statsErr{"Must be the same length."}
+    InfValue      = statsErr{"Value is infinite."}
+    YCoordErr     = statsErr{"Y Value must be greater than zero."}
+)
+
 // StandardDeviation the amount of variation in the dataset
 func StandardDeviation(input []float64) (sdev float64, err error) {
 	return StandardDeviationPopulation(input)
@@ -44,7 +57,7 @@ func StandardDeviation(input []float64) (sdev float64, err error) {
 // StandardDeviationPopulation finds the amount of variation from the population
 func StandardDeviationPopulation(input []float64) (sdev float64, err error) {
 
-	if input.Len() == 0 {
+	if len(input) == 0 {
 		return math.NaN(), EmptyInputErr
 	}
 
@@ -71,7 +84,7 @@ func PopulationVariance(input []float64) (pvar float64, err error) {
 // _variance finds the variance for both population and sample data
 func _variance(input []float64, sample int) (variance float64, err error) {
 
-	if input.Len() == 0 {
+	if len(input) == 0 {
 		return math.NaN(), EmptyInputErr
 	}
 
@@ -85,18 +98,18 @@ func _variance(input []float64, sample int) (variance float64, err error) {
 	// When getting the mean of the squared differences
 	// "sample" will allow us to know if it's a sample
 	// or population and wether to subtract by one or not
-	return variance / float64((input.Len() - (1 * sample))), nil
+	return variance / float64((len(input) - (1 * sample))), nil
 }
 
 
 // Mean gets the average of a slice of numbers
 func Mean(input []float64) (float64, error) {
 
-	if input.Len() == 0 {
+	if len(input) == 0 {
 		return math.NaN(), EmptyInputErr
 	}
 
 	sum, _ := input.Sum()
 
-	return sum / float64(input.Len()), nil
+	return sum / float64(len(input)), nil
 }
