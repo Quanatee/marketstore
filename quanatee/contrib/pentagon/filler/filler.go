@@ -48,19 +48,20 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		ohlcvs = append(ohlcvs, ohlcv)
 	}
 	
-	rand.Seed(time.Now().UnixNano())
 	
 	if (to.Add(time.Minute)).After(time.Now()) {
 		// Current task livefill
 		if len(ohlcv.HLC) > 0 {
-			// Randomly run alt providers at 34% chance per alt provider to ease api usage
-			if rand.Intn(3) == 0 {
+			// Randomly run alt providers at 50% chance per alt provider to ease api usage
+			rand.Seed(time.Now().UnixNano())
+			if rand.Intn(2) == 0 {
 				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv_ti.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_ti)
 				}
 			}
-			if rand.Intn(3) == 0 {
+			rand.Seed(time.Now().UnixNano())
+			if rand.Intn(2) == 0 {
 				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 				if len(ohlcv_tw.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv_tw)
@@ -93,28 +94,35 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// If crypto, we mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	// This happens regardless of backfill and livefill
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
+		log.Info("Is Crypto with USD")
 		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 		if len(ohlcv_pgt.HLC) > 0 {
+			log.Info("Adding Polygon USDT")
 			ohlcvs = append(ohlcvs, ohlcv_pgt)
 		}
 		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 		if len(ohlcv_tit.HLC) > 0 {
+			log.Info("Adding Tiingo USDT")
 			ohlcvs = append(ohlcvs, ohlcv_tit)
 		}
 		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 		if len(ohlcv_twt.HLC) > 0 {
+			log.Info("Adding Twelve USDT")
 			ohlcvs = append(ohlcvs, ohlcv_twt)
 		}
 		ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
 		if len(ohlcv_pgc.HLC) > 0 {
+			log.Info("Adding Polygon USDC")
 			ohlcvs = append(ohlcvs, ohlcv_pgc)
 		}
 		ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 		if len(ohlcv_tic.HLC) > 0 {
+			log.Info("Adding Tiingo USDC")
 			ohlcvs = append(ohlcvs, ohlcv_tic)
 		}
 		ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 		if len(ohlcv_twc.HLC) > 0 {
+			log.Info("Adding Twelve USDC")
 			ohlcvs = append(ohlcvs, ohlcv_twc)
 		}
 	}
