@@ -224,11 +224,16 @@ func GetDataFromProvider(
 	provider, symbol, marketType string,
 	from, to time.Time) (OHLCV) {
 	
+	filltype := "backfill"
+	if (to.Add(time.Minute)).After(time.Now()) {
+		filltype = "livefill"
+	}
+	
 	switch provider {
 	case "polygon":
 		ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 		if err != nil {
-			log.Error("[polygon] bars filler failure for: [%s] (%v)", symbol, err)
+			log.Error("[polygon] bars %s failure for: [%s] (%v)", filltype, symbol, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
 				reconstruct := OHLCV{
@@ -247,7 +252,7 @@ func GetDataFromProvider(
 	case "tiingo":
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
-			log.Error("[tiingo] bars filler failure for: [%s] (%v)", symbol, err)
+			log.Error("[tiingo] bars %s failure for: [%s] (%v)", filltype, symbol, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
 				reconstruct := OHLCV{
@@ -266,7 +271,7 @@ func GetDataFromProvider(
 	case "twelve":
 		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
-			log.Error("[twelve] bars filler failure for: [%s] (%v)", symbol, err)
+			log.Error("[twelve] bars %s failure for: [%s] (%v)", filltype, symbol, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
 				reconstruct := OHLCV{
