@@ -6,9 +6,11 @@ import (
 	"math/rand"
 	"sync"
 	"time"
+	"strings"
 
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4twelve"
 	"github.com/alpacahq/marketstore/executor"
 	"github.com/alpacahq/marketstore/utils/io"
 	"github.com/alpacahq/marketstore/utils/log"
@@ -66,7 +68,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				}
 			}
 		} else {
-			// Run all alt providers since main provider  failed
+			// Run all alt providers since main provider failed
 			ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv)
