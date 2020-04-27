@@ -120,13 +120,20 @@ func GetAggregates(
 				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
 				Epoch := dt.Unix() - 60
 				if dt.Unix() - 60 >= from.Unix() {
+					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto[0].PriceData[bar].Open
 					ohlcv.High[Epoch] = aggCrypto[0].PriceData[bar].High
 					ohlcv.Low[Epoch] = aggCrypto[0].PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggCrypto[0].PriceData[bar].Close
-					ohlcv.HLC[Epoch] = (aggCrypto[0].PriceData[bar].High + aggCrypto[0].PriceData[bar].Low + aggCrypto[0].PriceData[bar].Close)/3
-					ohlcv.Spread[Epoch] = aggCrypto[0].PriceData[bar].High - aggCrypto[0].PriceData[bar].Low
-					ohlcv.Volume[Epoch] = aggCrypto[0].PriceData[bar].Volume
+					if aggCrypto[0].PriceData[bar].Volume != 0 {
+						ohlcv.Volume[Epoch] = aggCrypto[0].PriceData[bar].Volume
+					} else {
+						ohlcv.Volume[Epoch] = 1.0
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
 				}
 			}
 		} else {
@@ -134,13 +141,16 @@ func GetAggregates(
 				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
 				Epoch := dt.Unix() - 60
 				if dt.Unix() - 60 >= from.Unix() {
+					// OHLCV
 					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 					ohlcv.High[Epoch] = agg.PriceData[bar].High
 					ohlcv.Low[Epoch] = agg.PriceData[bar].Low
 					ohlcv.Close[Epoch] = agg.PriceData[bar].Close
-					ohlcv.HLC[Epoch] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-					ohlcv.Spread[Epoch] = agg.PriceData[bar].High - agg.PriceData[bar].Low
 					ohlcv.Volume[Epoch] = 1.0
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
 				}
 			}
 		}

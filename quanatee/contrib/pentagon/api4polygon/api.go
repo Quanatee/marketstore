@@ -180,14 +180,20 @@ func GetAggregates(
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
 
 			Epoch := agg.PriceData[bar].Timestamp / 1000
+			//OHLCV
 			ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 			ohlcv.High[Epoch] = agg.PriceData[bar].High
 			ohlcv.Low[Epoch] = agg.PriceData[bar].Low
 			ohlcv.Close[Epoch] = agg.PriceData[bar].Close
-			ohlcv.HLC[Epoch] = (agg.PriceData[bar].High + agg.PriceData[bar].Low + agg.PriceData[bar].Close)/3
-			ohlcv.Spread[Epoch] = agg.PriceData[bar].High - agg.PriceData[bar].Low
-			ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
-
+			if agg.PriceData[bar].Volume != 0 {
+				ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
+			} else {
+				ohlcv.Volume[Epoch] = 1.0
+			}
+			// Extra
+			ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+			ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+			ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
 		}
 	}
 

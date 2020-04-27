@@ -278,6 +278,20 @@ func newAccumulator(cs *io.ColumnSeries, param accumParam) *accumulator {
 			return nil
 		}
 	}
+case "std":
+	inColumn := cs.GetColumn(param.inputName)
+	switch inColumn.(type) {
+	case []float32:
+		ifunc = functions.StdFloat32
+		iout = make([]float32, 0)
+	case []float64:
+		ifunc = functions.StdFloat64
+		iout = make([]float64, 0)
+	default:
+		fmt.Printf("no compatible function\n")
+		return nil
+	}
+}
 	return &accumulator{
 		iout:    iout,
 		ifunc:   ifunc,
