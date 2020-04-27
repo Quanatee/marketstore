@@ -95,7 +95,7 @@ func (qf *QuanateeFetcher) Run() {
 			if firstLoop == true {
 				for _, symbol := range qf.config.Symbols {
 					var err error
-					if err = filler.Bars(symbol, qf.config.MarketType, from.AddDate(0, 0, -5), to); err != nil {
+					if err = filler.Bars(symbol, qf.config.MarketType, from.AddDate(0, 0, -7), to); err != nil {
 						log.Error("[polygon] bars livefill failure for key: [%v] (%v)", symbol, err)
 					}
 				}
