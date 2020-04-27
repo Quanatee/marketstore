@@ -41,10 +41,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		to = time.Now()
 	}
 	
-	// ohlcvs := make([]OHLCV, 0)
 	var ohlcvs []OHLCV
+	var ohlcv OHLCV
 	
-	ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+	ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs = append(ohlcvs, ohlcv)
 	}
@@ -56,24 +56,24 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		if len(ohlcv.HLC) > 0 {
 			// Randomly run alt providers at 34% chance per alt provider to ease api usage
 			if rand.Intn(3) == 0 {
-				ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+				ohlcv = GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv)
 				}
 			}
 			if rand.Intn(3) == 0 {
-				ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+				ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
 				if len(ohlcv.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv)
 				}
 			}
 		} else {
 			// Run all alt providers since main provider failed
-			ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+			ohlcv = GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv)
 			}
-			ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+			ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv)
 			}
@@ -81,11 +81,11 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	} else {
 		// Current task is backfill
 		// Run all alt providers
-		ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+		ohlcv = GetDataFromProvider("tiingo", symbol, marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+		ohlcv = GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
@@ -94,27 +94,27 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// If crypto, we mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	// This happens regardless of backfill and livefill
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
-		ohlcv := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
+		ohlcv = GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		ohlcv := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
+		ohlcv = GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		ohlcv := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
+		ohlcv = GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		ohlcv := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
+		ohlcv = GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		ohlcv := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
+		ohlcv = GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
-		ohlcv := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
+		ohlcv = GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 		if len(ohlcv.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv)
 		}
@@ -247,7 +247,7 @@ func GetDataFromProvider(
 					Spread: ohlcv.Spread,
 					VWAP: ohlcv.VWAP,
 				}
-				return reconstruct, err
+				return reconstruct
 			}
 		}
 	}
