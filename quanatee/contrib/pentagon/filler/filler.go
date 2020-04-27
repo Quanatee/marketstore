@@ -238,8 +238,7 @@ func IsMarketOpen(
 		if ( 
 			( from.Weekday() == 0 && from.Hour() >= 22 ) ||
 			( from.Weekday() >= 1 && from.Weekday() <= 4 ) ||
-			( from.Weekday() == 5 && from.Hour() < 21 )
-		) {
+			( from.Weekday() == 5 && from.Hour() < 21 ) ) {
 			return true
 		} else {
 			return false
@@ -247,8 +246,7 @@ func IsMarketOpen(
 	case "stocks":
 		if ( 
 			( from.Weekday() >= 1 && from.Weekday() <= 5 ) &&
-			( from.Hour() >= 13 && from.Hour() < 21 )
-		) {
+			( from.Hour() >= 13 && from.Hour() < 21 ) ) {
 			return true
 		} else {
 			return false
