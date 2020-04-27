@@ -113,7 +113,10 @@ func Mean(input []float64) (float64, error) {
 		return math.NaN(), EmptyInputErr
 	}
 
-	sum, _ := input.Sum()
-
+	sum := 0.0
+	for _, value := range input {
+		sum += value
+	}
+	
 	return sum / float64(len(input)), nil
 }
