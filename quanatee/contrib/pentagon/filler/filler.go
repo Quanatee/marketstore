@@ -56,8 +56,9 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	if (to.Add(time.Minute)).After(time.Now()) {
 		// Current task livefill
 		if len(ohlcv.HLC) > 0 {
-			// Randomly run alt providers at 50% chance per alt provider
-			if rand.Intn(2) == 0 {
+			rand.Seed(time.Now().UnixNano())
+			// Randomly run alt providers at 34% chance per alt provider
+			if rand.Intn(3) == 0 {
 				ohlcv := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv.HLC) > 0 {
 					ohlcvs = append(ohlcvs, ohlcv)
