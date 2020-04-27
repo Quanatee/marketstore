@@ -32,7 +32,7 @@ bgworkers:
         - ETHUSD
       forex_symbols:
         - EURUSD
-        - GBPUSD
+        - USDGBP
       equity_symbols:
         - SPY
         - QQQ
