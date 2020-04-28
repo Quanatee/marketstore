@@ -65,7 +65,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(3) == 0 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv_tw.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tw)

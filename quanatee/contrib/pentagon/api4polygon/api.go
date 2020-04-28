@@ -179,7 +179,7 @@ func GetAggregates(
     for bar := 0; bar < length; bar++ {
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
 			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
-			if Epoch > from.Unix() && Epoch < to.Unix() { {
+			if Epoch > from.Unix() && Epoch < to.Unix() {
 				//OHLCV
 				ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 				ohlcv.High[Epoch] = agg.PriceData[bar].High

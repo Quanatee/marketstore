@@ -132,7 +132,7 @@ func GetAggregates(
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
 				dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 				Epoch := dt.Unix()
-				if Epoch > from.Unix() && Epoch < to.Unix() { {
+				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
 					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
@@ -149,7 +149,7 @@ func GetAggregates(
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
 				dt, _ := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
 				Epoch := dt.Unix()
-				if Epoch > from.Unix() && Epoch < to.Unix() { {
+				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
@@ -168,7 +168,7 @@ func GetAggregates(
 				dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
 				dt = dt.UTC()
 				Epoch := dt.Unix()
-				if Epoch > from.Unix() && Epoch < to.Unix() { {
+				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
