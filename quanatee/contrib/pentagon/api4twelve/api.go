@@ -129,9 +129,8 @@ func GetAggregates(
 	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
-			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
-			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Date)
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
+				dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
@@ -147,9 +146,8 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
-			dt, _ := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
-			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggForex.PriceData[bar].Date)
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
+				dt, _ := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
@@ -165,11 +163,10 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
-			loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
-			dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
-			dt = dt.UTC()
-			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
+				loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
+				dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
+				dt = dt.UTC()
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
