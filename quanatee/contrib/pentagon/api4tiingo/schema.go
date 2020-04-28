@@ -1,14 +1,14 @@
 package api4tiingo
 
 type AggCryptoData struct {
-	TradesDone     float32 `json:"tradesDone"`
-	Close          float32 `json:"close"`
-	VolumeNotional float32 `json:"volumeNotional"`
-	Low            float32 `json:"low"`
-	Open           float32 `json:"open"`
-	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
 	High           float32 `json:"high"`
+	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
+	Low            float32 `json:"low"`
+	Close          float32 `json:"close"`
+	TradesDone     float32 `json:"tradesDone"`
+	Open           float32 `json:"open"`
 	Volume         float32 `json:"volume"`
+	VolumeNotional float32 `json:"volumeNotional"`
 }
 
 type AggCrypto struct {
