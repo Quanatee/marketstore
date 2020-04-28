@@ -126,13 +126,13 @@ func GetAggregates(
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:05
-	// We use Timestamp on open, so we substract 60s from the timetamp
+	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
 			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Date)
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix() - 60
+				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
@@ -150,7 +150,7 @@ func GetAggregates(
 			dt, _ := time.Parse("2006-01-02 15:04:05", aggCurrency.PriceData[bar].Date)
 			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCurrency.PriceData[bar].Date)
 			if aggCurrency.PriceData[bar].Open != 0 && aggCurrency.PriceData[bar].High != 0 && aggCurrency.PriceData[bar].Low != 0 && aggCurrency.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix() - 60
+				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCurrency.PriceData[bar].Open
@@ -170,7 +170,7 @@ func GetAggregates(
 			dt = dt.UTC()
 			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix() - 60
+				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open

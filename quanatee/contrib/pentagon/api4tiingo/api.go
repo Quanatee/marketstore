@@ -117,14 +117,14 @@ func GetAggregates(
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:05
-	// We use Timestamp on open, so we substract 60s from the timetamp
+	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
 			dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto[0].PriceData[bar].Date)
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
-				Epoch := dt.Unix() - 60
-				if dt.Unix() - 60 >= from.Unix() {
+				Epoch := dt.Unix()
+				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto[0].PriceData[bar].Open
 					ohlcv.High[Epoch] = aggCrypto[0].PriceData[bar].High
@@ -145,7 +145,7 @@ func GetAggregates(
 			dt, _ := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
 			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggForex.PriceData[bar].Date)
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix() - 60
+				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
@@ -163,7 +163,7 @@ func GetAggregates(
 			dt, _ := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
 			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix() - 60
+				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open

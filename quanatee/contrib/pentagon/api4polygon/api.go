@@ -175,28 +175,29 @@ func GetAggregates(
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04
+	// We use Timestamp on close, so +60 to Timestamp
     for bar := 0; bar < length; bar++ {
-		
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
-
-			Epoch := agg.PriceData[bar].Timestamp / 1000
-			//OHLCV
-			ohlcv.Open[Epoch] = agg.PriceData[bar].Open
-			ohlcv.High[Epoch] = agg.PriceData[bar].High
-			ohlcv.Low[Epoch] = agg.PriceData[bar].Low
-			ohlcv.Close[Epoch] = agg.PriceData[bar].Close
-			if agg.PriceData[bar].Volume != 0 {
-				ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
-			} else {
-				ohlcv.Volume[Epoch] = 1.0
+			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+			if Epoch >= from.Unix() {
+				//OHLCV
+				ohlcv.Open[Epoch] = agg.PriceData[bar].Open
+				ohlcv.High[Epoch] = agg.PriceData[bar].High
+				ohlcv.Low[Epoch] = agg.PriceData[bar].Low
+				ohlcv.Close[Epoch] = agg.PriceData[bar].Close
+				if agg.PriceData[bar].Volume != 0 {
+					ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
+				} else {
+					ohlcv.Volume[Epoch] = 1.0
+				}
+				// Extra
+				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 			}
-			// Extra
-			ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-			ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-			ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 		}
 	}
-	
+
 	if len(ohlcv.HLC) == 0 {
 		log.Info("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 	}
