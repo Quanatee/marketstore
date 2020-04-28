@@ -107,7 +107,7 @@ func GetAggregates(
 	}
 
 	if length == 0 {
-		log.Debug("%s [twelve] returned 0 results between %v and %v", symbol, from, to)
+		log.Info("%s [twelve] returned 0 results between %v and %v", symbol, from, to)
 		return &OHLCV{}, nil
 	}
 	
@@ -191,7 +191,7 @@ func GetAggregates(
 		
 	}
 
-	log.Debug("%s [twelve] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+	log.Info("%s [twelve] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 
 	return ohlcv, nil
 
