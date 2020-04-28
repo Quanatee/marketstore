@@ -354,7 +354,7 @@ func IsMarketOpen(
 }
 
 
-func GetRandSeed() (int) {
+func GetRandSeed() (int64) {
 	var b [8]byte
 	_, err := crypto_rand.Read(b[:])
 	if err != nil {
