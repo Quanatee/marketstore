@@ -279,7 +279,7 @@ func GetDataFromProvider(
 			}
 		}
 	case "tiingo":
-		if strings.Compare(marketType, "crypto") == 0 && (to.Add(time.Minute)).After(time.Now()) {
+		if strings.Compare(marketType, "crypto") == 0 {
 			return OHLCV{}
 		}
 		if strings.Compare(marketType, "forex") == 0 {
