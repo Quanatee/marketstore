@@ -30,7 +30,7 @@ type OHLCV struct {
 	Volume    map[int64]float32
 	HLC       map[int64]float32
 	Spread    map[int64]float32
-	VWAP      map[int64]float32
+	TVAL      map[int64]float32
 }
 
 func Bars(symbol, marketType string, from, to time.Time) (err error) {
@@ -168,10 +168,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		return
 	}
 
-	var Opens, Highs, Lows, Closes, Volumes, HLCs, Spreads, Vwaps []float32
+	var Opens, Highs, Lows, Closes, Volumes, HLCs, Spreads, Tvals []float32
 	
 	for _, Epoch := range Epochs {
-		var open, high, low, close, volume, hlc, spread, vwap float32
+		var open, high, low, close, volume, hlc, spread, tval float32
 		for _, ohlcv_ := range ohlcvs {
 			if _, ok := ohlcv_.HLC[Epoch]; ok {
 				open += float32(ohlcv_.Open[Epoch])
@@ -181,7 +181,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				volume += float32(ohlcv_.Volume[Epoch])
 				hlc += float32(ohlcv_.HLC[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch])
-				vwap += float32(ohlcv_.VWAP[Epoch])
+				tval += float32(ohlcv_.TVAL[Epoch])
 			}
 		}
 		Opens = append(Opens, open / float32(len(ohlcvs)))
@@ -191,7 +191,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Volumes = append(Volumes, volume)
 		HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
 		Spreads = append(Spreads, spread / float32(len(ohlcvs)))
-		Vwaps = append(Vwaps, vwap / float32(len(ohlcvs)))
+		Tvals = append(Tvals, tval)
 	}
 	
 	if (to.Add(time.Minute)).After(time.Now()) {
@@ -209,7 +209,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	cs.AddColumn("Volume", Volumes)
 	cs.AddColumn("HLC", HLCs)
 	cs.AddColumn("Spread", Spreads)
-	cs.AddColumn("VWAP", Vwaps)
+	cs.AddColumn("TVAL", Tvals)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
 	csm := io.NewColumnSeriesMap()
@@ -245,7 +245,7 @@ func GetDataFromProvider(
 					Volume: ohlcv.Volume,
 					HLC: ohlcv.HLC,
 					Spread: ohlcv.Spread,
-					VWAP: ohlcv.VWAP,
+					TVAL: ohlcv.TVAL,
 				}
 				return reconstruct
 			}
@@ -266,7 +266,7 @@ func GetDataFromProvider(
 					Volume: ohlcv.Volume,
 					HLC: ohlcv.HLC,
 					Spread: ohlcv.Spread,
-					VWAP: ohlcv.VWAP,
+					TVAL: ohlcv.TVAL,
 				}
 				return reconstruct
 			}
@@ -287,7 +287,7 @@ func GetDataFromProvider(
 					Volume: ohlcv.Volume,
 					HLC: ohlcv.HLC,
 					Spread: ohlcv.Spread,
-					VWAP: ohlcv.VWAP,
+					TVAL: ohlcv.TVAL,
 				}
 				return reconstruct
 			}

@@ -13,7 +13,7 @@ import (
 	//"strconv"
 	"time"
 
-	//"github.com/alpacahq/marketstore/utils/log"
+	"github.com/alpacahq/marketstore/utils/log"
 	//"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )
@@ -107,7 +107,10 @@ func GetAggregates(
 	}
 
 	if length == 0 {
+		log.Info("%s [twelve] returned 0 results", symbol)
 		return &OHLCV{}, nil
+	} else {
+		log.Info("%s [twelve] returned %v results", symbol, length)
 	}
 	
 	ohlcv := &OHLCV{
@@ -118,7 +121,7 @@ func GetAggregates(
 		Volume: make(map[int64]float32),
 		HLC: make(map[int64]float32),
 		Spread: make(map[int64]float32),
-		VWAP: make(map[int64]float32),
+		TVAL: make(map[int64]float32),
 	}
 	
 	// Twelve candle formula (Timestamp on open)
@@ -144,7 +147,7 @@ func GetAggregates(
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				}
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
@@ -161,7 +164,7 @@ func GetAggregates(
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				}
 			}
 		} else if strings.Compare(marketType, "crypto") == 0 {
@@ -178,7 +181,7 @@ func GetAggregates(
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-					ohlcv.VWAP[Epoch] = (ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])/ohlcv.Volume[Epoch]
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				}
 			}
 		}
