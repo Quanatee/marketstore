@@ -193,14 +193,14 @@ func GetAggregates(
 	}
 
 	if len(ohlcv.HLC) == 0 {
-		log.Info("%s [twelve] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+		log.Debug("%s [twelve] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 		if length == 1 {
 			if strings.Compare(marketType, "crypto") == 0 {
-				log.Info("%s [twelve] LiveData: %v", symbol, aggCrypto)
+				log.Debug("%s [twelve] LiveData: %v", symbol, aggCrypto)
 			} else if strings.Compare(marketType, "forex") == 0 {
-				log.Info("%s [twelve] LiveData: %v", symbol, aggForex)
+				log.Debug("%s [twelve] LiveData: %v", symbol, aggForex)
 			} else if strings.Compare(marketType, "equity") == 0 {
-				log.Info("%s [twelve] LiveData: %v", symbol, aggEquity)
+				log.Debug("%s [twelve] LiveData: %v", symbol, aggEquity)
 			}
 		}
 	}

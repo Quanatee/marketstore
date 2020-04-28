@@ -199,9 +199,9 @@ func GetAggregates(
 	}
 
 	if len(ohlcv.HLC) == 0 {
-		log.Info("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+		log.Debug("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 		if length == 1 {
-			log.Info("%s [polygon] Data: %v", symbol, agg)
+			log.Debug("%s [polygon] Data: %v", symbol, agg)
 		}
 	}
 	
