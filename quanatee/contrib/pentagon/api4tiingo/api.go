@@ -77,9 +77,9 @@ func GetAggregates(
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
 	} else if strings.Compare(marketType, "forex") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex)
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex.PriceData)
 	} else if strings.Compare(marketType, "equity") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity.PriceData)
 	}
 
 	if err != nil {
@@ -93,9 +93,9 @@ func GetAggregates(
 			length = 0
 		}
 	} else if strings.Compare(marketType, "forex") == 0 {
-		length = len(aggForex)
+		length = len(aggForex.PriceData)
 	} else if strings.Compare(marketType, "equity") == 0 {
-		length = len(aggEquity)
+		length = len(aggEquity.PriceData)
 	}
 
 	if length == 0 {
@@ -142,17 +142,16 @@ func GetAggregates(
 					}
 				}
 		} else if strings.Compare(marketType, "forex") == 0 {
-			log.Info("%v", aggForex[bar])
-			dt, _ := time.Parse(time.RFC3339, aggForex[bar].PriceData.Date)
-			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggForex[bar].PriceData.Date)
-			if aggForex[bar].PriceData.Open != 0 && aggForex[bar].PriceData.High != 0 && aggForex[bar].PriceData.Low != 0 && aggForex[bar].PriceData.Close != 0 {
+			dt, _ := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
+			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggForex.PriceData[bar].Date)
+			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = aggForex[bar].PriceData.Open
-					ohlcv.High[Epoch] = aggForex[bar].PriceData.High
-					ohlcv.Low[Epoch] = aggForex[bar].PriceData.Low
-					ohlcv.Close[Epoch] = aggForex[bar].PriceData.Close
+					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
@@ -161,17 +160,16 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
-			log.Info("%v", aggEquity[bar])
-			dt, _ := time.Parse(time.RFC3339, aggEquity[bar].PriceData.Date)
-			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggEquity[bar].PriceData.Date)
-			if aggEquity[bar].PriceData.Open != 0 && aggEquity[bar].PriceData.High != 0 && aggEquity[bar].PriceData.Low != 0 && aggEquity[bar].PriceData.Close != 0 {
+			dt, _ := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
+			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
+			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = aggEquity[bar].PriceData.Open
-					ohlcv.High[Epoch] = aggEquity[bar].PriceData.High
-					ohlcv.Low[Epoch] = aggEquity[bar].PriceData.Low
-					ohlcv.Close[Epoch] = aggEquity[bar].PriceData.Close
+					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
