@@ -181,8 +181,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				}()
 			}
 
-			// limit 10 goroutines per CPU core
-			if count >= runtime.NumCPU()*10 {
+			// limit 2 goroutines per CPU core
+			if count >= runtime.NumCPU()*2 {
 				return false
 			}
 
