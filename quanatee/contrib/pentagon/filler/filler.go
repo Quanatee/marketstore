@@ -210,9 +210,9 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	}
 	
 	if (to.Add(time.Minute)).After(time.Now()) {
-		log.Info("filler.Bars(%s) livefill via [%v] [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
+		log.Info("filler.Bars(%s) livefill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	} else {
-		log.Info("filler.Bars(%s) backfill via [%v] [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
+		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	}
 
 	cs := io.NewColumnSeries()
@@ -270,7 +270,7 @@ func GetDataFromProvider(
 		if strings.Compare(marketType, "equity") != 0 && (to.Add(time.Minute)).After(time.Now()) == false {
 			return OHLCV{}
 		}
-		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from.AddDate(0, 0, -1), to.AddDate(0, 0, 1))
+		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			if !strings.Contains(err.Error(), "status code 400") {
 				log.Error("[tiingo] bars %s failure for: [%s] (%v)", filltype, symbol, err)
