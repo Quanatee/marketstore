@@ -128,9 +128,11 @@ func GetAggregates(
 	// Timestamped at 14:04
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "equity") == 0 {
+			loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
+			dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
+			dt = dt.UTC()
+			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Close)
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)	
-				log.Info("%s [twelve] Data: %v, From: %v, To: %v", symbol, dt, from, to)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
@@ -150,9 +152,9 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
+			dt, _ := time.Parse("2006-01-02 15:04:05", aggCurrency.PriceData[bar].Date)
+			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCurrency.PriceData[bar].Close)
 			if aggCurrency.PriceData[bar].Open != 0 && aggCurrency.PriceData[bar].High != 0 && aggCurrency.PriceData[bar].Low != 0 && aggCurrency.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggCurrency.PriceData[bar].Date)
-				log.Info("%s [twelve] Data: %v, From: %v, To: %v", symbol, dt, from, to)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
@@ -168,9 +170,9 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "crypto") == 0 {
+			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
+			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Close)
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggCrypto.PriceData[bar].Date)
-				log.Info("%s [twelve] Data: %v, From: %v, To: %v", symbol, dt, from, to)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
