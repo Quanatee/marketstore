@@ -142,16 +142,17 @@ func GetAggregates(
 					}
 				}
 		} else if strings.Compare(marketType, "forex") == 0 {
-			dt, _ := time.Parse(time.RFC3339, aggForex[bar].Date)	
-			log.Info("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggForex[bar].Date)
-			if aggForex[bar].Open != 0 && aggForex[bar].High != 0 && aggForex[bar].Low != 0 && aggForex[bar].Close != 0 {
+			log.Info("%v", aggForex[bar])
+			dt, _ := time.Parse(time.RFC3339, aggForex[bar].PriceData.Date)
+			log.Info("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggForex[bar].PriceData.Date)
+			if aggForex[bar].PriceData.Open != 0 && aggForex[bar].PriceData.High != 0 && aggForex[bar].PriceData.Low != 0 && aggForex[bar].PriceData.Close != 0 {
 				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = aggForex[bar].Open
-					ohlcv.High[Epoch] = aggForex[bar].High
-					ohlcv.Low[Epoch] = aggForex[bar].Low
-					ohlcv.Close[Epoch] = aggForex[bar].Close
+					ohlcv.Open[Epoch] = aggForex[bar].PriceData.Open
+					ohlcv.High[Epoch] = aggForex[bar].PriceData.High
+					ohlcv.Low[Epoch] = aggForex[bar].PriceData.Low
+					ohlcv.Close[Epoch] = aggForex[bar].PriceData.Close
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
@@ -160,16 +161,17 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
-			dt, _ := time.Parse(time.RFC3339, aggEquity[bar].Date)
-			log.Info("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggEquity[bar].Date)
-			if aggEquity[bar].Open != 0 && aggEquity[bar].High != 0 && aggEquity[bar].Low != 0 && aggEquity[bar].Close != 0 {
+			log.Info("%v", aggEquity[bar])
+			dt, _ := time.Parse(time.RFC3339, aggEquity[bar].PriceData.Date)
+			log.Info("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggEquity[bar].PriceData.Date)
+			if aggEquity[bar].PriceData.Open != 0 && aggEquity[bar].PriceData.High != 0 && aggEquity[bar].PriceData.Low != 0 && aggEquity[bar].PriceData.Close != 0 {
 				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = aggEquity[bar].Open
-					ohlcv.High[Epoch] = aggEquity[bar].High
-					ohlcv.Low[Epoch] = aggEquity[bar].Low
-					ohlcv.Close[Epoch] = aggEquity[bar].Close
+					ohlcv.Open[Epoch] = aggEquity[bar].PriceData.Open
+					ohlcv.High[Epoch] = aggEquity[bar].PriceData.High
+					ohlcv.Low[Epoch] = aggEquity[bar].PriceData.Low
+					ohlcv.Close[Epoch] = aggEquity[bar].PriceData.Close
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
