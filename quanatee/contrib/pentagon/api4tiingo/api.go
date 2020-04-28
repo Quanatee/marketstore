@@ -69,9 +69,7 @@ func GetAggregates(
 	}
 
 	u.RawQuery = q.Encode()
-
-	log.Info("%s [tiingo] %v", symbol, u)
-
+	
 	var aggCrypto []AggCrypto
 	var aggForex []AggForex
 	var aggEquity []AggEquity
