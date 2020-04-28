@@ -122,16 +122,17 @@ func GetAggregates(
 		TVAL: make(map[int64]float32),
 	}
 	
-	// Twelve candle formula (Timestamp on open)
+	// Twelve candle formula (Timestamp on close)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
-	// Timestamped at 14:04
+	// Timestamped at 14:05
+	// We use Timestamp on open, so we substract 60s from the timetamp
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
 			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Date)
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
@@ -149,7 +150,7 @@ func GetAggregates(
 			dt, _ := time.Parse("2006-01-02 15:04:05", aggCurrency.PriceData[bar].Date)
 			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCurrency.PriceData[bar].Date)
 			if aggCurrency.PriceData[bar].Open != 0 && aggCurrency.PriceData[bar].High != 0 && aggCurrency.PriceData[bar].Low != 0 && aggCurrency.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() - 60
 				if Epoch >= from.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCurrency.PriceData[bar].Open
@@ -166,7 +167,7 @@ func GetAggregates(
 		} else if strings.Compare(marketType, "equity") == 0 {
 			loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
-			dt = dt.UTC()
+			dt = dt.UTC() - 60
 			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()

@@ -44,7 +44,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	
 	var ohlcvs []OHLCV
 	
-	ohlcv := GetDataFromProvider("twelve", symbol, marketType, from, to)
+	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs = append(ohlcvs, ohlcv)
 		log.Debug("Adding Polygon %s A %v", symbol, len(ohlcvs))
