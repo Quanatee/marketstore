@@ -107,7 +107,7 @@ func GetAggregates(
 	}
 
 	if length == 0 {
-		log.Info("%s [twelve] returned 0 results between %v and %v", symbol, from, to)
+		log.Debug("%s [twelve] returned 0 results between %v and %v", symbol, from, to)
 		return &OHLCV{}, nil
 	}
 	
@@ -131,7 +131,7 @@ func GetAggregates(
 			loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
 			dt = dt.UTC()
-			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Close)
+			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Close)
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
@@ -153,7 +153,7 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
 			dt, _ := time.Parse("2006-01-02 15:04:05", aggCurrency.PriceData[bar].Date)
-			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCurrency.PriceData[bar].Close)
+			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCurrency.PriceData[bar].Close)
 			if aggCurrency.PriceData[bar].Open != 0 && aggCurrency.PriceData[bar].High != 0 && aggCurrency.PriceData[bar].Low != 0 && aggCurrency.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
@@ -171,7 +171,7 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "crypto") == 0 {
 			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
-			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Close)
+			log.Debug("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Close)
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
@@ -191,7 +191,7 @@ func GetAggregates(
 		
 	}
 
-	log.Info("%s [twelve] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+	log.Debug("%s [twelve] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 
 	return ohlcv, nil
 
