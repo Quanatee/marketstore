@@ -47,14 +47,11 @@ COPY /quanatee/mkts-store.yml .
 
 ARG POLYGON_API_KEY=${POLYGON_API_KEY}
 RUN test -z "$POLYGON_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
-# RUN test -z "$POLYGON_API_KEY" && sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml || :
 
 ARG TIINGO_API_KEY=${TIINGO_API_KEY}
 RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
-# RUN test -z "$TIINGO_API_KEY" && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml || :
 
 ARG TWELVE_API_KEY=${TWELVE_API_KEY}
 RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
-# RUN test -z "$TWELVE_API_KEY" && sed -i "s|<{twelve_api_key>|$TWELVE_API_KEY}|g" mkts.yml || :
 
 ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
