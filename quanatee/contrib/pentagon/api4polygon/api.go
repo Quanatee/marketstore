@@ -137,7 +137,7 @@ func GetAggregates(
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
 
 	if err != nil {
-		return nil, err
+		return &OHLCV{}, err
 	}
 	
 	q := u.Query()

@@ -53,7 +53,7 @@ func GetAggregates(
 	u, err := url.Parse(fullURL)
 
 	if err != nil {
-		return nil, err
+		return &OHLCV{}, err
 	}
 	
 	q := u.Query()
@@ -126,8 +126,11 @@ func GetAggregates(
 	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
+			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
+			if err_dt != nil {
+				continue;
+			}
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
@@ -147,8 +150,11 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "forex") == 0 {
+			dt, err_dt := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
+			if err_dt != nil {
+				continue;
+			}
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
@@ -164,8 +170,11 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
+			dt, err_dt := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
+			if err_dt != nil {
+				continue;
+			}
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
