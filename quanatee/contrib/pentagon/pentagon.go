@@ -57,8 +57,9 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
 
-	//log.Info("Polygon Key: %s", qf.config.PolygonApiKey)
-	//log.Info("Market Type: %s", qf.config.MarketType)
+	log.Info("Polygon Key: %s", qf.config.PolygonApiKey)
+	log.Info("Tiingo Key: %s", qf.config.TiingoApiKey)
+	log.Info("Twelve Key: %s", qf.config.TwelveApiKey)
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
