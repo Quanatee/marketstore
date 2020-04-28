@@ -7,7 +7,9 @@ import (
 	"sync"
 	"time"
 	"strings"
-
+	crypto_rand "crypto/rand"
+    "encoding/binary"
+	
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4twelve"
@@ -54,7 +56,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		// Current task livefill
 		if len(ohlcv.HLC) > 0 {
 			// Randomly run alt providers at 50% chance per alt provider to ease api usage
-			rand.Seed(time.Now().UnixNano())
+			rand.Seed(GetRandSeed())
 			if rand.Intn(2) == 1 {
 				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 				if len(ohlcv_ti.HLC) > 0 {
@@ -62,7 +64,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 					log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
 				}
 			}
-			rand.Seed(time.Now().UnixNano())
+			rand.Seed(GetRandSeed())
 			if rand.Intn(2) == 1 {
 				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 				if len(ohlcv_tw.HLC) > 0 {
@@ -101,7 +103,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	// If crypto, we randomly mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
 		// BUSD
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_pgb := GetDataFromProvider("polygon", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_pgb.HLC) > 0 {
@@ -109,7 +111,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				log.Debug("Adding Polygon BUSD %s to %v", symbol, len(ohlcvs))
 			}
 		}
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
@@ -117,7 +119,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				log.Debug("Adding Tiingo BUSD %s to %v", symbol, len(ohlcvs))
 			}
 		}
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_twb := GetDataFromProvider("twelve", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_twb.HLC) > 0 {
@@ -126,7 +128,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		// USDT
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 			if len(ohlcv_pgt.HLC) > 0 {
@@ -134,7 +136,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				log.Debug("Adding Polygon USDT %s to %v", symbol, len(ohlcvs))
 			}
 		}
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 			if len(ohlcv_tit.HLC) > 0 {
@@ -142,7 +144,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				log.Debug("Adding Tiingo USDT %s to %v", symbol, len(ohlcvs))
 			}
 		}
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 			if len(ohlcv_twt.HLC) > 0 {
@@ -151,7 +153,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		// USDC
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
 			if len(ohlcv_pgc.HLC) > 0 {
@@ -159,7 +161,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				log.Debug("Adding Polygon USDC %s to %v", symbol, len(ohlcvs))
 			}
 		}
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 			if len(ohlcv_tic.HLC) > 0 {
@@ -167,7 +169,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				log.Debug("Adding Tiingo USDC %s to %v", symbol, len(ohlcvs))
 			}
 		}
-		rand.Seed(time.Now().UnixNano())
+		rand.Seed(GetRandSeed())
 		if rand.Intn(2) == 1 {
 			ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 			if len(ohlcv_twc.HLC) > 0 {
@@ -350,4 +352,14 @@ func IsMarketOpen(
 	}
 
 	return true
+}
+
+
+func GetRandSeed() (int) {
+	var b [8]byte
+	_, err := crypto_rand.Read(b[:])
+	if err != nil {
+		panic("cannot seed math/rand package with cryptographically secure random number generator")
+	}
+	return int64(binary.LittleEndian.Uint64(b[:]))
 }
