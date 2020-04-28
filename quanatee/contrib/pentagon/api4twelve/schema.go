@@ -27,7 +27,7 @@ type AggEquityMeta struct {
 	AssetType	    string	      `json:"type"`
 }
 
-type AggCurrencyMeta struct {
+type AggForexMeta struct {
 	Symbol          string        `json:"symbol"`
 	Timeframe       string        `json:"interval"`
 	CurrencyBase    string        `json:"currency_base"`
@@ -51,9 +51,9 @@ type AggEquity struct {
 	Status			string				`json:"status"`
 }
 
-type AggCurrency struct {
+type AggForex struct {
 	PriceData       []AggOHLC    		`json:"values"`
-	MetaData	    AggCurrencyMeta		`json:"meta"`
+	MetaData	    AggForexMeta		`json:"meta"`
 	Status			string				`json:"status"`
 }
 

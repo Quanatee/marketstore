@@ -83,7 +83,7 @@ func GetAggregates(
 	u.RawQuery = q.Encode()
 
 	var aggEquity AggEquity
-	var aggCurrency AggCurrency
+	var aggCurrency AggForex
 	var aggCrypto AggCrypto
 
 	if strings.Compare(marketType, "equity") == 0 {
