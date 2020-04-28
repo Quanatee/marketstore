@@ -130,6 +130,7 @@ func GetAggregates(
 		if strings.Compare(marketType, "equity") == 0 {
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
 				dt, _ := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)	
+				log.Info("%s [twelve] Data: %v, From: %v, To: %v", symbol, dt, from, to)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
@@ -150,7 +151,8 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
 			if aggCurrency.PriceData[bar].Open != 0 && aggCurrency.PriceData[bar].High != 0 && aggCurrency.PriceData[bar].Low != 0 && aggCurrency.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggCurrency.PriceData[bar].Date)	
+				dt, _ := time.Parse(time.RFC3339, aggCurrency.PriceData[bar].Date)
+				log.Info("%s [twelve] Data: %v, From: %v, To: %v", symbol, dt, from, to)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
@@ -167,7 +169,8 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "crypto") == 0 {
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
-				dt, _ := time.Parse(time.RFC3339, aggCrypto.PriceData[bar].Date)	
+				dt, _ := time.Parse(time.RFC3339, aggCrypto.PriceData[bar].Date)
+				log.Info("%s [twelve] Data: %v, From: %v, To: %v", symbol, dt, from, to)
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV

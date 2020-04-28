@@ -98,56 +98,82 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		}
 	}
 
-	// If crypto, we mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
-	// This happens regardless of backfill and livefill
+	// If crypto, we randomly mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
 		// BUSD
-		ohlcv_pgb := GetDataFromProvider("polygon", "B"+symbol, marketType, from, to)
-		if len(ohlcv_pgb.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_pgb)
-			log.Debug("Adding Polygon BUSD %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_pgb := GetDataFromProvider("polygon", "B"+symbol, marketType, from, to)
+			if len(ohlcv_pgb.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_pgb)
+				log.Debug("Adding Polygon BUSD %s to %v", symbol, len(ohlcvs))
+			}
 		}
-		ohlcv_tib := GetDataFromProvider("tiingo", "B"+symbol, marketType, from, to)
-		if len(ohlcv_tib.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_tib)
-			log.Debug("Adding Tiingo BUSD %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_tib := GetDataFromProvider("tiingo", "B"+symbol, marketType, from, to)
+			if len(ohlcv_tib.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_tib)
+				log.Debug("Adding Tiingo BUSD %s to %v", symbol, len(ohlcvs))
+			}
 		}
-		ohlcv_twb := GetDataFromProvider("twelve", "B"+symbol, marketType, from, to)
-		if len(ohlcv_twb.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_twb)
-			log.Debug("Adding Twelve BUSD %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_twb := GetDataFromProvider("twelve", "B"+symbol, marketType, from, to)
+			if len(ohlcv_twb.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_twb)
+				log.Debug("Adding Twelve BUSD %s to %v", symbol, len(ohlcvs))
+			}
 		}
 		// USDT
-		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
-		if len(ohlcv_pgt.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_pgt)
-			log.Debug("Adding Polygon USDT %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
+			if len(ohlcv_pgt.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_pgt)
+				log.Debug("Adding Polygon USDT %s to %v", symbol, len(ohlcvs))
+			}
 		}
-		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
-		if len(ohlcv_tit.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_tit)
-			log.Debug("Adding Tiingo USDT %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
+			if len(ohlcv_tit.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_tit)
+				log.Debug("Adding Tiingo USDT %s to %v", symbol, len(ohlcvs))
+			}
 		}
-		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
-		if len(ohlcv_twt.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_twt)
-			log.Debug("Adding Twelve USDT %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
+			if len(ohlcv_twt.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_twt)
+				log.Debug("Adding Twelve USDT %s to %v", symbol, len(ohlcvs))
+			}
 		}
 		// USDC
-		ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
-		if len(ohlcv_pgc.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_pgc)
-			log.Debug("Adding Polygon USDC %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
+			if len(ohlcv_pgc.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_pgc)
+				log.Debug("Adding Polygon USDC %s to %v", symbol, len(ohlcvs))
+			}
 		}
-		ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
-		if len(ohlcv_tic.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_tic)
-			log.Debug("Adding Tiingo USDC %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
+			if len(ohlcv_tic.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_tic)
+				log.Debug("Adding Tiingo USDC %s to %v", symbol, len(ohlcvs))
+			}
 		}
-		ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
-		if len(ohlcv_twc.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_twc)
-			log.Debug("Adding Twelve USDC %s to %v", symbol, len(ohlcvs))
+		rand.Seed(time.Now().UnixNano())
+		if rand.Intn(2) == 1 {
+			ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
+			if len(ohlcv_twc.HLC) > 0 {
+				ohlcvs = append(ohlcvs, ohlcv_twc)
+				log.Debug("Adding Twelve USDC %s to %v", symbol, len(ohlcvs))
+			}
 		}
 	}
 

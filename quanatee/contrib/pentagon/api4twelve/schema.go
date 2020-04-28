@@ -3,16 +3,16 @@ package api4twelve
 type AggOHLC struct {
 	Date           string  `json:"datetime"` // "2017-12-19T00:00:00"
 	Open           float32 `json:"open,string"`
-	Low            float32 `json:"low,string"`
 	High           float32 `json:"high,string"`
+	Low            float32 `json:"low,string"`
 	Close          float32 `json:"close,string"`
 }
 
 type AggOHLCV struct {
 	Date           string  `json:"datetime"` // "2017-12-19T00:00:00"
 	Open           float32 `json:"open,string"`
-	Low            float32 `json:"low,string"`
 	High           float32 `json:"high,string"`
+	Low            float32 `json:"low,string"`
 	Close          float32 `json:"close,string"`
 	Volume         float32 `json:"volume,string"`
 }
