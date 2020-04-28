@@ -31,8 +31,8 @@ type OHLCV struct {
 	Close     map[int64]float32
 	Volume    map[int64]float32
 	HLC       map[int64]float32
-	Spread    map[int64]float32
 	TVAL      map[int64]float32
+	Spread    map[int64]float32
 }
 
 func Bars(symbol, marketType string, from, to time.Time) (err error) {
@@ -51,60 +51,43 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		ohlcvs = append(ohlcvs, ohlcv)
 		log.Debug("Adding Polygon %s A %v", symbol, len(ohlcvs))
 	}
-	
-	if (to.Add(time.Minute)).After(time.Now()) {
-		// Current task livefill
-		if len(ohlcv.HLC) > 0 {
-			// Randomly run alt providers at 50% chance per alt provider to ease api usage
-			rand.Seed(GetRandSeed())
-			if rand.Intn(2) == 1 {
-				ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
-				if len(ohlcv_ti.HLC) > 0 {
-					ohlcvs = append(ohlcvs, ohlcv_ti)
-					log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
-				}
-			}
-			rand.Seed(GetRandSeed())
-			if rand.Intn(2) == 1 {
-				ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
-				if len(ohlcv_tw.HLC) > 0 {
-					ohlcvs = append(ohlcvs, ohlcv_tw)
-					log.Debug("Adding Twelve %s R %v", symbol, len(ohlcvs))
-				}
-			}
-		} else {
-			// Run all alt providers since main provider failed to pull data
+	if len(ohlcv.HLC) > 0 {
+		// Randomly run alt providers to ease api usage
+		rand.Seed(GetRandSeed())
+		if rand.Intn(2) == 0 {
 			ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv_ti.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_ti)
-				log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
+				log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
 			}
+		}
+		rand.Seed(GetRandSeed())
+		if rand.Intn(3) == 0 {
 			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv_tw.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tw)
-				log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
+				log.Debug("Adding Twelve %s R %v", symbol, len(ohlcvs))
 			}
 		}
 	} else {
-		// Current task is backfill
-		// Run all alt providers
+		// Run all alt providers since main provider failed to pull data
 		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 		if len(ohlcv_ti.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_ti)
-			log.Debug("Adding Tiingo %s B %v", symbol, len(ohlcvs))
+			log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
 		}
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_tw)
-			log.Debug("Adding Twelve %s B %v", symbol, len(ohlcvs))
+			log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
 		}
 	}
-
+	
 	// If crypto, we randomly mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
 		// BUSD
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_pgb := GetDataFromProvider("polygon", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_pgb.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_pgb)
@@ -112,24 +95,26 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tib)
 				log.Debug("Adding Tiingo BUSD %s to %v", symbol, len(ohlcvs))
 			}
 		}
+		/*
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_twb := GetDataFromProvider("twelve", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_twb.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twb)
 				log.Debug("Adding Twelve BUSD %s to %v", symbol, len(ohlcvs))
 			}
 		}
+		*/
 		// USDT
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 			if len(ohlcv_pgt.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_pgt)
@@ -137,24 +122,26 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 			if len(ohlcv_tit.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tit)
 				log.Debug("Adding Tiingo USDT %s to %v", symbol, len(ohlcvs))
 			}
 		}
+		/*
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 			if len(ohlcv_twt.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twt)
 				log.Debug("Adding Twelve USDT %s to %v", symbol, len(ohlcvs))
 			}
 		}
+		*/
 		// USDC
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
 			if len(ohlcv_pgc.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_pgc)
@@ -162,21 +149,23 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 			if len(ohlcv_tic.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tic)
 				log.Debug("Adding Tiingo USDC %s to %v", symbol, len(ohlcvs))
 			}
 		}
+		/*
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 			if len(ohlcv_twc.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twc)
 				log.Debug("Adding Twelve USDC %s to %v", symbol, len(ohlcvs))
 			}
 		}
+		*/
 	}
 
 	// Get the Epoch slice of the largest OHLCV set
@@ -196,10 +185,10 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		return
 	}
 
-	var Opens, Highs, Lows, Closes, Volumes, HLCs, Spreads, Tvals []float32
+	var Opens, Highs, Lows, Closes, Volumes, HLCs, Tvals, Spreads []float32
 	
 	for _, Epoch := range Epochs {
-		var open, high, low, close, volume, hlc, spread, tval float32
+		var open, high, low, close, volume, hlc, tval, spread float32
 		for _, ohlcv_ := range ohlcvs {
 			if _, ok := ohlcv_.HLC[Epoch]; ok {
 				open += float32(ohlcv_.Open[Epoch])
@@ -208,8 +197,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 				close += float32(ohlcv_.Close[Epoch])
 				volume += float32(ohlcv_.Volume[Epoch])
 				hlc += float32(ohlcv_.HLC[Epoch])
-				spread += float32(ohlcv_.Spread[Epoch])
 				tval += float32(ohlcv_.TVAL[Epoch])
+				spread += float32(ohlcv_.Spread[Epoch])
 			}
 		}
 		Opens = append(Opens, open / float32(len(ohlcvs)))
@@ -218,8 +207,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Closes = append(Closes, close / float32(len(ohlcvs)))
 		Volumes = append(Volumes, volume)
 		HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
-		Spreads = append(Spreads, spread / float32(len(ohlcvs)))
 		Tvals = append(Tvals, tval)
+		Spreads = append(Spreads, spread / float32(len(ohlcvs)))
 	}
 	
 	if (to.Add(time.Minute)).After(time.Now()) {
@@ -236,8 +225,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	cs.AddColumn("Close", Closes)
 	cs.AddColumn("Volume", Volumes)
 	cs.AddColumn("HLC", HLCs)
-	cs.AddColumn("Spread", Spreads)
 	cs.AddColumn("TVAL", Tvals)
+	cs.AddColumn("Spread", Spreads)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
 	csm := io.NewColumnSeriesMap()
@@ -272,22 +261,20 @@ func GetDataFromProvider(
 					Close: ohlcv.Close,
 					Volume: ohlcv.Volume,
 					HLC: ohlcv.HLC,
-					Spread: ohlcv.Spread,
 					TVAL: ohlcv.TVAL,
+					Spread: ohlcv.Spread,
 				}
 				return reconstruct
 			}
 		}
 	case "tiingo":
-		if strings.Compare(marketType, "crypto") == 0 && (to.Add(time.Minute)).After(time.Now()) == false {
-			// Disable backfill
+		// Disable backfill for Crypto and Forex (causes crashes)
+		/*
+		if strings.Compare(marketType, "equity") != 0 && (to.Add(time.Minute)).After(time.Now()) == false {
 			return OHLCV{}
 		}
-		if strings.Compare(marketType, "forex") == 0 && (to.Add(time.Minute)).After(time.Now()) == false {
-			// Disable backfill
-			return OHLCV{}
-		}
-		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
+		*/
+		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from.AddDate(0, 0, -1), to.AddDate(0, 0, 1))
 		if err != nil {
 			if !strings.Contains(err.Error(), "status code 400") {
 				log.Error("[tiingo] bars %s failure for: [%s] (%v)", filltype, symbol, err)
@@ -301,8 +288,8 @@ func GetDataFromProvider(
 					Close: ohlcv.Close,
 					Volume: ohlcv.Volume,
 					HLC: ohlcv.HLC,
-					Spread: ohlcv.Spread,
 					TVAL: ohlcv.TVAL,
+					Spread: ohlcv.Spread,
 				}
 				return reconstruct
 			}
@@ -322,8 +309,8 @@ func GetDataFromProvider(
 					Close: ohlcv.Close,
 					Volume: ohlcv.Volume,
 					HLC: ohlcv.HLC,
-					Spread: ohlcv.Spread,
 					TVAL: ohlcv.TVAL,
+					Spread: ohlcv.Spread,
 				}
 				return reconstruct
 			}

@@ -118,8 +118,8 @@ func GetAggregates(
 		Close: make(map[int64]float32),
 		Volume: make(map[int64]float32),
 		HLC: make(map[int64]float32),
-		Spread: make(map[int64]float32),
 		TVAL: make(map[int64]float32),
+		Spread: make(map[int64]float32),
 	}
 	
 	// Twelve candle formula (Timestamp on close)
@@ -142,8 +142,8 @@ func GetAggregates(
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				}
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
@@ -160,8 +160,8 @@ func GetAggregates(
 					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
@@ -184,8 +184,8 @@ func GetAggregates(
 					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				}
 			}
 		}

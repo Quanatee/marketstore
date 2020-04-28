@@ -50,6 +50,6 @@ type OHLCV struct {
 	Close     map[int64]float32
 	Volume    map[int64]float32
 	HLC       map[int64]float32
-	Spread    map[int64]float32
 	TVAL      map[int64]float32
+	Spread    map[int64]float32
 }
