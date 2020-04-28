@@ -279,6 +279,11 @@ func GetDataFromProvider(
 			}
 		}
 	case "tiingo":
+		// Disable tiingo for Forex if Livefill
+		// Tiingo for Forex is not stable for livefilling
+		if strings.Compare(marketType, "forex") == 0 && (to.Add(time.Minute)).After(time.Now()) {
+			return OHLCV{}
+		}
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			if !strings.Contains(err.Error(), "status code 400") {
