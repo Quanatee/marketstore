@@ -196,9 +196,11 @@ func GetAggregates(
 			ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 		}
 	}
-
-	log.Debug("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
-
+	
+	if len(ohlcv.HLC) == 0 {
+		log.Info("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+	}
+	
 	return ohlcv, nil
 	
 }
