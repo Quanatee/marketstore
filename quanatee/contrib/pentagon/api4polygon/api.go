@@ -171,6 +171,12 @@ func GetAggregates(
 		TVAL: make(map[int64]float32),
 		Spread: make(map[int64]float32),
 	}
+	// Panic recovery
+    defer func() {
+        if err := recover(); err != nil {
+			return &OHLCV{}, err
+        }
+	}()
 	// Polygon candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
