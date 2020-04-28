@@ -279,7 +279,6 @@ func GetDataFromProvider(
 			}
 		}
 	case "tiingo":
-		return OHLCV{}
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			if !strings.Contains(err.Error(), "status code 400") {
