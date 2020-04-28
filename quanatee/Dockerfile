@@ -48,11 +48,10 @@ COPY /quanatee/mkts-store.yml .
 RUN test -z "$POLYGON_API_KEY" && { cp -u mkts-price.yml mkts.yml; sed -i "s|<polygon_api_key>|$POLYGON_API_KEY|g" mkts.yml; } || cp -u mkts-store.yml mkts.yml
 # RUN test -z "$POLYGON_API_KEY" && sed -i "s|<polygon_api_key>|$POLYGON_API_KEY|g" mkts.yml || :
 
-RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp mkts-store.yml mkts.yml
+RUN test -z "$TIINGO_API_KEY" && { cp -u mkts-price.yml mkts.yml; sed -i "s|<tiingo_api_key>|$TIINGO_API_KEY|g" mkts.yml; } || cp -u mkts-store.yml mkts.yml
 # RUN test -z "$TIINGO_API_KEY" && sed -i "s|<tiingo_api_key>|$TIINGO_API_KEY|g" mkts.yml || :
 
-RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
+RUN test -z "$TWELVE_API_KEY" && { cp -u mkts-price.yml mkts.yml; sed -i "s|<twelve_api_key>|$TWELVE_API_KEY|g" mkts.yml; } || cp -u mkts-store.yml mkts.yml
 # RUN test -z "$TWELVE_API_KEY" && sed -i "s|<twelve_api_key>|$TWELVE_API_KEY|g" mkts.yml || :
 
-# COPY /quanatee/mkts.yml .
 ENTRYPOINT marketstore start --config mkts.yml && /bin/bash
