@@ -33,10 +33,10 @@ type AggForex struct {
 
 type AggEquityData struct {
 	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
-	Open           float32 `json:"open"`
+	Close          float32 `json:"close"`
 	High           float32 `json:"high"`
 	Low            float32 `json:"low"`
-	Close          float32 `json:"close"`
+	Open           float32 `json:"open"`
 }
 
 type AggEquity struct {
