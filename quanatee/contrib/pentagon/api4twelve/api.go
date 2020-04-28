@@ -136,7 +136,7 @@ func GetAggregates(
 		if strings.Compare(marketType, "crypto") == 0 {
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 			if err_dt != nil {
-				continue;
+				return &OHLCV{}, err
 			}
 			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
@@ -156,7 +156,7 @@ func GetAggregates(
 		} else if strings.Compare(marketType, "currency") == 0 {
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
 			if err_dt != nil {
-				continue;
+				return &OHLCV{}, err
 			}
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
@@ -177,7 +177,7 @@ func GetAggregates(
 			loc, err_loc := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, err_dt := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
 			if err_loc != nil || err_dt != nil {
-				continue;
+				return &OHLCV{}, err
 			}
 			dt = dt.UTC()
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
