@@ -279,10 +279,12 @@ func GetDataFromProvider(
 			}
 		}
 	case "tiingo":
-		if strings.Compare(marketType, "crypto") == 0 {
+		if strings.Compare(marketType, "crypto") == 0 && (to.Add(time.Minute)).After(time.Now()) == false {
+			// Disable backfill
 			return OHLCV{}
 		}
-		if strings.Compare(marketType, "forex") == 0 {
+		if strings.Compare(marketType, "forex") == 0 && (to.Add(time.Minute)).After(time.Now()) == false {
+			// Disable backfill
 			return OHLCV{}
 		}
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
