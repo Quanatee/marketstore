@@ -114,11 +114,13 @@ func GetAggregates(
 		Spread: make(map[int64]float32),
 	}
 	// Panic recovery
+	/*
     defer func() {
         if err := recover(); err != nil {
             log.Error("Panic occurred:", err)
         }
 	}()
+	*/
 	// Tiingo candle formula (Timestamp on close)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
