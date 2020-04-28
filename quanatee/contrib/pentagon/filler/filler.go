@@ -209,7 +209,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		Spreads = append(Spreads, spread / float32(len(ohlcvs)))
 	}
 	
-	if (to.Add(time.Minute)).After(time.Now()) {
+	if (to.Add(5*time.Minute)).After(time.Now()) {
 		log.Info("filler.Bars(%s) livefill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	} else {
 		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
@@ -239,7 +239,7 @@ func GetDataFromProvider(
 	from, to time.Time) (OHLCV) {
 	
 	filltype := "backfill"
-	if (to.Add(time.Minute)).After(time.Now()) {
+	if (to.Add(5*time.Minute)).After(time.Now()) {
 		filltype = "livefill"
 	}
 	
@@ -268,7 +268,7 @@ func GetDataFromProvider(
 	case "tiingo":
 		// Disable backfill for Crypto and Forex (causes crashes)
 		/*
-		if strings.Compare(marketType, "equity") != 0 && (to.Add(time.Minute)).After(time.Now()) == false {
+		if strings.Compare(marketType, "equity") != 0 && (to.Add(5*time.Minute)).After(time.Now()) == false {
 			return OHLCV{}
 		}
 		*/
