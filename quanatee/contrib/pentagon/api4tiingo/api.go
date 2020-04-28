@@ -120,7 +120,7 @@ func GetAggregates(
 	// We use Timestamp on open, so we substract 60s from the timetamp
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
-			dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)	
+			dt, _ := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 			log.Info("%s [tiingo] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto[0].PriceData[bar].Close)
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
 					Epoch := dt.Unix() - 60
