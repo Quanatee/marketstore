@@ -39,5 +39,6 @@ EXPOSE 5993
 # ENTRYPOINT ["marketstore"]
 # CMD ["start", "--config", "/etc/mkts.yml"]
 
-COPY /quanatee/mkts.yml .
+RUN if [ -z "${POLYGON_API_KEY}" || -z "{$TIINGO_API_KEY}" || -z "{$TWELVE_API_KEY}" ]; then cp /quanatee/mkts-price.yml mkts.yml ; else cp /quanatee/mkts-store.yml mkts.yml ; fi
+# COPY /quanatee/mkts.yml .
 ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
