@@ -127,24 +127,18 @@ func GetAggregates(
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04
     for bar := 0; bar < length; bar++ {
-		if strings.Compare(marketType, "equity") == 0 {
-			loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
-			dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
-			dt = dt.UTC()
-			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
-			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
+		if strings.Compare(marketType, "crypto") == 0 {
+			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
+			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Date)
+			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
-					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
-					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
-					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					if aggEquity.PriceData[bar].Volume != 0 {
-						ohlcv.Volume[Epoch] = aggEquity.PriceData[bar].Volume
-					} else {
-						ohlcv.Volume[Epoch] = 1.0
-					}
+					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggCrypto.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggCrypto.PriceData[bar].Close
+					ohlcv.Volume[Epoch] = 1.0
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
@@ -169,18 +163,24 @@ func GetAggregates(
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				}
 			}
-		} else if strings.Compare(marketType, "crypto") == 0 {
-			dt, _ := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
-			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggCrypto.PriceData[bar].Date)
-			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
+		} else if strings.Compare(marketType, "equity") == 0 {
+			loc, _ := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
+			dt, _ := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
+			dt = dt.UTC()
+			log.Info("%s [twelve] Data: %v, From: %v, To: %v, Close: %v", symbol, dt, from, to, aggEquity.PriceData[bar].Date)
+			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
 				if Epoch >= from.Unix() {
 					// OHLCV
-					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
-					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
-					ohlcv.Low[Epoch] = aggCrypto.PriceData[bar].Low
-					ohlcv.Close[Epoch] = aggCrypto.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = 1.0
+					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
+					if aggEquity.PriceData[bar].Volume != 0 {
+						ohlcv.Volume[Epoch] = aggEquity.PriceData[bar].Volume
+					} else {
+						ohlcv.Volume[Epoch] = 1.0
+					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
