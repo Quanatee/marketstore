@@ -267,9 +267,11 @@ func GetDataFromProvider(
 		}
 	case "tiingo":
 		// Disable backfill for Crypto and Forex (causes crashes)
+		/*
 		if strings.Compare(marketType, "equity") != 0 && (to.Add(time.Minute)).After(time.Now()) == false {
 			return OHLCV{}
 		}
+		*/
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			if !strings.Contains(err.Error(), "status code 400") {
