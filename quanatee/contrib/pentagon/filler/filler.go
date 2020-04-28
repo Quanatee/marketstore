@@ -65,7 +65,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(2) == 0 {
+		if rand.Intn(2) == 1 {
 			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv_tw.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tw)
@@ -98,7 +98,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			log.Debug("Adding Polygon BUSD %s to %v", symbol, len(ohlcvs))
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(4) == 0 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tib)
@@ -106,7 +106,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(4) == 0 {
+		if rand.Intn(2) == 1 {
 			ohlcv_twb := GetDataFromProvider("twelve", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_twb.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twb)
@@ -122,7 +122,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			log.Debug("Adding Polygon USDT %s to %v", symbol, len(ohlcvs))
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(4) == 0 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 			if len(ohlcv_tit.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tit)
@@ -131,7 +131,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(4) == 0 {
+		if rand.Intn(2) == 1 {
 			ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 			if len(ohlcv_twt.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twt)
@@ -147,7 +147,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			log.Debug("Adding Polygon USDC %s to %v", symbol, len(ohlcvs))
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(4) == 0 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 			if len(ohlcv_tic.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tic)
@@ -156,7 +156,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 			}
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(4) == 0 {
+		if rand.Intn(2) == 1 {
 			ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 			if len(ohlcv_twc.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twc)
