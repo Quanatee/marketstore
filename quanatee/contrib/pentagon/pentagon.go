@@ -81,7 +81,6 @@ func (qf *QuanateeFetcher) Run() {
 			}
 		}
 		// Loop Crypto Symbols
-		/*
 		for _, symbol := range qf.config.CryptoSymbols {
 			var err error
 			if filler.IsMarketOpen("crypto", from) == true {
@@ -100,7 +99,6 @@ func (qf *QuanateeFetcher) Run() {
 				filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 			}
 		}
-		*/
 		// Loop Forex Symbols
 		for _, symbol := range qf.config.ForexSymbols {
 			var err error
