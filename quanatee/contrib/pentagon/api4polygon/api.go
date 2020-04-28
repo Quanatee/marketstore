@@ -174,7 +174,7 @@ func GetAggregates(
 	// Panic recovery
     defer func() {
         if err := recover(); err != nil {
-			return &OHLCV{}, err
+            log.Error("Panic occurred:", err)
         }
 	}()
 	// Polygon candle formula (Timestamp on open)
