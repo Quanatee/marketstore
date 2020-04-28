@@ -42,6 +42,17 @@ ARG POLYGON_API_KEY=${POLYGON_API_KEY}
 ARG TIINGO_API_KEY=${TIINGO_API_KEY}
 ARG TWELVE_API_KEY=${TWELVE_API_KEY}
 
-RUN if [ -z "$POLYGON_API_KEY" || -z "$TIINGO_API_KEY" || -z "$TWELVE_API_KEY" ]; then cp /quanatee/mkts-price.yml mkts.yml ; else cp /quanatee/mkts-store.yml mkts.yml ; fi
+COPY /quanatee/mkts-price.yml .
+COPY /quanatee/mkts-store.yml .
+
+RUN tests -z "$POLYGON_API_KEY" && cp mkts-price.yml mkts.yml || cp mkts-store.yml mkts.yml
+RUN tests -z "$POLYGON_API_KEY" && sed -i "s|<polygon_api_key>|$POLYGON_API_KEY|g" mkts.yml || :
+
+RUN tests -z "$TIINGO_API_KEY" && cp mkts-price.yml mkts.yml || cp mkts-store.yml mkts.yml
+RUN tests -z "$TIINGO_API_KEY" && sed -i "s|<tiingo_api_key>|$TIINGO_API_KEY|g" mkts.yml || :
+
+RUN tests -z "$TWELVE_API_KEY" && cp mkts-price.yml mkts.yml || cp mkts-store.yml mkts.yml
+RUN tests -z "$TWELVE_API_KEY" && sed -i "s|<twelve_api_key>|$TWELVE_API_KEY|g" mkts.yml || :
+
 # COPY /quanatee/mkts.yml .
-ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
+ENTRYPOINT marketstore start --config mkts.yml && /bin/bash
