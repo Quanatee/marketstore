@@ -1,6 +1,5 @@
 package api4tiingo
 
-// Crypto
 type AggCryptoData struct {
 	TradesDone     float32 `json:"tradesDone"`
 	Close          float32 `json:"close"`
@@ -19,7 +18,6 @@ type AggCrypto struct {
 	PriceData     []AggCryptoData `json:"priceData"`
 }
 
-// Forex and Equity
 type AggForexData struct {
 	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
 	Ticker         string  `json:"ticker"`
@@ -30,7 +28,7 @@ type AggForexData struct {
 }
 
 type AggForex struct {
-	PriceData	AggForexData
+	PriceData	[]AggForexData
 }
 
 type AggEquityData struct {
@@ -42,7 +40,7 @@ type AggEquityData struct {
 }
 
 type AggEquity struct {
-	PriceData	AggEquityData
+	PriceData	[]AggEquityData
 }
 
 type OHLCV struct {

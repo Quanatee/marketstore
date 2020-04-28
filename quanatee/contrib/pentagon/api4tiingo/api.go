@@ -71,8 +71,8 @@ func GetAggregates(
 	u.RawQuery = q.Encode()
 
 	var aggCrypto []AggCrypto
-	var aggForex []AggForex
-	var aggEquity []AggEquity
+	var aggForex AggForex
+	var aggEquity AggEquity
 
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
