@@ -128,6 +128,9 @@ func GetAggregates(
 	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
+			if len(aggCrypto[0].PriceData) == 0 {
+				return &OHLCV{}, err
+			}
 			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 			if err_dt != nil {
 				return &OHLCV{}, err
@@ -152,6 +155,9 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "forex") == 0 {
+			if len(aggForex.PriceData) == 0 {
+				return &OHLCV{}, err
+			}
 			dt, err_dt := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
 			if err_dt != nil {
 				return &OHLCV{}, err
@@ -172,6 +178,9 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
+			if len(aggEquity.PriceData) == 0 {
+				return &OHLCV{}, err
+			}
 			dt, err_dt := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
 			if err_dt != nil {
 				return &OHLCV{}, err
