@@ -103,7 +103,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		// BUSD
 		rand.Seed(time.Now().UnixNano())
 		if rand.Intn(2) == 1 {
-			ohlcv_pgb := GetDataFromProvider("polygon", "B"+symbol, marketType, from, to)
+			ohlcv_pgb := GetDataFromProvider("polygon", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_pgb.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_pgb)
 				log.Debug("Adding Polygon BUSD %s to %v", symbol, len(ohlcvs))
@@ -111,7 +111,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		}
 		rand.Seed(time.Now().UnixNano())
 		if rand.Intn(2) == 1 {
-			ohlcv_tib := GetDataFromProvider("tiingo", "B"+symbol, marketType, from, to)
+			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tib)
 				log.Debug("Adding Tiingo BUSD %s to %v", symbol, len(ohlcvs))
@@ -119,7 +119,7 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 		}
 		rand.Seed(time.Now().UnixNano())
 		if rand.Intn(2) == 1 {
-			ohlcv_twb := GetDataFromProvider("twelve", "B"+symbol, marketType, from, to)
+			ohlcv_twb := GetDataFromProvider("twelve", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_twb.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twb)
 				log.Debug("Adding Twelve BUSD %s to %v", symbol, len(ohlcvs))
