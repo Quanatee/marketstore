@@ -143,7 +143,7 @@ func GetAggregates(
 				}
 		} else if strings.Compare(marketType, "forex") == 0 {
 			if bar == length {
-				log.Info("?????")
+				log.Info("????? %s", symbol)
 			}
 			dt, _ := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
 			log.Debug("%s [tiingo] Parse: %v, From: %v, To: %v, Date: %v", symbol, dt, from, to, aggForex.PriceData[bar].Date)
