@@ -5,7 +5,7 @@ import "math/big"
 func RocFloat32(values []float32) float32 {
 
 	length := len(values)
-	two_parts = int(length/2)
+	two_parts := int(length/2)
 
 	avg_of_first_part := float32(0)
 	for _, val := range values[:two_parts] {
@@ -28,13 +28,13 @@ func RocFloat32(values []float32) float32 {
 func RocFloat64(values []float64) float64 {
 
 	length := len(values)
-	two_parts = int(length/2)
+	two_parts := int(length/2)
 
 	avg_of_first_part := big.NewFloat(float64(0.0))
 	for _, val := range values[:two_parts] {
         avg_of_first_part = avg_of_first_part.Add(avg_of_first_part, big.NewFloat(float64(val)))
 	}
-	float_avg_of_first_part, _ := float_avg_of_first_part.Float64()
+	float_avg_of_first_part, _ := avg_of_first_part.Float64()
 	float_avg_of_first_part = float_avg_of_first_part/float64(len(values[:two_parts]))
 	
 	avg_of_second_part := big.NewFloat(float64(0.0))
