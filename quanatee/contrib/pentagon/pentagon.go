@@ -281,9 +281,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	// log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
 	
 	// request & write the missing bars
-	if err = filler.Bars(symbol, marketType, from, to); err != nil {
-		log.Error("bars backfill failure for key: [%v] (%v)", tbk.String(), err)
-	}
+	filler.Bars(symbol, marketType, from, to)
 	
 	return stop
 }
