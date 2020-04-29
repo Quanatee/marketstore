@@ -214,7 +214,6 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 
 	var (
 		start time.Time
-		end   time.Time
 		from time.Time
 		err  error
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
@@ -269,7 +268,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 		from = start
 	}
 
-	to := from.AddDate(0, 0, 14)
+	to := from.AddDate(0, 0, 31)
 	if to.Unix() >= end.Unix() {
 		to = end
 		stop = true
