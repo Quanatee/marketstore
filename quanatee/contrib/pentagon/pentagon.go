@@ -239,7 +239,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	q := planner.NewQuery(cDir)
 	q.AddTargetKey(tbk)
 	q.SetRowLimit(io.LAST, 1)
-	q.SetEnd(endEpoch - int64(time.Minute.Seconds()))
+	q.SetEnd(end.Unix() - int64(time.Minute.Seconds()))
 
 	parsed, err := q.Parse()
 	if err != nil {
