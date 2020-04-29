@@ -131,7 +131,6 @@ func (qf *QuanateeFetcher) Run() {
 		}
 		// Loop Equity Symbols
 		for _, symbol := range qf.config.EquitySymbols {
-			var err error
 			if filler.IsMarketOpen("equity", from) == true {
 				// Market is open
 				go func() {
