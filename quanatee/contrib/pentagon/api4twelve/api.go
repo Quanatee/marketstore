@@ -136,6 +136,10 @@ func GetAggregates(
 	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
+			if len(aggCrypto.PriceData) <= bar {
+				// Unknown issue that causes index out of range (Probably malformed json)
+				return &OHLCV{}, err
+			}
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 			if err_dt != nil {
 				return &OHLCV{}, err
@@ -156,6 +160,10 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
+			if len(aggForex.PriceData) <= bar {
+				// Unknown issue that causes index out of range (Probably malformed json)
+				return &OHLCV{}, err
+			}
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
 			if err_dt != nil {
 				return &OHLCV{}, err
@@ -176,6 +184,10 @@ func GetAggregates(
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
+			if len(aggEquity.PriceData) <= bar {
+				// Unknown issue that causes index out of range (Probably malformed json)
+				return &OHLCV{}, err
+			}
 			loc, err_loc := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, err_dt := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
 			if err_loc != nil || err_dt != nil {
