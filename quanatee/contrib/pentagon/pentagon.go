@@ -123,6 +123,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 	}
 	defer wg2.Done()
+	defer wg2.Wait()
 }
 
 func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
@@ -145,6 +146,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 		}
 	}
 	defer wg2.Done()
+	defer wg2.Wait()
 }
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
@@ -166,6 +168,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 	}
 	defer wg2.Done()
+	defer wg2.Wait()
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
