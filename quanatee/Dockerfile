@@ -40,8 +40,8 @@ EXPOSE 5993
 # CMD ["start", "--config", "/etc/mkts.yml"]
 
 # Copy out pre-defined configs
-COPY /quanatee/mkts-store.yml .
 COPY /quanatee/mkts-price.yml .
+COPY /quanatee/mkts-store.yml .
 
 # "cp -u" only copies when file is missing or newer to assure that mkts.yml is not overwritten once created
 
