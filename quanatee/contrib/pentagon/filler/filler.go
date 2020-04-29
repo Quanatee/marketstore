@@ -35,7 +35,8 @@ type OHLCV struct {
 	Spread    map[int64]float32
 }
 
-func Bars(symbol, marketType string, from, to time.Time) {
+func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
+	defer wg.Done()
 	if from.IsZero() {
 		from = time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC)
 	}
