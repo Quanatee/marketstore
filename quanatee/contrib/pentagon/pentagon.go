@@ -72,7 +72,6 @@ func (qf *QuanateeFetcher) Run() {
 	
 	firstLoop := true
 	var wg sync.WaitGroup
-
 	for {
 		
 		for {
@@ -84,13 +83,13 @@ func (qf *QuanateeFetcher) Run() {
 		}
 
 		wg.Add(1)
-		go qf.liveCrypto(from, to, firstLoop)
+		go qf.liveCrypto(&wg, from, to, firstLoop)
 		wg.Add(1)
-		go qf.liveForex(from, to, firstLoop)
+		go qf.liveForex(&wg, from, to, firstLoop)
 		wg.Add(1)
-		go qf.liveEquity(from, to, firstLoop)
+		go qf.liveEquity(&wg, from, to, firstLoop)
 		wg.Wait()
-		
+
 		// Start backfill and disable first loop
 		if firstLoop == true {
 			go qf.workBackfillBars()
@@ -103,7 +102,8 @@ func (qf *QuanateeFetcher) Run() {
 
 }
 
-func (qf *QuanateeFetcher) liveCrypto(from, to time.Time, firstLoop bool) {
+func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
+	defer wg.Done()
 	var err error
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
@@ -125,7 +125,8 @@ func (qf *QuanateeFetcher) liveCrypto(from, to time.Time, firstLoop bool) {
 	}
 }
 
-func (qf *QuanateeFetcher) liveForex(from, to time.Time, firstLoop bool) {
+func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
+	defer wg.Done()
 	var err error
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
@@ -146,7 +147,8 @@ func (qf *QuanateeFetcher) liveForex(from, to time.Time, firstLoop bool) {
 		}
 	}
 }
-func (qf *QuanateeFetcher) liveEquity(from, to time.Time, firstLoop bool) {
+func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
+	defer wg.Done()
 	var err error
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
@@ -188,7 +190,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
-
+					
 					// backfill the symbol in parallel
 					stop := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
 					if stop == true {
