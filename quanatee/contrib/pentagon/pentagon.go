@@ -173,7 +173,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(60 * time.Second)
+	ticker := time.NewTicker(90 * time.Second)
 
 	for range ticker.C {
 		
@@ -203,8 +203,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				}()
 			}
 
-			// limit 12 goroutines per CPU core
-			if count >= runtime.NumCPU()*12 {
+			// limit 6 goroutines per CPU core
+			if count >= runtime.NumCPU()*6 {
 				return false
 			}
 
