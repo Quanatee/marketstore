@@ -173,7 +173,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 				filler.BackfillFrom.LoadOrStore(symbol, from)
 				filler.BackfillMarket.LoadOrStore(symbol, "equity")
 			}
-		}
+		}()
 	}
 }
 
