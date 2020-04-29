@@ -46,13 +46,13 @@ COPY /quanatee/mkts-price.yml .
 # "cp -u" only copies when file is missing or newer to assure that mkts.yml is not overwritten once created
 
 ARG POLYGON_API_KEY=${POLYGON_API_KEY}
-RUN test -z "$POLYGON_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+RUN test -z "$POLYGON_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
 
 ARG TIINGO_API_KEY=${TIINGO_API_KEY}
-RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
 
 ARG TWELVE_API_KEY=${TWELVE_API_KEY}
-RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
 
 # Create store config if not already created for price config
 RUN cp -u mkts-store.yml mkts.yml
