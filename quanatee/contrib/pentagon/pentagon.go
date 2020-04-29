@@ -101,7 +101,7 @@ func (qf *QuanateeFetcher) Run() {
 				}()
 			}
 			if firstLoop == true {
-				filler.BackfillFrom.LoadOrStore(symbol, from.Unix())
+				filler.BackfillFrom.LoadOrStore(symbol, from)
 				filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 			}
 		}
@@ -125,7 +125,7 @@ func (qf *QuanateeFetcher) Run() {
 				}()
 			}
 			if firstLoop == true {
-				filler.BackfillFrom.LoadOrStore(symbol, from.Unix())
+				filler.BackfillFrom.LoadOrStore(symbol, from)
 				filler.BackfillMarket.LoadOrStore(symbol, "forex")
 			}
 		}
@@ -149,7 +149,7 @@ func (qf *QuanateeFetcher) Run() {
 				}()
 			}
 			if firstLoop == true {
-				filler.BackfillFrom.LoadOrStore(symbol, from.Unix())
+				filler.BackfillFrom.LoadOrStore(symbol, from)
 				filler.BackfillMarket.LoadOrStore(symbol, "equity")
 			}
 		}
@@ -187,9 +187,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					defer wg.Done()
 
 					// backfill the symbol in parallel
-					stop := qf.backfillBars(symbol, marketType.(string), value.(int64))
+					stop := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
 					if stop == true {
-						log.Info("%s backfill is complete", symbol)
+						log.Info("%s backfill completed. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
 					} else {
 						filler.BackfillFrom.LoadOrStore(key, nil)
@@ -210,7 +210,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 }
 
 // Backfill bars from start
-func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, endEpoch int64) bool {
+func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time) bool {
 
 	var (
 		start time.Time
@@ -232,8 +232,6 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, endEpoch int6
 			break
 		}
 	}
-
-	end = time.Unix(endEpoch, 0)
 
 	// query the latest entry prior to the streamed record	
 	instance := executor.ThisInstance
