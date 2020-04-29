@@ -233,7 +233,7 @@ func downloadAndUnmarshal(url string, retryCount int, data interface{}) error {
 
 		if err != nil && strings.Contains(err.Error(), "GOAWAY") {
 			// Polygon's way to tell that we are too fast
-			time.Sleep(5 * time.Second)
+			time.Sleep(3 * time.Second)
 		}
 
 		return attempt < retryCount, err

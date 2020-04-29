@@ -79,21 +79,25 @@ func (qf *QuanateeFetcher) Run() {
 				break
 			} else {
 				time.Sleep(to.Sub(time.Now()))
-				time.Sleep(1*time.Second)
 			}
 		}
 		// Loop Crypto Symbols
 		for _, symbol := range qf.config.CryptoSymbols {
-			var err error
 			if filler.IsMarketOpen("crypto", from) == true {
 				// Market is open
-				if err = filler.Bars(symbol, "crypto", from, to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
+				go func() {
+					var err error
+					if err = filler.Bars(symbol, "crypto", from, to); err != nil {
+						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+					}
+				}()
 			} else if firstLoop == true {
 				// Market is closed but we just started pentagon
-				if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -7), to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+				go func() {
+					var err error
+					if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -7), to); err != nil {
+						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+					}
 				}
 			}
 			if firstLoop == true {
@@ -103,16 +107,21 @@ func (qf *QuanateeFetcher) Run() {
 		}
 		// Loop Forex Symbols
 		for _, symbol := range qf.config.ForexSymbols {
-			var err error
 			if filler.IsMarketOpen("forex", from) == true {
 				// Market is open
-				if err = filler.Bars(symbol, "forex", from, to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+				go func() {
+					var err error
+					if err = filler.Bars(symbol, "forex", from, to); err != nil {
+						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+					}
 				}
 			} else if firstLoop == true {
 				// Market is closed but we just started pentagon
-				if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -7), to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+				go func() {
+					var err error
+					if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -7), to); err != nil {
+						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+					}
 				}
 			}
 			if firstLoop == true {
@@ -125,13 +134,19 @@ func (qf *QuanateeFetcher) Run() {
 			var err error
 			if filler.IsMarketOpen("equity", from) == true {
 				// Market is open
-				if err = filler.Bars(symbol, "equity", from, to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+				go func() {
+					var err error
+					if err = filler.Bars(symbol, "equity", from, to); err != nil {
+						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+					}
 				}
 			} else if firstLoop == true {
 				// Market is closed but we just started pentagon
-				if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -7), to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+				go func() {
+					var err error
+					if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -7), to); err != nil {
+						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
+					}
 				}
 			}
 			if firstLoop == true {
