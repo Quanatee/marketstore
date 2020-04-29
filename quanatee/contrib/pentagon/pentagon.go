@@ -95,7 +95,7 @@ func (qf *QuanateeFetcher) Run() {
 				// Market is closed but we just started pentagon
 				go func() {
 					var err error
-					if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -7), to); err != nil {
+					if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -3), to); err != nil {
 						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 					}
 				}()
@@ -119,7 +119,7 @@ func (qf *QuanateeFetcher) Run() {
 				// Market is closed but we just started pentagon
 				go func() {
 					var err error
-					if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -7), to); err != nil {
+					if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -3), to); err != nil {
 						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 					}
 				}()
@@ -143,7 +143,7 @@ func (qf *QuanateeFetcher) Run() {
 				// Market is closed but we just started pentagon
 				go func() {
 					var err error
-					if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -7), to); err != nil {
+					if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -3), to); err != nil {
 						log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
 					}
 				}()
@@ -197,8 +197,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				}()
 			}
 
-			// limit 8 goroutines per CPU core
-			if count >= runtime.NumCPU()*8 {
+			// limit 12 goroutines per CPU core
+			if count >= runtime.NumCPU()*12 {
 				return false
 			}
 
@@ -271,7 +271,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, endEpoch int6
 		from = start
 	}
 
-	to := from.AddDate(0, 0, 7)
+	to := from.AddDate(0, 0, 14)
 	if to.Unix() >= end.Unix() {
 		to = end
 		stop = true
