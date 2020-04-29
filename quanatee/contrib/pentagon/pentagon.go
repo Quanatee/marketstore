@@ -105,16 +105,13 @@ func (qf *QuanateeFetcher) Run() {
 
 func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
-	var wg2 sync.WaitGroup
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
 		if filler.IsMarketOpen("crypto", from) == true {
 			// Market is open
-			wg2.Add(1)
 			go filler.Bars(symbol, "crypto", from, to)
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
-			wg2.Add(1)
 			go filler.Bars(symbol, "crypto", from.AddDate(0, 0, -3), to)
 		}
 		if firstLoop == true {
@@ -122,22 +119,17 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 		}
 	}
-	defer wg2.Done()
-	wg2.Wait()
 }
 
 func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
-	var wg2 sync.WaitGroup
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
 		if filler.IsMarketOpen("forex", from) == true {
 			// Market is open
-			wg2.Add(1)
 			go filler.Bars(symbol, "forex", from, to)
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
-			wg2.Add(1)
 			go filler.Bars(symbol, "forex", from.AddDate(0, 0, -3), to)
 		}
 		if firstLoop == true {
@@ -145,21 +137,16 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 			filler.BackfillMarket.LoadOrStore(symbol, "forex")
 		}
 	}
-	defer wg2.Done()
-	wg2.Wait()
 }
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
-	var wg2 sync.WaitGroup
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 		if filler.IsMarketOpen("equity", from) == true {
 			// Market is open
-			wg2.Add(1)
 			go filler.Bars(symbol, "equity", from, to)
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
-			wg2.Add(1)
 			go filler.Bars(symbol, "equity", from.AddDate(0, 0, -3), to)
 		}
 		if firstLoop == true {
@@ -167,8 +154,6 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		}
 	}
-	defer wg2.Done()
-	wg2.Wait()
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
