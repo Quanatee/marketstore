@@ -40,18 +40,21 @@ EXPOSE 5993
 # CMD ["start", "--config", "/etc/mkts.yml"]
 
 # Copy out pre-defined configs
-COPY /quanatee/mkts-price.yml .
 COPY /quanatee/mkts-store.yml .
+COPY /quanatee/mkts-price.yml .
 
 # "cp -u" only copies when file is missing or newer to assure that mkts.yml is not overwritten once created
 
 ARG POLYGON_API_KEY=${POLYGON_API_KEY}
-RUN test -z "$POLYGON_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
+RUN test -z "$POLYGON_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-price.yml mkts.yml
 
 ARG TIINGO_API_KEY=${TIINGO_API_KEY}
-RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
+RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-price.yml mkts.yml
 
 ARG TWELVE_API_KEY=${TWELVE_API_KEY}
-RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
+RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+
+# Create store config if not already created for price config
+RUN cp -u mkts-store.yml mkts.yml
 
 ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
