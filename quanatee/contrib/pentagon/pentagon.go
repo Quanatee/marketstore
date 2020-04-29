@@ -167,7 +167,7 @@ func (qf *QuanateeFetcher) Run() {
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(90 * time.Second)
+	ticker := time.NewTicker(60 * time.Second)
 
 	for range ticker.C {
 		
