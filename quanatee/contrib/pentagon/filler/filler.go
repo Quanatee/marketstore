@@ -35,7 +35,7 @@ type OHLCV struct {
 	Spread    map[int64]float32
 }
 
-func Bars(symbol, marketType string, from, to time.Time) (err error) {
+func Bars(symbol, marketType string, from, to time.Time) {
 	if from.IsZero() {
 		from = time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC)
 	}
@@ -230,7 +230,8 @@ func Bars(symbol, marketType string, from, to time.Time) (err error) {
 	csm := io.NewColumnSeriesMap()
 	csm.AddColumnSeries(*tbk, cs)
 
-	return executor.WriteCSM(csm, false)
+	executor.WriteCSM(csm, false)
+	
 }
 
 

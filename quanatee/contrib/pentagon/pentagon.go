@@ -105,75 +105,57 @@ func (qf *QuanateeFetcher) Run() {
 
 func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
+	var err error
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
-		go func() {
-			var err error
-			if filler.IsMarketOpen("crypto", from) == true {
-				// Market is open
-				if err = filler.Bars(symbol, "crypto", from, to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
-			} else if firstLoop == true {
-				// Market is closed but we just started pentagon
-				if err = filler.Bars(symbol, "crypto", from.AddDate(0, 0, -3), to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
-			}
-			if firstLoop == true {
-				filler.BackfillFrom.LoadOrStore(symbol, from)
-				filler.BackfillMarket.LoadOrStore(symbol, "crypto")
-			}
-		}()
+		if filler.IsMarketOpen("crypto", from) == true {
+			// Market is open
+			go filler.Bars(symbol, "crypto", from, to)
+		} else if firstLoop == true {
+			// Market is closed but we just started pentagon
+			go filler.Bars(symbol, "crypto", from.AddDate(0, 0, -3), to)
+		}
+		if firstLoop == true {
+			filler.BackfillFrom.LoadOrStore(symbol, from)
+			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
+		}
 	}
 }
 
 func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
+	var err error
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
-		go func() {
-			var err error
-			if filler.IsMarketOpen("forex", from) == true {
-				// Market is open
-				if err = filler.Bars(symbol, "forex", from, to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
-			} else if firstLoop == true {
-				// Market is closed but we just started pentagon
-				if err = filler.Bars(symbol, "forex", from.AddDate(0, 0, -3), to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
-			}
-			if firstLoop == true {
-				filler.BackfillFrom.LoadOrStore(symbol, from)
-				filler.BackfillMarket.LoadOrStore(symbol, "forex")
-			}
-		}()
+		if filler.IsMarketOpen("forex", from) == true {
+			// Market is open
+			go filler.Bars(symbol, "forex", from, to)
+		} else if firstLoop == true {
+			// Market is closed but we just started pentagon
+			go filler.Bars(symbol, "forex", from.AddDate(0, 0, -3), to)
+		}
+		if firstLoop == true {
+			filler.BackfillFrom.LoadOrStore(symbol, from)
+			filler.BackfillMarket.LoadOrStore(symbol, "forex")
+		}
 	}
 }
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
+	var err error
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
-		go func() {
-			var err error
-			if filler.IsMarketOpen("equity", from) == true {
-				// Market is open
-				if err = filler.Bars(symbol, "equity", from, to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
-			} else if firstLoop == true {
-				// Market is closed but we just started pentagon
-				if err = filler.Bars(symbol, "equity", from.AddDate(0, 0, -3), to); err != nil {
-					log.Error("bars livefill failure for key: [%v] (%v)", symbol, err)
-				}
-			}
-			if firstLoop == true {
-				filler.BackfillFrom.LoadOrStore(symbol, from)
-				filler.BackfillMarket.LoadOrStore(symbol, "equity")
-			}
-		}()
+		if filler.IsMarketOpen("equity", from) == true {
+			// Market is open
+			go filler.Bars(symbol, "equity", from, to)
+		} else if firstLoop == true {
+			// Market is closed but we just started pentagon
+			go filler.Bars(symbol, "equity", from.AddDate(0, 0, -3), to)
+		}
+		if firstLoop == true {
+			filler.BackfillFrom.LoadOrStore(symbol, from)
+			filler.BackfillMarket.LoadOrStore(symbol, "equity")
+		}
 	}
 }
 
@@ -209,8 +191,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				}()
 			}
 
-			// limit 12 goroutines per CPU core
-			if count >= runtime.NumCPU()*12 {
+			// limit 6 goroutines per CPU core
+			if count >= runtime.NumCPU()*6 {
 				return false
 			}
 
