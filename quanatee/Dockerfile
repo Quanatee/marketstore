@@ -54,7 +54,4 @@ RUN test -z "$TIINGO_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-sto
 ARG TWELVE_API_KEY=${TWELVE_API_KEY}
 RUN test -z "$TWELVE_API_KEY" && cp -u mkts-price.yml mkts.yml || cp -u mkts-store.yml mkts.yml
 
-# Create store config if not already created for price config
-RUN cp -u mkts-store.yml mkts.yml
-
 ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
