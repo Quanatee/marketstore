@@ -268,6 +268,7 @@ func (s *OnDiskAggTrigger) writeAggregates(
 		if len(tqSlc.GetEpoch()) > 0 {
 			outCs := aggregate(&slc, aggTbk)
 			if len(OutCs.GetColumns) > 1 {
+				// > 1 includes Epoch column
 				csm.AddColumnSeries(*aggTbk, outCs)
 			} else {
 				return nil
@@ -276,6 +277,7 @@ func (s *OnDiskAggTrigger) writeAggregates(
 	} else {
 		outCs := aggregate(&slc, aggTbk)
 		if len(OutCs.GetColumns) > 1 {
+			// > 1 includes Epoch column
 			csm.AddColumnSeries(*aggTbk, outCs)
 		} else {
 			return nil
