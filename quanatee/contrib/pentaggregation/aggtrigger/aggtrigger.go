@@ -266,28 +266,16 @@ func (s *OnDiskAggTrigger) writeAggregates(
 		// normally this will always be true, but when there are random bars
 		// on the weekend, it won't be, so checking to avoid panic
 		if len(tqSlc.GetEpoch()) > 0 {
-			outCs := aggregate(tqSlc, aggTbk)
-			if len(OutCs.GetColumns()) > 1 {
-				// > 1 includes Epoch column
-				csm.AddColumnSeries(*aggTbk, outCS)
-			} else {
-				return nil
-			}
+			csm.AddColumnSeries(*aggTbk, aggregate(tqSlc, aggTbk))
 		}
 	} else {
-		outCs := aggregate(&slc, aggTbk)
-		if len(outCs.GetColumns()) > 1 {
-			// > 1 includes Epoch column
-			csm.AddColumnSeries(*aggTbk, outCS)
-		} else {
-			return nil
-		}
+		csm.AddColumnSeries(*aggTbk, aggregate(&slc, aggTbk))
 	}
-
+	
 	return executor.WriteCSM(csm, false)
 }
 
-func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) (*io.ColumnSeries) {
+func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 
 	params := []accumParam{
@@ -340,7 +328,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) (*io.ColumnSeries) {
 	// No zero value allowed
 	for _, accumulator := range accumGroup.accumulators {
 		if accumulator.zero == true {
-			return outCs
+			return nil
 		}
 	}
 	
