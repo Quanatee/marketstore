@@ -2,7 +2,7 @@ package functions
 
 func AvgRightFloat32(values []float32) float32 {
 
-	var e SimpleEWMA
+	var e AvgRightEWMA
 	decay := 2 / (float64(len(values)) + 1)
 	
 	for _, val := range values {
@@ -14,7 +14,7 @@ func AvgRightFloat32(values []float32) float32 {
 
 func AvgRightFloat64(values []float64) float64 {
 	
-	var e SimpleEWMA
+	var e AvgRightEWMA
 	decay := 2 / (float64(len(values)) + 1)
 	
 	for _, val := range values {
@@ -24,27 +24,19 @@ func AvgRightFloat64(values []float64) float64 {
 	return e.Value()
 }
 
-type SimpleEWMA struct {
-	// The current value of the average. After adding with Add(), this is
-	// updated to reflect the average of all values seen thus far.
+type AvgRightEWMA struct {
 	value float64
 }
-
-// Add adds a value to the series and updates the moving average.
-func (e *SimpleEWMA) Add(value, decay float64) {
-	if e.value == 0 { // this is a proxy for "uninitialized"
+func (e *AvgRightEWMA) Add(value, decay float64) {
+	if e.value == 0 {
 		e.value = value
 	} else {
 		e.value = (value * decay) + (e.value * (1 - decay))
 	}
 }
-
-// Value returns the current value of the moving average.
-func (e *SimpleEWMA) Value() float64 {
+func (e *AvgRightEWMA) Value() float64 {
 	return e.value
 }
-
-// Set sets the EWMA's value.
-func (e *SimpleEWMA) Set(value float64) {
+func (e *AvgRightEWMA) Set(value float64) {
 	e.value = value
 }
