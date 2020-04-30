@@ -194,7 +194,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
-		filler.BackfillFrom.Range(func(key, value interface{}) {
+		filler.BackfillFrom.Range(func(key, value interface{}) bool {
 			count++
 			if count % 2 == 0 {
 				time.Sleep(time.Second)
@@ -219,7 +219,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					}
 				}()
 			}
-
+			return true
 		})
 		wg.Wait()
 	}
