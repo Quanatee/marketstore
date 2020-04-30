@@ -1,7 +1,7 @@
 package functions
 
 import "math"
-import "github.com/alpacahq/marketstore/utils/log"
+//import "github.com/alpacahq/marketstore/utils/log"
 
 func AvgLeftFloat32(values []float32) float32 {
 
