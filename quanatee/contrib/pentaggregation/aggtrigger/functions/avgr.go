@@ -2,22 +2,31 @@ package functions
 
 func AvgRightFloat32(values []float32) float32 {
 
+	avg := AvgFloat32(values)
+	std := StdFloat32(values)
+	
 	var e AvgRightEWMA
 	decay := 2 / (float64(len(values)/2) + 1)
 	
 	for _, val := range values {
-		e.Add(float64(val), decay)
-	}
+		zsc := val-avg/std
+		if zsc < 2.576 {
+			e.Add(float64(val), decay)
+		}
 	
 	return float32(e.Value())
 }
 
 func AvgRightFloat64(values []float64) float64 {
 	
+	avg := AvgFloat64(values)
+	std := StdFloat64(values)
+	
 	var e AvgRightEWMA
 	decay := 2 / (float64(len(values)/2) + 1)
 	
-	for _, val := range values {
+	zsc := val-avg/std
+	if zsc < 2.576 {
 		e.Add(float64(val), decay)
 	}
 	

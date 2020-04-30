@@ -3,6 +3,7 @@ package functions
 import "math/big"
 
 func AvgFloat32(values []float32) float32 {
+	
 	avg := float32(0)
 	for _, val := range values {
 		avg += val
@@ -14,6 +15,7 @@ func AvgFloat32(values []float32) float32 {
 }
 
 func AvgFloat64(values []float64) float64 {
+
 	avg := big.NewFloat(float64(0.0))
 	for _, val := range values {
         avg = avg.Add(avg, big.NewFloat(float64(val)))
