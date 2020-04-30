@@ -13,7 +13,7 @@ func AvgRightFloat32(values []float32) float32 {
 	for _, val := range values {
 		zsc := math.Abs(float64((val-avg)/std))
 		// 95% Confidence Interval
-		if zsc < 1.960 {
+		if zsc <= 1.960 {
 			e.Add(float64(val), decay)
 		}
 	}
@@ -31,7 +31,7 @@ func AvgRightFloat64(values []float64) float64 {
 	for _, val := range values {
 		zsc := math.Abs(float64((val-avg)/std))
 		// 95% Confidence Interval
-		if zsc < 1.960 {
+		if zsc <= 1.960 {
 			e.Add(float64(val), decay)
 		}
 	}
