@@ -3,49 +3,52 @@ package functions
 import "math/big"
 
 func RocFloat32(values []float32) float32 {
-
-	length := len(values)
-	two_parts := int(length/2)
-
-	avg_of_first_part := float32(0)
-	for _, val := range values[:two_parts] {
-		avg_of_first_part += val
-	}
-	avg_of_first_part = avg_of_first_part/float32(len(values[:two_parts]))
 	
-	avg_of_second_part := float32(0)
-	for _, val := range values[length-two_parts:] {
-		avg_of_second_part += val
-	}
-	avg_of_second_part = avg_of_second_part/float32(len(values[length-two_parts:]))
-	
-	roc := (avg_of_second_part - avg_of_first_part) / avg_of_first_part
+	left := AvgLeftFloat32(values)
+	right := AvgRightFloat32(values)
 
+	roc := (right - left) / left
+	
 	return roc
 
 }
 
 func RocFloat64(values []float64) float64 {
-
-	length := len(values)
-	two_parts := int(length/2)
-
-	avg_of_first_part := big.NewFloat(float64(0.0))
-	for _, val := range values[:two_parts] {
-        avg_of_first_part = avg_of_first_part.Add(avg_of_first_part, big.NewFloat(float64(val)))
-	}
-	float_avg_of_first_part, _ := avg_of_first_part.Float64()
-	float_avg_of_first_part = float_avg_of_first_part/float64(len(values[:two_parts]))
 	
-	avg_of_second_part := big.NewFloat(float64(0.0))
-	for _, val := range values[length-two_parts:] {
-        avg_of_second_part = avg_of_second_part.Add(avg_of_second_part, big.NewFloat(float64(val)))
-	}
-	float_avg_of_second_part, _ := avg_of_second_part.Float64()
-	float_avg_of_second_part = float_avg_of_second_part/float64(len(values[length-two_parts:]))
-	
-	roc := (float_avg_of_second_part - float_avg_of_first_part) / float_avg_of_first_part
+	left := AvgLeftFloat64(values)
+	right := AvgRightFloat64(values)
+
+	roc := (right - left) / left
 	
 	return roc
 	
+}
+
+func ROCFloat64(values []float64) float64 {
+	
+	var e ROCEWMA
+	decay := 2 / (float64(len(values)) + 1)
+	
+	for i := len(values)-1; i >= 0; i-- {
+		e.Add(float64(values[i]), decay)
+	}
+	
+	return e.Value()
+}
+
+type ROCEWMA struct {
+	value float64
+}
+func (e *ROCEWMA) Add(value, decay float64) {
+	if e.value == 0 {
+		e.value = value
+	} else {
+		e.value = (value * decay) + (e.value * (1 - decay))
+	}
+}
+func (e *ROCEWMA) Value() float64 {
+	return e.value
+}
+func (e *ROCEWMA) Set(value float64) {
+	e.value = value
 }
