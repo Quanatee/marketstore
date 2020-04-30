@@ -10,10 +10,10 @@ func AvgLeftFloat32(values []float32) float32 {
 	
 	for _, val := range values {
 		zsc := val-avg/std
-		if zsc < 2.576 {
+		if zsc < 2.576 { 
 			e.Add(float64(val), decay)
 		}
-	
+	}
 	return float32(e.Value())
 }
 
@@ -25,11 +25,12 @@ func AvgLeftFloat64(values []float64) float64 {
 	var e AvgLeftEWMA
 	decay := 2 / (float64(len(values)/2) + 1)
 	
-	zsc := val-avg/std
-	if zsc < 2.576 {
-		e.Add(float64(val), decay)
+	for _, val := range values {
+		zsc := val-avg/std
+		if zsc < 2.576 {
+			e.Add(float64(val), decay)
+		}
 	}
-	
 	return e.Value()
 }
 
