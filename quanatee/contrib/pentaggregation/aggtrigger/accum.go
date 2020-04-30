@@ -20,7 +20,6 @@ type accumulator struct {
 	ivalues interface{} // input column(s)
 	iout    interface{} // output slice
 	ifunc   interface{} // function
-	zero 	bool // contains zero
 }
 
 func newAccumGroup(cs *io.ColumnSeries, params []accumParam) *accumGroup {
@@ -343,84 +342,52 @@ func (ac *accumulator) apply(start, end int) {
 	case func([]float32) float32:
 		ivalues := ac.ivalues
 		out := ac.iout.([]float32)
-		value := fn(ivalues.([]float32)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]float32)[start:end]))
 	case func([]float64) float64:
 		ivalues := ac.ivalues
 		out := ac.iout.([]float64)
-		value := fn(ivalues.([]float64)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]float64)[start:end]))
 	case func([]int8) int8:
 		ivalues := ac.ivalues
 		out := ac.iout.([]int8)
-		value := fn(ivalues.([]int8)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]int8)[start:end]))
 	case func([]int16) int16:
 		ivalues := ac.ivalues
 		out := ac.iout.([]int16)
-		value := fn(ivalues.([]int16)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]int16)[start:end]))
 	case func([]int) int:
 		ivalues := ac.ivalues
 		out := ac.iout.([]int)
-		value := fn(ivalues.([]int)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]int)[start:end]))
 	case func([]int32) int32:
 		ivalues := ac.ivalues
 		out := ac.iout.([]int32)
-		value := fn(ivalues.([]int32)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]int32)[start:end]))
 	case func([]int64) int64:
 		ivalues := ac.ivalues
 		out := ac.iout.([]int64)
-		value := fn(ivalues.([]int64)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]int64)[start:end]))
 	case func([]uint8) uint8:
 		ivalues := ac.ivalues
 		out := ac.iout.([]uint8)
-		value := fn(ivalues.([]uint8)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]uint8)[start:end]))
 	case func([]uint16) uint16:
 		ivalues := ac.ivalues
 		out := ac.iout.([]uint16)
-		value := fn(ivalues.([]uint16)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]uint16)[start:end]))
 	case func([]uint) uint:
 		ivalues := ac.ivalues
 		out := ac.iout.([]uint)
-		value := fn(ivalues.([]uint)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]uint)[start:end]))
 	case func([]uint32) uint32:
 		ivalues := ac.ivalues
 		out := ac.iout.([]uint32)
-		value := fn(ivalues.([]uint32)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]uint32)[start:end]))
 	case func([]uint64) uint64:
 		ivalues := ac.ivalues
 		out := ac.iout.([]uint64)
-		value := fn(ivalues.([]uint64)[start:end])
-		ac.mark_zero(float64(value))
-		ac.iout = append(out, value)
+		ac.iout = append(out, fn(ivalues.([]uint64)[start:end]))
 	default:
 		panic("cannot apply")
-	}
-}
-
-func (ac *accumulator) mark_zero(value float64) {
-	if value == 0.0 {
-		ac.zero = true
-	} else {
-		ac.zero = false
 	}
 }

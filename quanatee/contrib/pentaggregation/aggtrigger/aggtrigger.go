@@ -324,14 +324,6 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	
 	// finalize output
 	outCs := io.NewColumnSeries()
-	
-	// No zero value allowed
-	for _, accumulator := range accumGroup.accumulators {
-		if accumulator.zero == true {
-			return nil
-		}
-	}
-	
 	outCs.AddColumn("Epoch", outEpoch)
 	accumGroup.addColumns(outCs)
 	return outCs
