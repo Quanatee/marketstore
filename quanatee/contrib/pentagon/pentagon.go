@@ -120,7 +120,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "crypto", from.AddDate(0, 0, -3), to)
+			go filler.Bars(&wg2, symbol, "crypto", from.Add(-5000*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -147,7 +147,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -3), to)
+			go filler.Bars(&wg2, symbol, "forex", from.Add(-5000*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -173,7 +173,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from.AddDate(0, 0, -3), to)
+			go filler.Bars(&wg2, symbol, "equity", from.Add(-5000*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -185,7 +185,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(60 * time.Second)
+	ticker := time.NewTicker(90 * time.Second)
 
 	for range ticker.C {
 		
@@ -251,7 +251,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	q := planner.NewQuery(cDir)
 	q.AddTargetKey(tbk)
 	q.SetRowLimit(io.LAST, 1)
-	q.SetEnd(end.AddDate(0, 0, -3).Unix() - int64(time.Minute.Seconds()))
+	q.SetEnd(end.Add(-5000*time.Minute).Unix() - int64(time.Minute.Seconds()))
 
 	parsed, err := q.Parse()
 	if err != nil {
@@ -281,7 +281,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 		from = start
 	}
 
-	to := from.AddDate(0, 0, 3) // Keep requests < 5000 rows at a time (approx. 3.4 days)
+	to := from.Add(5000*time.Minute) // Keep requests < 5000 rows at a time (approx. 3.4 days)
 	if to.Unix() >= end.Unix() {
 		to = end
 		stop = true
