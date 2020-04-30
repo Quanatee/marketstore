@@ -266,19 +266,19 @@ func (s *OnDiskAggTrigger) writeAggregates(
 		// normally this will always be true, but when there are random bars
 		// on the weekend, it won't be, so checking to avoid panic
 		if len(tqSlc.GetEpoch()) > 0 {
-			outCs := aggregate(&slc, aggTbk)
+			outCs := aggregate(tqSlc, aggTbk)
 			if len(OutCs.GetColumns()) > 1 {
 				// > 1 includes Epoch column
-				csm.AddColumnSeries(*aggTbk, outCs)
+				csm.AddColumnSeries(*aggTbk, tqSlc)
 			} else {
 				return nil
 			}
 		}
 	} else {
-		outCs := aggregate(&slc, aggTbk)
-		if len(OutCs.GetColumns()) > 1 {
+		outCs := aggregate(slc, aggTbk)
+		if len(outCs.GetColumns()) > 1 {
 			// > 1 includes Epoch column
-			csm.AddColumnSeries(*aggTbk, outCs)
+			csm.AddColumnSeries(*aggTbk, slc)
 		} else {
 			return nil
 		}
