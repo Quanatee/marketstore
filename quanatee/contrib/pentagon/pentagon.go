@@ -137,7 +137,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
 		count++
-		if count % 5 == 0 {
+		if count % 7 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("forex", from) == true {
@@ -163,7 +163,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 		count++
-		if count % 7 == 0 {
+		if count % 13 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("equity", from) == true {
