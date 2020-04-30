@@ -213,9 +213,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					if stop == true {
 						log.Info("%s backfill completed. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
-					} else {
-						time.Sleep(time.Second)
-						// filler.BackfillFrom.LoadOrStore(key, nil)
 					}
 				}()
 			}
