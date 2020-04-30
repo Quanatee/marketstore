@@ -185,7 +185,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(90 * time.Second)
+	ticker := time.NewTicker(60 * time.Second)
 
 	for range ticker.C {
 		
