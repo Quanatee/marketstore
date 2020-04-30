@@ -3,7 +3,7 @@ package functions
 func AvgLeftFloat32(values []float32) float32 {
 
 	var e AvgLeftEWMA
-	decay := 2 / (float64(len(values)) + 1)
+	decay := 2 / (float64(len(values)/2) + 1)
 	
 	for i := len(values)-1; i >= 0; i-- {
 		e.Add(float64(values[i]), decay)
@@ -15,7 +15,7 @@ func AvgLeftFloat32(values []float32) float32 {
 func AvgLeftFloat64(values []float64) float64 {
 	
 	var e AvgLeftEWMA
-	decay := 2 / (float64(len(values)) + 1)
+	decay := 2 / (float64(len(values)/2) + 1)
 	
 	for i := len(values)-1; i >= 0; i-- {
 		e.Add(float64(values[i]), decay)
