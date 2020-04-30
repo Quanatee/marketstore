@@ -144,7 +144,9 @@ func GetAggregates(
 			if err_dt != nil {
 				return &OHLCV{}, err
 			}
-			if aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0 {
+			if ( (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) &&
+				(aggCrypto.PriceData[bar].Open != aggCrypto.PriceData[bar].Close) && 
+				(aggCrypto.PriceData[bar].High != aggCrypto.PriceData[bar].Low) ) {
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
@@ -168,7 +170,9 @@ func GetAggregates(
 			if err_dt != nil {
 				return &OHLCV{}, err
 			}
-			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
+			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) &&
+				(aggForex.PriceData[bar].Open != aggForex.PriceData[bar].Close) && 
+				(aggForex.PriceData[bar].High != aggForex.PriceData[bar].Low) ) {
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
@@ -194,7 +198,9 @@ func GetAggregates(
 				return &OHLCV{}, err
 			}
 			dt = dt.UTC()
-			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
+			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) &&
+				(aggEquity.PriceData[bar].Open != aggEquity.PriceData[bar].Close) && 
+				(aggEquity.PriceData[bar].High != aggEquity.PriceData[bar].Low) ) {
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
