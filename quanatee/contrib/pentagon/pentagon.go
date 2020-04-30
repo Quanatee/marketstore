@@ -281,7 +281,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 		from = start
 	}
 
-	to := from.AddDate(0, 0, 3)
+	to := from.AddDate(0, 0, 3) // Keep requests < 5000 rows at a time (approx. 3.4 days)
 	if to.Unix() >= end.Unix() {
 		to = end
 		stop = true
