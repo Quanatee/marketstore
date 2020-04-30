@@ -14,8 +14,8 @@ func AvgLeftFloat32(values []float32) float32 {
 	for _, val := range values {
 		zsc := math.Abs(float64((val-avg)/std))
 		log.Info("%v", zsc)
-		// 99.9% Confidence Interval
-		if zsc < 3.291 {
+		// 95% Confidence Interval
+		if zsc < 1.960 {
 			e.Add(float64(val), decay)
 		}
 	}
@@ -32,8 +32,8 @@ func AvgLeftFloat64(values []float64) float64 {
 	
 	for _, val := range values {
 		zsc := math.Abs(float64((val-avg)/std))
-		// 99.9% Confidence Interval
-		if zsc < 3.291 {
+		// 95% Confidence Interval
+		if zsc < 1.960 {
 			e.Add(float64(val), decay)
 		}
 	}

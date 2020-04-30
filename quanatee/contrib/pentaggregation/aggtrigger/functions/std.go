@@ -48,6 +48,28 @@ func MeanStdDev(x, weights []float64) (mean, std float64) {
 	return mean, math.Sqrt(variance)
 }
 
+// Mean computes the weighted mean of the data set.
+//  sum_i {w_i * x_i} / sum_i {w_i}
+// If weights is nil then all of the weights are 1. If weights is not nil, then
+// len(x) must equal len(weights).
+func Mean(x, weights []float64) float64 {
+	if weights == nil {
+		return floats.Sum(x) / float64(len(x))
+	}
+	if len(x) != len(weights) {
+		panic("stat: slice length mismatch")
+	}
+	var (
+		sumValues  float64
+		sumWeights float64
+	)
+	for i, w := range weights {
+		sumValues += w * x[i]
+		sumWeights += w
+	}
+	return sumValues / sumWeights
+}
+
 // MeanVariance computes the sample mean and variance, where the mean and variance are
 //  \sum_i w_i * x_i / (sum_i w_i)
 //  \sum_i w_i (x_i - mean)^2 / (sum_i w_i - 1)
