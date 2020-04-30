@@ -110,7 +110,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
 		count++
-		if count % 5 == 0 {
+		if count % 3 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("crypto", from) == true {
@@ -163,7 +163,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 		count++
-		if count % 5 == 0 {
+		if count % 7 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("equity", from) == true {
