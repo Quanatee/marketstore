@@ -287,7 +287,7 @@ func (s *OnDiskAggTrigger) writeAggregates(
 	return executor.WriteCSM(csm, false)
 }
 
-func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) (io.ColumnSeries) {
+func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) (*io.ColumnSeries) {
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 
 	params := []accumParam{
