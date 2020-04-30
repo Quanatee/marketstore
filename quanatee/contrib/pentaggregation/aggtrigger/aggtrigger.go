@@ -279,10 +279,10 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 
 	params := []accumParam{
-		accumParam{"Open", "first", "Open"},
+		accumParam{"Open", "avgl", "Open"},
 		accumParam{"High", "avg", "High"},
 		accumParam{"Low", "avg", "Low"},
-		accumParam{"Close", "last", "Close"},
+		accumParam{"Close", "avgr", "Close"},
 	}
 	if cs.Exists("HLC") {
 		params = append(params, accumParam{"HLC", "avg", "HLC"})

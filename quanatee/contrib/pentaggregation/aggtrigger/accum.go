@@ -277,6 +277,32 @@ func newAccumulator(cs *io.ColumnSeries, param accumParam) *accumulator {
 			fmt.Printf("no compatible function\n")
 			return nil
 		}
+	case "avgl":
+		inColumn := cs.GetColumn(param.inputName)
+		switch inColumn.(type) {
+		case []float32:
+			ifunc = functions.AvgLeftFloat32
+			iout = make([]float32, 0)
+		case []float64:
+			ifunc = functions.AvgLeftFloat64
+			iout = make([]float64, 0)
+		default:
+			fmt.Printf("no compatible function\n")
+			return nil
+		}
+	case "avgr":
+		inColumn := cs.GetColumn(param.inputName)
+		switch inColumn.(type) {
+		case []float32:
+			ifunc = functions.AvgRightFloat32
+			iout = make([]float32, 0)
+		case []float64:
+			ifunc = functions.AvgRightFloat64
+			iout = make([]float64, 0)
+		default:
+			fmt.Printf("no compatible function\n")
+			return nil
+		}
 	case "roc":
 		inColumn := cs.GetColumn(param.inputName)
 		switch inColumn.(type) {

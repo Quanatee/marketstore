@@ -110,7 +110,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
 		count++
-		if count % 7 == 0 {
+		if count % 2 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("crypto", from) == true {
@@ -137,7 +137,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
 		count++
-		if count % 7 == 0 {
+		if count % 2 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("forex", from) == true {
@@ -163,7 +163,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 		count++
-		if count % 7 == 0 {
+		if count % 2 == 0 {
 			time.Sleep(time.Second)
 		}
 		if filler.IsMarketOpen("equity", from) == true {
@@ -195,6 +195,10 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
+			count++
+			if count % 2 == 0 {
+				time.Sleep(time.Second)
+			}
 			symbol := key.(string)
 			marketType, _ := filler.BackfillMarket.Load(key)
 			// make sure epoch value isn't nil (i.e. hasn't
@@ -210,17 +214,12 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 						log.Info("%s backfill completed. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
 					} else {
-						filler.BackfillFrom.LoadOrStore(key, nil)
+						time.Sleep(time.Second)
+						// filler.BackfillFrom.LoadOrStore(key, nil)
 					}
 				}()
 			}
 
-			// limit 12 goroutines per CPU core
-			if count >= runtime.NumCPU()*12 {
-				return false
-			}
-
-			return true
 		})
 		wg.Wait()
 	}
