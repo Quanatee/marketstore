@@ -57,16 +57,14 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	if len(ohlcv.HLC) > 0 {
 		// Randomly run alt providers to ease api usage
 		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
 			if len(ohlcv_ti.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_ti)
 				sources = append(sources, "tiingo")
 				log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
 			}
-		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		} else {
 			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 			if len(ohlcv_tw.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tw)
@@ -99,15 +97,13 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			log.Debug("Adding Polygon BUSD %s to %v", symbol, len(ohlcvs))
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tib)
 				log.Debug("Adding Tiingo BUSD %s to %v", symbol, len(ohlcvs))
 			}
-		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		} else {
 			ohlcv_twb := GetDataFromProvider("twelve", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_twb.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twb)
@@ -123,16 +119,14 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			log.Debug("Adding Polygon USDT %s to %v", symbol, len(ohlcvs))
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 			if len(ohlcv_tit.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tit)
 				sources = append(sources, "tiingo")
 				log.Debug("Adding Tiingo USDT %s to %v", symbol, len(ohlcvs))
 			}
-		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		} else {
 			ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
 			if len(ohlcv_twt.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twt)
@@ -148,16 +142,14 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			log.Debug("Adding Polygon USDC %s to %v", symbol, len(ohlcvs))
 		}
 		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		if rand.Intn(2) == 0 {
 			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 			if len(ohlcv_tic.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_tic)
 				sources = append(sources, "tiingo")
 				log.Debug("Adding Tiingo USDC %s to %v", symbol, len(ohlcvs))
 			}
-		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(3) >= 1 {
+		} else {
 			ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
 			if len(ohlcv_twc.HLC) > 0 {
 				ohlcvs = append(ohlcvs, ohlcv_twc)

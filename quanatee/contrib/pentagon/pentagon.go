@@ -255,7 +255,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	q.AddTargetKey(tbk)
 	q.SetRowLimit(io.LAST, 1)
 	q.SetEnd(end.AddDate(0, 0, -3).Unix() - int64(time.Minute.Seconds()))
-	
+
 	parsed, err := q.Parse()
 	if err != nil {
 		log.Error("query parse failure (%v)", err)
@@ -284,7 +284,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 		from = start
 	}
 
-	to := from.AddDate(0, 0, 31)
+	to := from.AddDate(0, 0, 3)
 	if to.Unix() >= end.Unix() {
 		to = end
 		stop = true
