@@ -12,10 +12,9 @@ func StdFloat32(values []float32) float32 {
 
 func StdFloat64(values []float64) float64 {
 
-	std, _ := StdDev(values, nil)
-
+	std := StdDev(values, nil)
 	return std
-	
+
 }
 
 func convertFloat32ToFloat64(ar []float32) []float64 {
