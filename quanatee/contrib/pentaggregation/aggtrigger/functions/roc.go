@@ -1,7 +1,5 @@
 package functions
 
-import "math/big"
-
 func RocFloat32(values []float32) float32 {
 	
 	left := AvgLeftFloat32(values)
