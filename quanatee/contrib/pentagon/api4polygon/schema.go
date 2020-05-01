@@ -10,7 +10,7 @@ type SplitData struct {
 	ForFactor   float32		`json:"forfactor"` // optional
 }
 
-type Splits struct {
+type SplitsItem struct {
 	Status 		string 		`json:"status"`
 	Count 		int64 		`json:"count"`
 	SplitData   []SplitData	`json:"results"`

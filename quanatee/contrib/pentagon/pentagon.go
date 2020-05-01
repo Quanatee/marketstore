@@ -182,8 +182,8 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			api4polygon.UpdateSplits(symbol)
 			// Check if symbol has splits
 			splits := api4polygon.GetPreviousSplits(symbol)
-			if splits.Count > 0 {
-				for _, split := range splits.SplitData {
+			if len(splits) > 0 {
+				for _, split := range splits {
 					issueDate, _ := time.Parse("2006-01-02", split.Issue)
 					// Check if splits is after plugin was started and in the future
 					if issueDate.Before(qf.TimeStarted) && issueDate.After(time.Now()) {
