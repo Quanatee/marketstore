@@ -191,16 +191,16 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		next := time.Now().Add(time.Minute)
 		next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 30, 0, time.UTC)
 		time.Sleep(next.Sub(time.Now()))
-		
+
 		wg := sync.WaitGroup{}
 		count := 0
 		ran := false
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
-			// Delay for 1 second every 5 requests
+			// Delay for 1 second every 3 requests
 			count++
-			if count % 5 == 0 {
+			if count % 3 == 0 {
 				time.Sleep(time.Second)
 			}
 			symbol := key.(string)
