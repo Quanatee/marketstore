@@ -40,9 +40,9 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func GetPreviousSplits(symbol string) (time.Time) {
-	if issueDate, ok := previousSplits[symbol]; ok {
-		return previousSplits
+func GetPreviousSplits(symbol string) (Splits) {
+	if splits, ok := previousSplits[symbol]; ok {
+		return splits
 	}
 	return Splits{}
 }
