@@ -200,7 +200,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				divsor += 1
 			}
 		}
-		if divsor > 0 {
+		if divsor > 1 {
 			Opens = append(Opens, open / float32(len(ohlcvs)))
 			Highs = append(Highs, high / float32(len(ohlcvs)))
 			Lows = append(Lows, low / float32(len(ohlcvs)))
@@ -209,7 +209,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
 			Tvals = append(Tvals, tval)
 			Spreads = append(Spreads, spread / float32(len(ohlcvs)))
-		} else {
+		} else if divisor == 1 {
 			Opens = append(Opens, open)
 			Highs = append(Highs, high)
 			Lows = append(Lows, low)
