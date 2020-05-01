@@ -10,11 +10,10 @@ import (
 
 	"net/http"
 	"net/url"
-	"strconv"
+	//"strconv"
 	"time"
 
 	"github.com/alpacahq/marketstore/utils/log"
-	"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )
 
@@ -43,10 +42,10 @@ func SetAPIKey(key string) {
 
 func SetSplits(symbol string) {
 		
-	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
+	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol)
 
 	if err != nil {
-		return &OHLCV{}, err
+		log.Error("%s %v", symbol, err)
 	}
 	
 	q := u.Query()
@@ -56,7 +55,7 @@ func SetSplits(symbol string) {
 
 	var splits Splits
 
-	err = downloadAndUnmarshal(u.String(), retryCount, &split)
+	err = downloadAndUnmarshal(u.String(), retryCount, &splits)
 
 	if err != nil {
 		return err
