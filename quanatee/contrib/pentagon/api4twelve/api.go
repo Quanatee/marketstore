@@ -30,6 +30,7 @@ var (
 		"equity": "%v/time_series",
 	}
 	baseURL = "https://api.twelvedata.com"
+	start time.Time
 	apiKey 	 string
 	length = 0
 )

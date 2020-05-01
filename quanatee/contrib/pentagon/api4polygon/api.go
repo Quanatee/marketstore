@@ -20,119 +20,28 @@ import (
 
 const (
 	aggURL     = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
-	tickersURL = "%v/v2/reference/tickers"
+	splitsURL  = "%v/v2/reference/splits/%v"
 	retryCount = 10
 )
 	
 var (
 	baseURL = "https://api.polygon.io"
+	start time.Time
 	apiKey  	string
 	symbolPrefix = map[string]string{
 		"crypto": "X:",
 		"forex": "C:",
 		"equity": "",
 	}
+	symbolSplits := map[string]Splits{}
+	upcomingSplits := map[string]time.Time{}
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
 }
 
-type ListTickersResponse struct {
-	Page    int    `json:"page"`
-	PerPage int    `json:"perPage"`
-	Count   int    `json:"count"`
-	Status  string `json:"status"`
-	Tickers []struct {
-		Ticker      string `json:"ticker"`
-		Name        string `json:"name"`
-		Market      string `json:"market"`
-		Locale      string `json:"locale"`
-		Type        string `json:"type"`
-		Currency    string `json:"currency"`
-		Active      bool   `json:"active"`
-		PrimaryExch string `json:"primaryExch"`
-		Updated     string `json:"updated"`
-		Codes       struct {
-			Cik     string `json:"cik"`
-			Figiuid string `json:"figiuid"`
-			Scfigi  string `json:"scfigi"`
-			Cfigi   string `json:"cfigi"`
-			Figi    string `json:"figi"`
-		} `json:"codes"`
-		URL string `json:"url"`
-	} `json:"tickers"`
-}
-
-func includeExchange(exchange string) bool {
-	// Polygon returns all tickers on all exchanges, which yields over 34k symbols
-	// If we leave out OTC markets it will still have over 11k symbols
-	if exchange == "CVEM" || exchange == "GREY" || exchange == "OTO" ||
-		exchange == "OTC" || exchange == "OTCQB" || exchange == "OTCQ" {
-		return false
-	}
-	return true
-}
-
-func ListTickers() (*ListTickersResponse, error) {
-	resp := ListTickersResponse{}
-	page := 0
-
-	for {
-		u, err := url.Parse(fmt.Sprintf(tickersURL, baseURL))
-		if err != nil {
-			return nil, err
-		}
-
-		q := u.Query()
-		q.Set("apiKey", apiKey)
-		q.Set("sort", "ticker")
-		q.Set("perpage", "50")
-		q.Set("market", "equity")
-		q.Set("locale", "us")
-		q.Set("active", "true")
-		q.Set("page", strconv.FormatInt(int64(page), 10))
-
-		u.RawQuery = q.Encode()
-
-		code, body, err := fasthttp.Get(nil, u.String())
-		if err != nil {
-			return nil, err
-		}
-
-		if code >= fasthttp.StatusMultipleChoices {
-			return nil, fmt.Errorf("status code %v", code)
-		}
-
-		r := &ListTickersResponse{}
-
-		err = json.Unmarshal(body, r)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if len(r.Tickers) == 0 {
-			break
-		}
-
-		for _, ticker := range r.Tickers {
-			if includeExchange(ticker.PrimaryExch) {
-				resp.Tickers = append(resp.Tickers, ticker)
-			}
-		}
-
-		page++
-	}
-
-	log.Debug("[polygon] Returning %v symbols\n", len(resp.Tickers))
-
-	return &resp, nil
-}
-
-func GetAggregates(
-	symbol, marketType, multiplier, resolution string,
-	from, to time.Time) (*OHLCV, error) {
+func SetSplits(symbol string) {
 		
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
 
@@ -142,11 +51,37 @@ func GetAggregates(
 	
 	q := u.Query()
 	q.Set("apiKey", apiKey)
-	q.Set("unadjusted", "true")
 
 	u.RawQuery = q.Encode()
 
-	var agg Aggv2
+	var splits Splits
+
+	err = downloadAndUnmarshal(u.String(), retryCount, &split)
+
+	if err != nil {
+		return err
+	}
+	
+	symbolSplits[symbol] := splits
+	
+}
+func GetAggregates(
+	symbol, marketType, multiplier, resolution string,
+	from, to time.Time) (*OHLCV, error) {
+	
+	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
+
+	if err != nil {
+		log.Error("%s %v", symbol, err)
+	}
+	
+	q := u.Query()
+	q.Set("apiKey", apiKey)
+	q.Set("unadjusted", "true") // false is buggy
+
+	u.RawQuery = q.Encode()
+
+	var agg Agg
 
 	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
 	
@@ -202,10 +137,32 @@ func GetAggregates(
 				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				// Correct for Splits if required
+				if splits, ok := symbolSplits[symbol]; ok {
+					for _, split := range splits.SplitData {
+						dt, _ := time.Parse("2006-01-02", split.Issue)
+						issuedEpoch := dt.Unix()
+						if Epoch < issuedEpoch {
+							// data is before the split date
+							//OHLCV Adjusted
+							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
+							ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
+							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
+							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
+							if ohlcv.Volume != 1.0 {
+								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch]/ split.Ratio
+							}
+							// Extra Adjusted
+							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
+							ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
+							ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
+						}
+					}
+				}
 			}
 		}
 	}
-
+	
 	if len(ohlcv.HLC) == 0 {
 		log.Debug("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 		if length == 1 {
@@ -215,6 +172,24 @@ func GetAggregates(
 	
 	return ohlcv, nil
 	
+}
+
+func adjustOHLCV(ohlcv OHLCV) {
+
+	ohlcv[]
+
+	if splits, ok := symbolSplits[symbol]; ok {
+		for _, split := range splits.SplitData {
+			dt, _ := time.Parse("2006-01-02", split.Issue)
+			issuedEpoch := dt.Unix()
+			if dt < start {
+				continue;
+			} else {
+				
+			}
+		}
+	}
+
 }
 
 func downloadAndUnmarshal(url string, retryCount int, data interface{}) error {

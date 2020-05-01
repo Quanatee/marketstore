@@ -30,6 +30,7 @@ var (
 		"equity": "%v/iex/%v/prices",
 	}
 	baseURL = "https://api.tiingo.com"
+	start time.Time
 	apiKey 	 string
 	length = 0
 )

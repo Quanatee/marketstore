@@ -23,6 +23,8 @@ import (
 
 type QuanateeFetcher struct {
 	config FetcherConfig
+	QueryStart time.Time
+	TimeStarted time.Time
 }
 
 type FetcherConfig struct {
@@ -44,12 +46,16 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	if err != nil {
 		return
     }
-    
+	
 	filler.BackfillFrom = &sync.Map{}
 	filler.BackfillMarket = &sync.Map{}
 	
+	startDate, _ = time.Parse("2006-01-02", qf.config.QueryStart)
+	
 	return &QuanateeFetcher{
 		config: config,
+		QueryStart: startDate,
+		TimeStarted: time.Now(),
 	}, nil
 }
 
@@ -82,7 +88,7 @@ func (qf *QuanateeFetcher) Run() {
 				time.Sleep(1*time.Second)
 			}
 		}
-
+		
 		wg.Add(1)
 		go qf.liveCrypto(&wg, from, to, firstLoop)
 		wg.Add(1)
@@ -160,8 +166,28 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	defer wg.Done()
 	var wg2 sync.WaitGroup
 	count := 0
+	checkSplit := rand.Intn(99)
+
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
+
+		// Initalize splits data from polygon, or randomly check if there are new splits
+		if firstLoop == true || checkSplit == 0 {
+			api4polygon.SetSplits(symbol)
+			// Check if symbol has splits
+			if splits, ok := api4polygon.symbolSplits[symbol]; ok {
+				for _, split := range splits.SplitData {
+					issueDate, _ := time.Parse("2006-01-02", split.Issue)
+					// Check if splits is after plugin was started and before current time
+					if qf.TimeStarted < issueDate && time.Now() < issueDate {
+						// Book mark the future split event
+						api4polygon.upcomingSplits[symbol] = issueDate
+					}
+				}
+			}
+		}
+		
+		// Slow down requests
 		count++
 		if count % 13 == 0 {
 			time.Sleep(1*time.Second)
@@ -179,6 +205,24 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillFrom.LoadOrStore(symbol, from)
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		}
+		// If time has passed the issue date of future split event, trigger backfill
+		if issueDate, ok := api4polygon.upcomingSplits[symbol]; ok {
+			if time.Now() > issueDate {
+				// Delete bookmark of future split event
+				delete(api4polygon.upcomingSplits, symbol)
+				// Delete entire tbk
+				tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
+				err = executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
+				if err != nil {
+					log.Error("removal of catalog entry failed: %s", err.Error())
+				}
+				// Start new "firstLoop" request
+				filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
+				// Retrigger Backfill
+				filler.BackfillFrom.Store(symbol, from)
+				filler.BackfillMarket.Store(symbol, "equity")
+			}
+		}
 	}
 	defer wg2.Wait()
 }
@@ -194,7 +238,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 		wg := sync.WaitGroup{}
 		count := 0
-		ran := false
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
@@ -212,8 +255,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
-					
-					// backfill the symbol in parallel
+					force := false
+					// backfill the symbol
 					stop := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
 					if stop == true {
 						log.Info("%s backfill stopped. Last input: %v", symbol, value.(time.Time))
@@ -224,11 +267,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			return true
 		})
 		wg.Wait()
-
-		if ran == false {
-			log.Info("BACKFILL COMPLETED.")
-			break
-		}
 		
 	}
 }
@@ -237,25 +275,10 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time) bool {
 
 	var (
-		start time.Time
 		from time.Time
-		err  error
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 	)
 	
-	for _, layout := range []string{
-		"2006-01-02 03:04:05",
-		"2006-01-02T03:04:05",
-		"2006-01-02 03:04",
-		"2006-01-02T03:04",
-		"2006-01-02",
-	} {
-		start, err = time.Parse(layout, qf.config.QueryStart)
-		if err == nil {
-			break
-		}
-	}
-
 	// query the latest entry prior to the streamed record	
 	instance := executor.ThisInstance
 	cDir := instance.CatalogDir
@@ -294,7 +317,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	if len(epoch) != 0 {
 		from = time.Unix(epoch[len(epoch)-1], 0)
 	} else {
-		from = start
+		from = qf.QueryStart
 	}
 		
 	to := from
