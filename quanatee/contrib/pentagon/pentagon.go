@@ -73,7 +73,7 @@ func (qf *QuanateeFetcher) Run() {
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
 	for _, symbol := range qf.config.EquitySymbols {
-		api4polygon.UpdateSplits(symbol)
+		_ := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 	}
 
 	from := time.Now().Add(time.Minute)
@@ -171,27 +171,10 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	defer wg.Done()
 	var wg2 sync.WaitGroup
 	count := 0
-	rand.Seed(filler.GetRandSeed())
-	checkSplit := rand.Intn(99)
 	
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 
-		// Randomly check if there are new splits
-		if checkSplit == 0 {
-			api4polygon.UpdateSplits(symbol)
-			// Check if symbol has splits
-			splits := api4polygon.GetPreviousSplits(symbol)
-			if len(splits) > 0 {
-				for _, split := range splits {
-					// Check if splits is after plugin was started and in the future
-					if split.Issue.Before(qf.TimeStarted) && split.Issue.After(time.Now()) {
-						// Bookmark the future split event
-						api4polygon.SetUpcomingSplits(symbol, split.Issue)
-					}
-				}
-			}
-		}
 		// Slow down requests
 		count++
 		if count % 13 == 0 {
@@ -210,25 +193,33 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillFrom.LoadOrStore(symbol, from)
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		}
-		// If time has passed the issue date of future split event, trigger backfill
-		issueDate := api4polygon.GetUpcomingSplits(symbol)
-		if time.Now().After(issueDate) && issueDate.IsZero() == false {
-			// Delete bookmark of future split event
-			api4polygon.DeleteUpcomingSplits(symbol)
-			// Delete entire tbk
-			tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
-			err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
-			if err != nil {
-				log.Error("removal of catalog entry failed: %s", err.Error())
-			}
-			// Start new "firstLoop" request
-			filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
-			// Retrigger Backfill
-			filler.BackfillFrom.Store(symbol, from)
-			filler.BackfillMarket.Store(symbol, "equity")
-		}
 	}
 	defer wg2.Wait()
+	if filler.IsMarketOpen("equity", from) == false {
+		rand.Seed(filler.GetRandSeed())
+		checkSplit := rand.Intn(60)
+		if checkSplit == 0 {
+			for _, symbol := range qf.config.EquitySymbols {
+				rebackfill := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
+				currently_not_backfilling, _ := filler.BackfillMarket.Load(key)
+				if rebackfill == true && currently_not_backfilling == nil {
+					// Delete bookmark of future split event
+					api4polygon.DeleteUpcomingSplits(symbol)
+					// Delete entire tbk
+					tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
+					err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
+					if err != nil {
+						log.Error("removal of catalog entry failed: %s", err.Error())
+					}
+					// Start new "firstLoop" request
+					filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
+					// Retrigger Backfill
+					filler.BackfillFrom.Store(symbol, from)
+					filler.BackfillMarket.Store(symbol, "equity")
+				}
+			}
+		}
+	}
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {

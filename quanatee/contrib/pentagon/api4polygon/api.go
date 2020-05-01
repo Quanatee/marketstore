@@ -34,50 +34,16 @@ var (
 		"equity": "",
 	}
 	
-	previousSplits *sync.Map
-	upcomingSplits *sync.Map
+	//previousSplits *sync.Map
+	//upcomingSplits *sync.Map
+	previousSplits = map[string][]Split
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func GetPreviousSplits(symbol string) ([]Split) {
-	value, ok := previousSplits.Load(symbol)
-	if ok == false {
-		return []Split{}
-	}
-	if value == nil {
-		return []Split{}
-	}
-	return value.([]Split)
-}
-
-func SetPreviousSplits(symbol string, splits []Split) {
-	log.Info("%s %v", symbol, splits)
-	previousSplits.Store(symbol, splits)
-}
-
-func SetUpcomingSplits(symbol string, issueDate time.Time) {
-	upcomingSplits.Store(symbol, issueDate)
-}
-
-func GetUpcomingSplits(symbol string) (time.Time) {
-	value, ok := upcomingSplits.Load(symbol)
-	if ok == false {
-		return time.Time{}
-	}
-	if value == nil {
-		return time.Time{}
-	}
-	return value.(time.Time)
-}
-
-func DeleteUpcomingSplits(symbol string) {
-	upcomingSplits.Store(symbol, nil)
-}
-
-func UpdateSplits(symbol string) {
+func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 		
 	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))
 
@@ -98,18 +64,35 @@ func UpdateSplits(symbol string) {
 		log.Error("%s %v", symbol, err)
 	}
 	
+	rebackfill := false
+
 	if splitsItem.Count > 0 {
-		splits := make([]Split, len(splitsItem.SplitData))
-		for i, splitData := range splitsItem.SplitData {
-			dt, _ := time.Parse("2006-01-02", splitData.Issue)
-			split := Split{
-							Issue: dt,
-							Ratio: splitData.Ratio,
-							}
-			splits[i] = split
+		
+		if (previousSplits) == 0 {
+			splits := make([]Split, len(splitsItem.SplitData))
+			for _, splitData := range splitsItem.SplitData {
+				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
+				// Check if splits is after plugin was started and in the future
+				if issueDate.After(timeStarted) && issueDate.After(time.Now()) {
+					rebackfill = true
+				}
+				split := Split{
+								Issue: issueDate,
+								Ratio: splitData.Ratio,
+								Done: true,
+								}
+				splits[issueDate.Unix()] = split
+			}
+			previousSplits[symbol] = splits
+		} else {
+			//
+			for _, splitData := range splitsItem.SplitData {
+
+			}
 		}
-		previousSplits.Store(symbol, &splits)
 	}
+
+	return rebackfill
 	
 }
 func GetAggregates(
@@ -185,23 +168,24 @@ func GetAggregates(
 				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				// Correct for Splits if required
-				splits := GetPreviousSplits(symbol)
-				if len(splits) > 0 {
-					for _, split := range splits {
-						if Epoch < split.Issue.Unix() {
-							// data is before the split date
-							//OHLCV Adjusted
-							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
-							ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
-							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
-							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
-							if ohlcv.Volume[Epoch] != float32(1) {
-								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
+				if splits, ok := previousSplits[symbol]; ok {
+					if len(splits) > 0 {
+						for _, split := range splits {
+							if Epoch < split.Issue.Unix() {
+								// data is before the split date
+								//OHLCV Adjusted
+								ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
+								ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
+								ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
+								ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
+								if ohlcv.Volume[Epoch] != float32(1) {
+									ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
+								}
+								// Extra Adjusted
+								ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
+								ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
+								ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
 							}
-							// Extra Adjusted
-							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
-							ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
-							ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
 						}
 					}
 				}
