@@ -72,6 +72,8 @@ func (qf *QuanateeFetcher) Run() {
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
+	api4polygon.UpdateSplits(symbol)
+	
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
@@ -173,8 +175,8 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 
-		// Initalize splits data from polygon, or randomly check if there are new splits
-		if firstLoop == true || checkSplit == 0 {
+		// Randomly check if there are new splits
+		if checkSplit == 0 {
 			api4polygon.UpdateSplits(symbol)
 			// Check if symbol has splits
 			splits := api4polygon.GetPreviousSplits(symbol)
