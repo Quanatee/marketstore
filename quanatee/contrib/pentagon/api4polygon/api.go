@@ -92,7 +92,7 @@ func UpdateSplits(symbol string) {
 
 	u.RawQuery = q.Encode()
 
-	var splitsItem SplitItem
+	var splitsItem SplitsItem
 
 	err = downloadAndUnmarshal(u.String(), retryCount, &splitsItem)
 
@@ -104,7 +104,7 @@ func UpdateSplits(symbol string) {
 		var splits []Split
 		for _, splitData := range splitsItem.SplitData {
 			dt, _ := time.Parse("2006-01-02", splitData.Issue)
-			append(splits, Split{Issue: dt, Ratio: splitData.Ratio,})
+			append(splits, Split{"Issue": dt, "Ratio": splitData.Ratio,})
 		}
 		log.Info("%s %v", symbol, splits)
 		SetPreviousSplits(symbol, splits)
