@@ -207,7 +207,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 		// If time has passed the issue date of future split event, trigger backfill
 		issueDate := api4polygon.GetUpcomingSplits(symbol)
-		if time.Now().After(issueDate) {
+		if time.Now().After(issueDate) && issueDate.IsZero() == false {
 			// Delete bookmark of future split event
 			api4polygon.DeleteUpcomingSplits(symbol)
 			// Delete entire tbk
