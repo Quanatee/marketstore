@@ -58,7 +58,7 @@ func SetSplits(symbol string) {
 	err = downloadAndUnmarshal(u.String(), retryCount, &splits)
 
 	if err != nil {
-		return err
+		log.Error("%s %v", symbol, err)
 	}
 	
 	symbolSplits[symbol] = splits
