@@ -32,8 +32,13 @@ var (
 		"forex": "C:",
 		"equity": "",
 	}
+	
+	previousSplits *sync.Map
+	upcomingSplits *sync.Map
+	/*
 	previousSplits = map[string]Splits{}
 	upcomingSplits = map[string]time.Time{}
+	*/
 )
 
 func SetAPIKey(key string) {
@@ -41,25 +46,33 @@ func SetAPIKey(key string) {
 }
 
 func GetPreviousSplits(symbol string) (Splits) {
-	if splits, ok := previousSplits[symbol]; ok {
-		return splits
+	value, err := previousSplits.Load(key)
+	if err != nil {
+		return Splits{}
 	}
-	return Splits{}
+	if value == nil {
+		return Splits{}
+	}
+	return value.(Splits)
 }
 
 func SetUpcomingSplits(symbol string, issueDate time.Time) {
-	upcomingSplits[symbol] = issueDate
+	upcomingSplits.Store(symbol, issueDate)
 }
 
 func GetUpcomingSplits(symbol string) (time.Time) {
-	if issueDate, ok := upcomingSplits[symbol]; ok {
-		return issueDate
+	value, err := upcomingSplits.Load(key)
+	if err != nil {
+		return time.Time{}
 	}
-	return time.Time{}
+	if value == nil {
+		return time.Time{}
+	}
+	return value.(time.Time)
 }
 
 func DeleteUpcomingSplits(symbol string) {
-	delete(upcomingSplits, symbol)
+	upcomingSplits.Store(symbol, nil)
 }
 
 func GetSplits(symbol string) {
