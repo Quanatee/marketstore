@@ -167,8 +167,9 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	defer wg.Done()
 	var wg2 sync.WaitGroup
 	count := 0
+	rand.Seed(filler.GetRandSeed())
 	checkSplit := rand.Intn(99)
-
+	
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 
