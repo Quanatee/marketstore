@@ -193,9 +193,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
-			// Delay for 1 second every 7 requests
+			// Delay for 1 second every 5 requests
 			count++
-			if count % 7 == 0 {
+			if count % 5 == 0 {
 				time.Sleep(time.Second)
 			}
 			symbol := key.(string)
