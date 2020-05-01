@@ -187,6 +187,11 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 	for {
 		
+		// Sleep to the next 30th second of the next minute
+		next := time.Now().Add(time.Minute)
+		next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 30, 0, time.UTC)
+		time.Sleep(next.Sub(time.Now()))
+		
 		wg := sync.WaitGroup{}
 		count := 0
 		ran := false
@@ -224,10 +229,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			log.Info("BACKFILL COMPLETED.")
 			break
 		}
-		// Sleep to the next 30th second of the next minute
-		next := time.Now().Add(time.Minute)
-		next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 30, 0, time.UTC)
-		time.Sleep(next.Sub(time.Now()))
 		
 	}
 }
