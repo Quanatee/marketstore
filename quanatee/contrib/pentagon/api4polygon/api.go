@@ -177,7 +177,7 @@ func GetAggregates(
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				// Correct for Splits if required
 				splits := GetPreviousSplits(symbol)
-				if (Splits{}) == splits  {
+				if splits.Status == "ok"  {
 					for _, split := range splits.SplitData {
 						dt, _ := time.Parse("2006-01-02", split.Issue)
 						issuedEpoch := dt.Unix()
