@@ -181,16 +181,14 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	for _, Epoch := range Epochs {
 		var open, high, low, close, volume, hlc, tval, spread float32
 		for _, ohlcv_ := range ohlcvs {
-			if _, ok := ohlcv_.HLC[Epoch]; ok {
-				open += float32(ohlcv_.Open[Epoch])
-				high += float32(ohlcv_.High[Epoch])
-				low += float32(ohlcv_.Low[Epoch])
-				close += float32(ohlcv_.Close[Epoch])
-				volume += float32(ohlcv_.Volume[Epoch])
-				hlc += float32(ohlcv_.HLC[Epoch])
-				tval += float32(ohlcv_.TVAL[Epoch])
-				spread += float32(ohlcv_.Spread[Epoch])
-			}
+			open += float32(ohlcv_.Open[Epoch])
+			high += float32(ohlcv_.High[Epoch])
+			low += float32(ohlcv_.Low[Epoch])
+			close += float32(ohlcv_.Close[Epoch])
+			volume += float32(ohlcv_.Volume[Epoch])
+			hlc += float32(ohlcv_.HLC[Epoch])
+			tval += float32(ohlcv_.TVAL[Epoch])
+			spread += float32(ohlcv_.Spread[Epoch])
 		}
 		Opens = append(Opens, open / float32(len(ohlcvs)))
 		Highs = append(Highs, high / float32(len(ohlcvs)))
