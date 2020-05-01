@@ -288,6 +288,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 		
 	to := from
 	// Keep requests under 5000 rows (Twelvedata limit). Equity gets more due to operating hours
+	switch marketType {
 	case "equity":
 		to = to.Add(20000*time.Minute)
 	default:
