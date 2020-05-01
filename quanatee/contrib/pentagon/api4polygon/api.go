@@ -34,8 +34,8 @@ var (
 		"equity": "",
 	}
 	
-	previousSplits *sync.Map
-	upcomingSplits *sync.Map
+	previousSplits = sync.Map
+	upcomingSplits = sync.Map
 	/*
 	previousSplits = map[string]Splits{}
 	upcomingSplits = map[string]time.Time{}
