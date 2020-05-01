@@ -180,7 +180,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	
 	for _, Epoch := range Epochs {
 		var open, high, low, close, volume, hlc, tval, spread float32
-		divider := 0
+		divisor := 0
 		for _, ohlcv_ := range ohlcvs {
 			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
 				(ohlcv_.Open[Epoch] != ohlcv_.Close[Epoch]) && 
@@ -197,10 +197,10 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				hlc += float32(ohlcv_.HLC[Epoch])
 				tval += float32(ohlcv_.TVAL[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch])
-				divider += 1
+				divisor += 1
 			}
 		}
-		if divider > 1 {
+		if divisor > 1 {
 			Opens = append(Opens, open / float32(len(ohlcvs)))
 			Highs = append(Highs, high / float32(len(ohlcvs)))
 			Lows = append(Lows, low / float32(len(ohlcvs)))
@@ -209,7 +209,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
 			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread / float32(len(ohlcvs)))
-		} else if divider == 1 {
+		} else if divisor == 1 {
 			Opens = append(Opens, open)
 			Highs = append(Highs, high)
 			Lows = append(Lows, low)
