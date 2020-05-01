@@ -173,7 +173,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from.Add(-5000*time.Minute), to)
+			go filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -251,7 +251,12 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	q := planner.NewQuery(cDir)
 	q.AddTargetKey(tbk)
 	q.SetRowLimit(io.LAST, 1)
-	q.SetEnd(end.Add(-5000*time.Minute).Unix() - int64(time.Minute.Seconds()))
+	
+	switch marketType {
+	case "equity":
+		q.SetEnd(end.Add(-20000*time.Minute).Unix() - int64(time.Minute.Seconds()))
+    default:
+		q.SetEnd(end.Add(-5000*time.Minute).Unix() - int64(time.Minute.Seconds()))
 
 	parsed, err := q.Parse()
 	if err != nil {
@@ -280,8 +285,13 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	} else {
 		from = start
 	}
-
-	to := from.Add(5000*time.Minute) // Keep requests < 5000 rows at a time (approx. 3.4 days)
+		
+	to := from
+	// Keep requests under 5000 rows (Twelvedata limit). Equity gets more due to operating hours
+	case "equity":
+		to = to.Add(20000*time.Minute)
+	default:
+		to = to.Add(5000*time.Minute)
 	if to.Unix() >= end.Unix() {
 		to = end
 		stop = true
