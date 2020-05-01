@@ -46,17 +46,17 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func GetPreviousSplits(symbol string) ([]Splits) {
+func GetPreviousSplits(symbol string) ([]Split) {
 	value, ok := previousSplits.Load(symbol)
 	if ok == false {
-		return []Splits{}
+		return []Split{}
 	}
 	if value == nil {
-		return []Splits{}
+		return []Split{}
 	}
-	return value.([]Splits)
+	return value.([]Split)
 }
-func SetPreviousSplits(symbol string, splits []Splits) {
+func SetPreviousSplits(symbol string, splits []Split) {
 	previousSplits.Store(symbol, splits)
 }
 
@@ -92,7 +92,7 @@ func UpdateSplits(symbol string) {
 
 	u.RawQuery = q.Encode()
 
-	var splitsItem []SplitsItem
+	var splitsItem []SplitItem
 
 	err = downloadAndUnmarshal(u.String(), retryCount, &splitsItem)
 
@@ -101,7 +101,7 @@ func UpdateSplits(symbol string) {
 	}
 	
 	if splitsItem.Count > 0 {
-		var splits []Splits
+		var splits []Split
 		for _, splitData := range splitsItem.SplitData {
 			dt, _ := time.Parse("2006-01-02", splitData.Issue)
 			append(splitsItem, Splits{Issue: dt, Ratio: splitData.Ratio,})
