@@ -1,7 +1,5 @@
 package functions
 
-import "math"
-
 func AvgLeftFloat32(values []float32) float32 {
 
 	if len(values) > 2 {

@@ -1,7 +1,5 @@
 package functions
 
-import "math"
-
 func AvgRightFloat32(values []float32) float32 {
 
 	if len(values) > 2 {
@@ -21,7 +19,7 @@ func AvgRightFloat32(values []float32) float32 {
 func AvgRightFloat64(values []float64) float64 {
 		
 	if len(values) > 2 {
-		
+
 		var e AvgRightEWMA
 		decay := 2 / (float64(len(values)/2) + 1)
 		
