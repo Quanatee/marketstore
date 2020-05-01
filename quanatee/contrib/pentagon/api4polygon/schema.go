@@ -1,7 +1,7 @@
 package api4polygon
 
 type SplitData struct {
-	Symbol 		string 		`json:"status"`
+	Symbol 		string 		`json:"ticker"`
 	Expiry 		string 		`json:"exDate"`
 	Issue	 	string 		`json:"paymentDate"`
 	Declared	string		`json:"declaredDate"` // optional
@@ -14,6 +14,16 @@ type SplitsItem struct {
 	Status 		string 		`json:"status"`
 	Count 		int64 		`json:"count"`
 	SplitData   []SplitData	`json:"results"`
+}
+
+type Split struct {
+	Symbol 		string 		`json:"status"`
+	Expiry 		string 		`json:"exDate"`
+	Issue	 	string 		`json:"paymentDate"`
+	Declared	string		`json:"declaredDate"` // optional
+	Ratio		float32		`json:"ratio"`
+	ToFactor    float32		`json:"tofactor"` // optional
+	ForFactor   float32		`json:"forfactor"` // optional
 }
 
 type Agg1 struct {
