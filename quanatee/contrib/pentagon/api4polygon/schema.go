@@ -1,10 +1,12 @@
 package api4polygon
 
+import "time"
+
 type SplitData struct {
 	Symbol 		string 		`json:"ticker"`
 	Expiry 		string 		`json:"exDate"`
 	Issue	 	string 		`json:"paymentDate"`
-	Declared	string		`json:"declaredDate"` // optional
+	Announce	string		`json:"declaredDate"` // optional
 	Ratio		float32		`json:"ratio"`
 	ToFactor    float32		`json:"tofactor"` // optional
 	ForFactor   float32		`json:"forfactor"` // optional
@@ -17,13 +19,8 @@ type SplitsItem struct {
 }
 
 type Split struct {
-	Symbol 		string 		`json:"status"`
-	Expiry 		string 		`json:"exDate"`
-	Issue	 	string 		`json:"paymentDate"`
-	Declared	string		`json:"declaredDate"` // optional
-	Ratio		float32		`json:"ratio"`
-	ToFactor    float32		`json:"tofactor"` // optional
-	ForFactor   float32		`json:"forfactor"` // optional
+	Issue	 	time.Time
+	Ratio		float32
 }
 
 type Agg1 struct {

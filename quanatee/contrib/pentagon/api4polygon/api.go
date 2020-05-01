@@ -46,17 +46,17 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func GetPreviousSplits(symbol string) ([]SplitData) {
+func GetPreviousSplits(symbol string) ([]Splits) {
 	value, ok := previousSplits.Load(symbol)
 	if ok == false {
-		return []SplitData{}
+		return []Splits{}
 	}
 	if value == nil {
-		return []SplitData{}
+		return []Splits{}
 	}
-	return value.([]SplitData)
+	return value.([]Splits)
 }
-func SetPreviousSplits(symbol string, splits []SplitData) {
+func SetPreviousSplits(symbol string, splits []Splits) {
 	previousSplits.Store(symbol, splits)
 }
 
@@ -92,7 +92,7 @@ func UpdateSplits(symbol string) {
 
 	u.RawQuery = q.Encode()
 
-	var splitsItem SplitsItem
+	var splitsItem []SplitsItem
 
 	err = downloadAndUnmarshal(u.String(), retryCount, &splitsItem)
 
@@ -101,8 +101,13 @@ func UpdateSplits(symbol string) {
 	}
 	
 	if splitsItem.Count > 0 {
-		log.Info("%s %v", symbol, splitsItem.SplitData)
-		SetPreviousSplits(symbol, splitsItem.SplitData)
+		var splits []Splits
+		for _, splitData := range splitsItem.SplitData {
+			dt, _ := time.Parse("2006-01-02", splitData.Issue)
+			append(splitsItem, Splits{Issue: dt, Ratio: splitData.Ratio,})
+		}
+		log.Info("%s %v", symbol, splits)
+		SetPreviousSplits(symbol, splits)
 	}
 	
 }
@@ -182,9 +187,7 @@ func GetAggregates(
 				splits := GetPreviousSplits(symbol)
 				if len(splits) > 0 {
 					for _, split := range splits {
-						dt, _ := time.Parse("2006-01-02", split.Issue)
-						issuedEpoch := dt.Unix()
-						if Epoch < issuedEpoch {
+						if Epoch < split.Issue.Unix() {
 							// data is before the split date
 							//OHLCV Adjusted
 							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
