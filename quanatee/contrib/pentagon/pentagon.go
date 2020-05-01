@@ -271,8 +271,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	}
 	parsed, err := q.Parse()
 	if err != nil {
-		log.Error("query parse failure (%v)", err)
-		return true
+		// log.Error("query parse failure (%v)", err)
+		return false
 	}
 
 	scanner, err := executor.NewReader(parsed)
