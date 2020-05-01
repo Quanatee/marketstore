@@ -221,7 +221,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 
 		// Sleep to the next 30th second of the next minute
 		next := time.Now().Add(time.Minute)
-		next = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 30, 0, time.UTC)
+		next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 30, 0, time.UTC)
 		time.Sleep(next.Sub(time.Now()))
 		
 	}
