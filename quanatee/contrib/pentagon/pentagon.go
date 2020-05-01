@@ -216,7 +216,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					// backfill the symbol in parallel
 					stop := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
 					if stop == true {
-						log.Info("%s backfill completed. Last input: %v", symbol, value.(time.Time))
+						log.Info("%s backfill stopped. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
 					}
 				}()
@@ -271,19 +271,19 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	}
 	parsed, err := q.Parse()
 	if err != nil {
-		// log.Error("query parse failure (%v)", err)
-		return false
+		log.Error("%s query parse failure (%v), symbol data not available.", err)
+		return true
 	}
 
 	scanner, err := executor.NewReader(parsed)
 	if err != nil {
-		log.Error("new scanner failure (%v)", err)
+		log.Error("%s new scanner failure (%v)", err)
 		return true
 	}
 
 	csm, err := scanner.Read()
 	if err != nil {
-		log.Error("scanner read failure (%v)", err)
+		log.Error("%s scanner read failure (%v)", err)
 		return true
 	}
 
