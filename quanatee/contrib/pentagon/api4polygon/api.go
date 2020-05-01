@@ -100,7 +100,9 @@ func UpdateSplits(symbol string) {
 		log.Error("%s %v", symbol, err)
 	}
 	
-	SetPreviousSplits(symbol, *splits)
+	log.Info("%s %v", symbol, splits)
+
+	SetPreviousSplits(symbol, splits)
 	
 }
 func GetAggregates(
