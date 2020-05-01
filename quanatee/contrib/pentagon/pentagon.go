@@ -186,7 +186,6 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 				}
 			}
 		}
-		
 		// Slow down requests
 		count++
 		if count % 13 == 0 {
