@@ -176,7 +176,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		return
 	}
 
-	var Opens, Highs, Lows, Closes, Volumes, HLCs, Tvals, Spreads []float32
+	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads []float32
 	
 	for _, Epoch := range Epochs {
 		var open, high, low, close, volume, hlc, tval, spread float32
@@ -207,7 +207,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			Closes = append(Closes, close / float32(len(ohlcvs)))
 			Volumes = append(Volumes, volume)
 			HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
-			Tvals = append(Tvals, tval)
+			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread / float32(len(ohlcvs)))
 		} else if divisor == 1 {
 			Opens = append(Opens, open)
@@ -216,7 +216,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			Closes = append(Closes, close)
 			Volumes = append(Volumes, volume)
 			HLCs = append(HLCs, hlc)
-			Tvals = append(Tvals, tval)
+			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread)
 		}
 	}
@@ -235,7 +235,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	cs.AddColumn("Close", Closes)
 	cs.AddColumn("Volume", Volumes)
 	cs.AddColumn("HLC", HLCs)
-	cs.AddColumn("TVAL", Tvals)
+	cs.AddColumn("TVAL", TVALs)
 	cs.AddColumn("Spread", Spreads)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
