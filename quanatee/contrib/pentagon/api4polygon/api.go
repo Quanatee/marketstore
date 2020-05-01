@@ -79,7 +79,7 @@ func DeleteUpcomingSplits(symbol string) {
 	upcomingSplits.Store(symbol, nil)
 }
 
-func GetSplits(symbol string) {
+func UpdateSplits(symbol string) {
 		
 	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))
 
@@ -177,23 +177,25 @@ func GetAggregates(
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				// Correct for Splits if required
 				splits := GetPreviousSplits(symbol)
-				for _, split := range splits.SplitData {
-					dt, _ := time.Parse("2006-01-02", split.Issue)
-					issuedEpoch := dt.Unix()
-					if Epoch < issuedEpoch {
-						// data is before the split date
-						//OHLCV Adjusted
-						ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
-						ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
-						ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
-						ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
-						if ohlcv.Volume[Epoch] != float32(1) {
-							ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
+				if (Splits{}) == splits  {
+					for _, split := range splits.SplitData {
+						dt, _ := time.Parse("2006-01-02", split.Issue)
+						issuedEpoch := dt.Unix()
+						if Epoch < issuedEpoch {
+							// data is before the split date
+							//OHLCV Adjusted
+							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
+							ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
+							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
+							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
+							if ohlcv.Volume[Epoch] != float32(1) {
+								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
+							}
+							// Extra Adjusted
+							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
+							ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
+							ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
 						}
-						// Extra Adjusted
-						ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
-						ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
-						ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
 					}
 				}
 			}
