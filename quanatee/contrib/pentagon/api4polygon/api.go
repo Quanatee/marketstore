@@ -108,7 +108,7 @@ func UpdateSplits(symbol string) {
 			splits = append(splits, split)
 		}
 		log.Info("%s %v", symbol, splits)
-		previousSplits.Store(symbol, splits)
+		previousSplits.Store(symbol, &splits)
 	}
 	
 }
