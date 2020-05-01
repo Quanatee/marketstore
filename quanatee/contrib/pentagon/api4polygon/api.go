@@ -42,7 +42,7 @@ func SetAPIKey(key string) {
 
 func SetSplits(symbol string) {
 		
-	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol)
+	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))
 
 	if err != nil {
 		log.Error("%s %v", symbol, err)
