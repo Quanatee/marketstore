@@ -55,6 +55,9 @@ func GetPreviousSplits(symbol string) (Splits) {
 	}
 	return value.(Splits)
 }
+func SetPreviousSplits(symbol string, splits Splits) {
+	preiousSplits.Store(symbol, splits)
+}
 
 func SetUpcomingSplits(symbol string, issueDate time.Time) {
 	upcomingSplits.Store(symbol, issueDate)
@@ -96,7 +99,7 @@ func GetSplits(symbol string) {
 		log.Error("%s %v", symbol, err)
 	}
 	
-	previousSplits[symbol] = splits
+	SetPreviousSplits(symbol, splits)
 	
 }
 func GetAggregates(
@@ -172,25 +175,24 @@ func GetAggregates(
 				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				// Correct for Splits if required
-				if splits, ok := previousSplits[symbol]; ok {
-					for _, split := range splits.SplitData {
-						dt, _ := time.Parse("2006-01-02", split.Issue)
-						issuedEpoch := dt.Unix()
-						if Epoch < issuedEpoch {
-							// data is before the split date
-							//OHLCV Adjusted
-							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
-							ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
-							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
-							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
-							if ohlcv.Volume[Epoch] != float32(1) {
-								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
-							}
-							// Extra Adjusted
-							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
-							ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
-							ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
+				splits := GetPreviousSplits(symbol)
+				for _, split := range splits.SplitData {
+					dt, _ := time.Parse("2006-01-02", split.Issue)
+					issuedEpoch := dt.Unix()
+					if Epoch < issuedEpoch {
+						// data is before the split date
+						//OHLCV Adjusted
+						ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
+						ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
+						ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
+						ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
+						if ohlcv.Volume[Epoch] != float32(1) {
+							ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
 						}
+						// Extra Adjusted
+						ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
+						ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
+						ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
 					}
 				}
 			}
