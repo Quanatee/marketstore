@@ -130,7 +130,7 @@ func GetAggregates(
 				if agg.PriceData[bar].Volume != 0 {
 					ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
 				} else {
-					ohlcv.Volume[Epoch] = 1.0
+					ohlcv.Volume[Epoch] = float32(1.0)
 				}
 				// Extra
 				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
@@ -148,8 +148,8 @@ func GetAggregates(
 							ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
 							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
 							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
-							if ohlcv.Volume != 1.0 {
-								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch]/ split.Ratio
+							if ohlcv.Volume != 1 {
+								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] / split.Ratio
 							}
 							// Extra Adjusted
 							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
