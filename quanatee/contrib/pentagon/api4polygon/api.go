@@ -148,7 +148,7 @@ func GetAggregates(
 							ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
 							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
 							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
-							if ohlcv.Volume != float32(1) {
+							if ohlcv.Volume[Epoch] != float32(1) {
 								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
 							}
 							// Extra Adjusted
