@@ -185,7 +185,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(90 * time.Second)
+	ticker := time.NewTicker(180 * time.Second)
 
 	for range ticker.C {
 		
@@ -197,7 +197,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
 			count++
 			if count % 7 == 0 {
-				time.Sleep(3*time.Second)
+				time.Sleep(time.Second)
 			}
 			symbol := key.(string)
 			marketType, _ := filler.BackfillMarket.Load(key)
