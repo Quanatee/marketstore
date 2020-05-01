@@ -189,7 +189,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		
 		wg := sync.WaitGroup{}
 		count := 0
-
+		ran := false
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
@@ -203,6 +203,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
 			if value != nil {
+				ran = true
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
@@ -219,6 +220,10 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		})
 		wg.Wait()
 
+		if ran == false {
+			log.Info("BACKFILL COMPLETED.")
+			break
+		}
 		// Sleep to the next 30th second of the next minute
 		next := time.Now().Add(time.Minute)
 		next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 30, 0, time.UTC)
