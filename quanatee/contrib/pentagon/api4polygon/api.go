@@ -34,8 +34,8 @@ var (
 		"equity": "",
 	}
 	
-	previousSplits = sync.Map
-	upcomingSplits = sync.Map
+	previousSplits *sync.Map
+	upcomingSplits *sync.Map
 	/*
 	previousSplits = map[string]Splits{}
 	upcomingSplits = map[string]time.Time{}
@@ -56,7 +56,7 @@ func GetPreviousSplits(symbol string) ([]Split) {
 	}
 	return value.([]Split)
 }
-func SetPreviousSplits(symbol string, splits []Split) {
+func SetPreviousSplits(symbol string, splits *[]Split) {
 	previousSplits.Store(symbol, splits)
 }
 
