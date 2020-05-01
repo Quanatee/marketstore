@@ -72,7 +72,9 @@ func (qf *QuanateeFetcher) Run() {
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
-	api4polygon.UpdateSplits(symbol)
+	for _, symbol := range qf.config.EquitySymbols {
+		api4polygon.UpdateSplits(symbol)
+	}
 	
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
