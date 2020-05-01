@@ -33,8 +33,8 @@ var (
 		"forex": "C:",
 		"equity": "",
 	}
-	symbolSplits := map[string]Splits{}
-	upcomingSplits := map[string]time.Time{}
+	symbolSplits = map[string]Splits{}
+	upcomingSplits = map[string]time.Time{}
 )
 
 func SetAPIKey(key string) {
@@ -62,7 +62,7 @@ func SetSplits(symbol string) {
 		return err
 	}
 	
-	symbolSplits[symbol] := splits
+	symbolSplits[symbol] = splits
 	
 }
 func GetAggregates(
@@ -172,24 +172,6 @@ func GetAggregates(
 	
 	return ohlcv, nil
 	
-}
-
-func adjustOHLCV(ohlcv OHLCV) {
-
-	ohlcv[]
-
-	if splits, ok := symbolSplits[symbol]; ok {
-		for _, split := range splits.SplitData {
-			dt, _ := time.Parse("2006-01-02", split.Issue)
-			issuedEpoch := dt.Unix()
-			if dt < start {
-				continue;
-			} else {
-				
-			}
-		}
-	}
-
 }
 
 func downloadAndUnmarshal(url string, retryCount int, data interface{}) error {
