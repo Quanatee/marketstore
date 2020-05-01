@@ -56,9 +56,6 @@ func GetPreviousSplits(symbol string) ([]Split) {
 	}
 	return value.([]Split)
 }
-func SetPreviousSplits(symbol string, splits *[]Split) {
-	previousSplits.Store(symbol, splits)
-}
 
 func SetUpcomingSplits(symbol string, issueDate time.Time) {
 	upcomingSplits.Store(symbol, issueDate)
@@ -108,10 +105,10 @@ func UpdateSplits(symbol string) {
 							Issue: dt,
 							Ratio: splitData.Ratio,
 							}
-			splits =append(splits, split)
+			splits = append(splits, split)
 		}
 		log.Info("%s %v", symbol, splits)
-		SetPreviousSplits(symbol, splits)
+		previousSplits.Store(symbol, splits)
 	}
 	
 }
