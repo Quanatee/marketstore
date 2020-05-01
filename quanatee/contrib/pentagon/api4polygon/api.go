@@ -92,7 +92,7 @@ func UpdateSplits(symbol string) {
 
 	u.RawQuery = q.Encode()
 
-	var splitsItem []SplitItem
+	var splitsItem SplitItem
 
 	err = downloadAndUnmarshal(u.String(), retryCount, &splitsItem)
 
