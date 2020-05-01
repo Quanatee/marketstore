@@ -100,8 +100,8 @@ func UpdateSplits(symbol string) {
 		log.Error("%s %v", symbol, err)
 	}
 	
-	// log.Info("%s %v", symbol, splits)
 	if splits.Count > 0 {
+		log.Info("%s %v", symbol, splits)
 		SetPreviousSplits(symbol, splits)
 	}
 	
