@@ -106,9 +106,9 @@ func UpdateSplits(symbol string) {
 			dt, _ := time.Parse("2006-01-02", splitData.Issue)
 			split := Split{
 							Issue: dt,
-							"Ratio": splitData.Ratio,
+							Ratio: splitData.Ratio,
 							}
-			append(splits, split)
+			splits =append(splits, split)
 		}
 		log.Info("%s %v", symbol, splits)
 		SetPreviousSplits(symbol, splits)
