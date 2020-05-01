@@ -75,7 +75,7 @@ func (qf *QuanateeFetcher) Run() {
 	for _, symbol := range qf.config.EquitySymbols {
 		api4polygon.UpdateSplits(symbol)
 	}
-	
+
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
@@ -182,7 +182,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			api4polygon.UpdateSplits(symbol)
 			// Check if symbol has splits
 			splits := api4polygon.GetPreviousSplits(symbol)
-			if splits.Status == "ok"  {
+			if splits.Count > 0 {
 				for _, split := range splits.SplitData {
 					issueDate, _ := time.Parse("2006-01-02", split.Issue)
 					// Check if splits is after plugin was started and in the future
