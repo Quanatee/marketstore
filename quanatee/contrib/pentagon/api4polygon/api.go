@@ -36,10 +36,6 @@ var (
 	
 	previousSplits *sync.Map
 	upcomingSplits *sync.Map
-	/*
-	previousSplits = map[string]Splits{}
-	upcomingSplits = map[string]time.Time{}
-	*/
 )
 
 func SetAPIKey(key string) {
@@ -56,7 +52,9 @@ func GetPreviousSplits(symbol string) ([]Split) {
 	}
 	return value.([]Split)
 }
+
 func SetPreviousSplits(symbol string, splits []Split) {
+	log.Info("%s %v", symbol, splits)
 	previousSplits.Store(symbol, splits)
 }
 
@@ -110,7 +108,6 @@ func UpdateSplits(symbol string) {
 							}
 			splits[i] = split
 		}
-		log.Info("%s %v", symbol, splits)
 		SetPreviousSplits(symbol, splits)
 	}
 	
