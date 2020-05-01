@@ -185,9 +185,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 
 func (qf *QuanateeFetcher) workBackfillBars() {
 
-	ticker := time.NewTicker(180 * time.Second)
-
-	for range ticker.C {
+	for {
 		
 		wg := sync.WaitGroup{}
 		count := 0
@@ -195,6 +193,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
+			// Delay for 1 second every 7 requests
 			count++
 			if count % 7 == 0 {
 				time.Sleep(time.Second)
@@ -219,6 +218,12 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			return true
 		})
 		wg.Wait()
+
+		// Sleep to the next 30th second of the next minute
+		next := time.Now().Add(time.Minute)
+		next = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 30, 0, time.UTC)
+		time.Sleep(next.Sub(time.Now()))
+		
 	}
 }
 
