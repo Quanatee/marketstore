@@ -212,7 +212,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			api4polygon.DeleteUpcomingSplits(symbol)
 			// Delete entire tbk
 			tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
-			err = executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
+			err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
 			if err != nil {
 				log.Error("removal of catalog entry failed: %s", err.Error())
 			}
@@ -250,7 +250,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
 			if value != nil {
-				ran = true
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
