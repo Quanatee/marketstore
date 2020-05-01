@@ -47,8 +47,8 @@ func SetAPIKey(key string) {
 }
 
 func GetPreviousSplits(symbol string) (Splits) {
-	value, err := previousSplits.Load(symbol)
-	if err != nil {
+	value, ok := previousSplits.Load(symbol)
+	if ok == false {
 		return Splits{}
 	}
 	if value == nil {
@@ -65,8 +65,8 @@ func SetUpcomingSplits(symbol string, issueDate time.Time) {
 }
 
 func GetUpcomingSplits(symbol string) (time.Time) {
-	value, err := upcomingSplits.Load(symbol)
-	if err != nil {
+	value, ok := upcomingSplits.Load(symbol)
+	if ok == false {
 		return time.Time{}
 	}
 	if value == nil {
