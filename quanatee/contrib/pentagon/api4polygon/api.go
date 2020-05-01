@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+	"sync"
 
 	"net/http"
 	"net/url"
@@ -46,7 +47,7 @@ func SetAPIKey(key string) {
 }
 
 func GetPreviousSplits(symbol string) (Splits) {
-	value, err := previousSplits.Load(key)
+	value, err := previousSplits.Load(symbol)
 	if err != nil {
 		return Splits{}
 	}
@@ -56,7 +57,7 @@ func GetPreviousSplits(symbol string) (Splits) {
 	return value.(Splits)
 }
 func SetPreviousSplits(symbol string, splits Splits) {
-	preiousSplits.Store(symbol, splits)
+	previousSplits.Store(symbol, splits)
 }
 
 func SetUpcomingSplits(symbol string, issueDate time.Time) {
@@ -64,7 +65,7 @@ func SetUpcomingSplits(symbol string, issueDate time.Time) {
 }
 
 func GetUpcomingSplits(symbol string) (time.Time) {
-	value, err := upcomingSplits.Load(key)
+	value, err := upcomingSplits.Load(symbol)
 	if err != nil {
 		return time.Time{}
 	}
