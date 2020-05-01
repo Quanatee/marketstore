@@ -146,7 +146,6 @@ bgworkers:
         - IWM
         - UVXY
         - IEMG
-        # - UWTI # Not available on polygon
         - GDXJ
         - VWO
         - VEA
@@ -277,7 +276,6 @@ bgworkers:
         - DIS
         - TRV
         - JPM
-        - UTX
         - AXP
         - MRK
         - NKE
