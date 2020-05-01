@@ -4,6 +4,7 @@ import (
 	//"encoding/json"
 	"fmt"
 	//"runtime"
+	"math/rand"
 	"sync"
 	"time"
 	
@@ -50,7 +51,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	filler.BackfillFrom = &sync.Map{}
 	filler.BackfillMarket = &sync.Map{}
 	
-	startDate, _ = time.Parse("2006-01-02", qf.config.QueryStart)
+	startDate, _ := time.Parse("2006-01-02", config.QueryStart)
 	
 	return &QuanateeFetcher{
 		config: config,
