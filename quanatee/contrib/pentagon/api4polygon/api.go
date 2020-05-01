@@ -47,7 +47,7 @@ func SetAPIKey(key string) {
 }
 
 func GetPreviousSplits(symbol string) (Splits) {
-	value, ok := api4polygon.previousSplits.Load(symbol)
+	value, ok := previousSplits.Load(symbol)
 	if ok == false {
 		return Splits{}
 	}
@@ -57,15 +57,15 @@ func GetPreviousSplits(symbol string) (Splits) {
 	return value.(Splits)
 }
 func SetPreviousSplits(symbol string, splits Splits) {
-	api4polygon.previousSplits.Store(symbol, splits)
+	previousSplits.Store(symbol, splits)
 }
 
 func SetUpcomingSplits(symbol string, issueDate time.Time) {
-	api4polygon.upcomingSplits.Store(symbol, issueDate)
+	upcomingSplits.Store(symbol, issueDate)
 }
 
 func GetUpcomingSplits(symbol string) (time.Time) {
-	value, ok := api4polygon.upcomingSplits.Load(symbol)
+	value, ok := upcomingSplits.Load(symbol)
 	if ok == false {
 		return time.Time{}
 	}
@@ -76,7 +76,7 @@ func GetUpcomingSplits(symbol string) (time.Time) {
 }
 
 func DeleteUpcomingSplits(symbol string) {
-	api4polygon.upcomingSplits.Store(symbol, nil)
+	upcomingSplits.Store(symbol, nil)
 }
 
 func UpdateSplits(symbol string) {
@@ -100,7 +100,7 @@ func UpdateSplits(symbol string) {
 		log.Error("%s %v", symbol, err)
 	}
 	
-	SetPreviousSplits(symbol, splits)
+	SetPreviousSplits(symbol, *splits)
 	
 }
 func GetAggregates(
