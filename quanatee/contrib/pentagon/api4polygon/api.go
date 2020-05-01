@@ -108,7 +108,7 @@ func UpdateSplits(symbol string) {
 							}
 			splits[i] = split
 		}
-		SetPreviousSplits(symbol, splits)
+		previousSplits.Store(symbol, splits)
 	}
 	
 }
