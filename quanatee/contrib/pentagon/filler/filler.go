@@ -180,24 +180,45 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	
 	for _, Epoch := range Epochs {
 		var open, high, low, close, volume, hlc, tval, spread float32
+		divsor := 0
 		for _, ohlcv_ := range ohlcvs {
-			open += float32(ohlcv_.Open[Epoch])
-			high += float32(ohlcv_.High[Epoch])
-			low += float32(ohlcv_.Low[Epoch])
-			close += float32(ohlcv_.Close[Epoch])
-			volume += float32(ohlcv_.Volume[Epoch])
-			hlc += float32(ohlcv_.HLC[Epoch])
-			tval += float32(ohlcv_.TVAL[Epoch])
-			spread += float32(ohlcv_.Spread[Epoch])
+			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
+				(ohlcv_.Open[Epoch] != ohlcv_.Close[Epoch]) && 
+				(ohlcv_.High[Epoch] != ohlcv_.Low[Epoch]) ) &&
+				(ohlcv_.Volume[Epoch] != 0) &&
+				(ohlcv_.HLC[Epoch] != 0) &&
+				(ohlcv_.TVAL[Epoch] != 0) &&
+				(ohlcv_.Spread[Epoch] != 0) ) {
+				open += float32(ohlcv_.Open[Epoch])
+				high += float32(ohlcv_.High[Epoch])
+				low += float32(ohlcv_.Low[Epoch])
+				close += float32(ohlcv_.Close[Epoch])
+				volume += float32(ohlcv_.Volume[Epoch])
+				hlc += float32(ohlcv_.HLC[Epoch])
+				tval += float32(ohlcv_.TVAL[Epoch])
+				spread += float32(ohlcv_.Spread[Epoch])
+				divsor += 1
+			}
 		}
-		Opens = append(Opens, open / float32(len(ohlcvs)))
-		Highs = append(Highs, high / float32(len(ohlcvs)))
-		Lows = append(Lows, low / float32(len(ohlcvs)))
-		Closes = append(Closes, close / float32(len(ohlcvs)))
-		Volumes = append(Volumes, volume)
-		HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
-		Tvals = append(Tvals, tval)
-		Spreads = append(Spreads, spread / float32(len(ohlcvs)))
+		if divsor > 0 {
+			Opens = append(Opens, open / float32(len(ohlcvs)))
+			Highs = append(Highs, high / float32(len(ohlcvs)))
+			Lows = append(Lows, low / float32(len(ohlcvs)))
+			Closes = append(Closes, close / float32(len(ohlcvs)))
+			Volumes = append(Volumes, volume)
+			HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
+			Tvals = append(Tvals, tval)
+			Spreads = append(Spreads, spread / float32(len(ohlcvs)))
+		} else {
+			Opens = append(Opens, open)
+			Highs = append(Highs, high)
+			Lows = append(Lows, low)
+			Closes = append(Closes, close)
+			Volumes = append(Volumes, volume)
+			HLCs = append(HLCs, hlc)
+			Tvals = append(Tvals, tval)
+			Spreads = append(Spreads, spread)
+		}
 	}
 	
 	if (to.Add(5*time.Minute)).After(time.Now()) {
