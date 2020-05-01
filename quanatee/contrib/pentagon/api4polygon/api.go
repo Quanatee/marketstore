@@ -40,6 +40,21 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
+func SetUpcomingSplits(symbol string, issueDate time.Time) {
+	upcomingSplits[symbol] = issueDate
+}
+
+func GetUpcomingSplits(symbol string) (time.Time) {
+	if issueDate, ok := upcomingSplits[symbol]; ok {
+		return issueDate
+	}
+	return time.Time{}
+}
+
+func DeleteUpcomingSplits(symbol string) {
+	delete(upcomingSplits, symbol)
+}
+
 func SetSplits(symbol string) {
 		
 	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))

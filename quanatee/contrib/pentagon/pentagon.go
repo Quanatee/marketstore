@@ -207,22 +207,21 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		}
 		// If time has passed the issue date of future split event, trigger backfill
-		if issueDate, ok := api4polygon.upcomingSplits[symbol]; ok {
-			if time.Now() > issueDate {
-				// Delete bookmark of future split event
-				delete(api4polygon.upcomingSplits, symbol)
-				// Delete entire tbk
-				tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
-				err = executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
-				if err != nil {
-					log.Error("removal of catalog entry failed: %s", err.Error())
-				}
-				// Start new "firstLoop" request
-				filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
-				// Retrigger Backfill
-				filler.BackfillFrom.Store(symbol, from)
-				filler.BackfillMarket.Store(symbol, "equity")
+		issueDate := api4polygon.GetUpcomingSplits(symbol)
+		if time.Now().After(issueDate) {
+			// Delete bookmark of future split event
+			api4polygon.DeleteUpcomingSplits(symbol)
+			// Delete entire tbk
+			tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
+			err = executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
+			if err != nil {
+				log.Error("removal of catalog entry failed: %s", err.Error())
 			}
+			// Start new "firstLoop" request
+			filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
+			// Retrigger Backfill
+			filler.BackfillFrom.Store(symbol, from)
+			filler.BackfillMarket.Store(symbol, "equity")
 		}
 	}
 	defer wg2.Wait()
