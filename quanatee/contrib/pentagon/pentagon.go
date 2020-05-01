@@ -253,7 +253,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
-					force := false
 					// backfill the symbol
 					stop := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
 					if stop == true {
