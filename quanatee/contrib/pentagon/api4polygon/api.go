@@ -76,7 +76,6 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 				symbolSplits[issueDate] = splitData.Ratio
 			}
 			if len(symbolSplits) > 0 {
-				log.Info("1 %v", symbolSplits)
 				SplitEvents.Store(symbol, symbolSplits)
 			}
 		} else {
@@ -150,6 +149,7 @@ func GetAggregates(
 		HLC: make(map[int64]float32),
 		TVAL: make(map[int64]float32),
 		Spread: make(map[int64]float32),
+		Split: make(map[int64]float32),
 	}
 	// Panic recovery
     defer func() {
@@ -170,40 +170,48 @@ func GetAggregates(
 			(agg.PriceData[bar].High != agg.PriceData[bar].Low) ) {
 			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
 			if Epoch > from.Unix() && Epoch < to.Unix() {
-				//OHLCV
-				ohlcv.Open[Epoch] = agg.PriceData[bar].Open
-				ohlcv.High[Epoch] = agg.PriceData[bar].High
-				ohlcv.Low[Epoch] = agg.PriceData[bar].Low
-				ohlcv.Close[Epoch] = agg.PriceData[bar].Close
-				if agg.PriceData[bar].Volume != float32(0) {
-					ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
+				if symbolSplits == nil {
+					//OHLCV
+					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
+					ohlcv.High[Epoch] = agg.PriceData[bar].High
+					ohlcv.Low[Epoch] = agg.PriceData[bar].Low
+					ohlcv.Close[Epoch] = agg.PriceData[bar].Close
+					if agg.PriceData[bar].Volume != float32(0) {
+						ohlcv.Volume[Epoch] = agg.PriceData[bar].Volume
+					} else {
+						ohlcv.Volume[Epoch] = float32(1)
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = float32((ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3)
+					ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
+					ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])
+					// Store Split Ratio
+					ohlcv.Split[Epoch] = 1.0
 				} else {
-					ohlcv.Volume[Epoch] = float32(1)
-				}
-				// Extra
-				ohlcv.HLC[Epoch] = float32((ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3)
-				ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
-				ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])
-
-				if symbolSplits != nil {
 					symbolSplits := symbolSplits.(map[time.Time]float32)
+					splitRatio := float(1)
+					// Calculate the total split ratio for the epoch
 					for issueDate, ratio := range symbolSplits {
-						// If data is before the split date
 						if Epoch < issueDate.Unix() {
-							//OHLCV Adjusted
-							ohlcv.Open[Epoch] = float32(ohlcv.Open[Epoch] / ratio)
-							ohlcv.High[Epoch] = float32(ohlcv.High[Epoch] / ratio)
-							ohlcv.Low[Epoch] = float32(ohlcv.Low[Epoch] / ratio)
-							ohlcv.Close[Epoch] = float32(ohlcv.Close[Epoch] / ratio)
-							if ohlcv.Volume[Epoch] != float32(1) {
-								ohlcv.Volume[Epoch] = float32(ohlcv.Volume[Epoch] * ratio)
-							}
-							// Extra Adjusted
-							ohlcv.HLC[Epoch] = float32(ohlcv.HLC[Epoch] / ratio)
-							ohlcv.TVAL[Epoch] = float32(ohlcv.TVAL[Epoch] / ratio)
-							ohlcv.Spread[Epoch] = float32(ohlcv.Spread[Epoch] / ratio)
+							splitRatio *= float32(ratio)
 						}
 					}
+					//OHLCV Adjusted
+					ohlcv.Open[Epoch] = float32(agg.PriceData[bar].Open / splitRatio)
+					ohlcv.High[Epoch] = float32(agg.PriceData[bar].High / splitRatio)
+					ohlcv.Low[Epoch] = float32(agg.PriceData[bar].Low / splitRatio)
+					ohlcv.Close[Epoch] = float32(agg.PriceData[bar].Close / splitRatio)
+					if agg.PriceData[bar].Volume != float32(0) {
+						ohlcv.Volume[Epoch] = float32(agg.PriceData[bar].Volume * splitRatio)
+					} else {
+						ohlcv.Volume[Epoch] = float32(1)
+					}
+					// Extra Adjusted
+					ohlcv.HLC[Epoch] = float32((ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3)
+					ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
+					ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])
+					// Store Split Ratio
+					ohlcv.Split[Epoch] = splitRatio
 				}
 			}
 		}

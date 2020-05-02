@@ -33,6 +33,7 @@ type OHLCV struct {
 	HLC       map[int64]float32
 	TVAL      map[int64]float32
 	Spread    map[int64]float32
+	Split     map[int64]float32
 }
 
 func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
@@ -176,10 +177,10 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		return
 	}
 
-	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads []float32
+	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads, Splits []float32
 	
 	for _, Epoch := range Epochs {
-		var open, high, low, close, volume, hlc, tval, spread float32
+		var open, high, low, close, volume, hlc, tval, spread, split float32
 		divisor := 0
 		for _, ohlcv_ := range ohlcvs {
 			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
@@ -188,7 +189,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				(ohlcv_.Volume[Epoch] != 0) &&
 				(ohlcv_.HLC[Epoch] != 0) &&
 				(ohlcv_.TVAL[Epoch] != 0) &&
-				(ohlcv_.Spread[Epoch] != 0) ) {
+				(ohlcv_.Spread[Epoch] != 0) &&
+				(ohlcv_.Split[Epoch] != 0) ) {
 				open += float32(ohlcv_.Open[Epoch])
 				high += float32(ohlcv_.High[Epoch])
 				low += float32(ohlcv_.Low[Epoch])
@@ -197,6 +199,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				hlc += float32(ohlcv_.HLC[Epoch])
 				tval += float32(ohlcv_.TVAL[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch])
+				split *= float32(ohlcv_.Split[Epoch])
 				divisor += 1
 			}
 		}
@@ -209,6 +212,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
 			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread / float32(len(ohlcvs)))
+			Splits = append(Splits, split)
 		} else if divisor == 1 {
 			Opens = append(Opens, open)
 			Highs = append(Highs, high)
@@ -218,6 +222,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			HLCs = append(HLCs, hlc)
 			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread)
+			Splits = append(Splits, split)
 		}
 	}
 	
@@ -237,6 +242,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	cs.AddColumn("HLC", HLCs)
 	cs.AddColumn("TVAL", TVALs)
 	cs.AddColumn("Spread", Spreads)
+	cs.AddColumn("Split", Splits)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
 	csm := io.NewColumnSeriesMap()

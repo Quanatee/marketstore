@@ -284,6 +284,9 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 		accumParam{"Low", "avgr", "Low"},
 		accumParam{"Close", "avgr", "Close"},
 	}
+	if cs.Exists("Volume") {
+		params = append(params, accumParam{"Volume", "sum", "Volume"})
+	}
 	if cs.Exists("HLC") {
 		params = append(params, accumParam{"HLC", "avgr", "HLC"})
 		params = append(params, accumParam{"HLC", "roc", "ROC"}) // Original output
@@ -297,9 +300,9 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	if cs.Exists("Spread") {
 		params = append(params, accumParam{"Spread", "avgr", "Spread"})
     }
-	if cs.Exists("Volume") {
-		params = append(params, accumParam{"Volume", "sum", "Volume"})
-	}
+	if cs.Exists("Split") {
+		params = append(params, accumParam{"Split", "last", "Split"})
+    }
 	accumGroup := newAccumGroup(cs, params)
 
 	ts := cs.GetTime()

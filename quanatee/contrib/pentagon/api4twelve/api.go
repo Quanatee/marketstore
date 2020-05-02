@@ -121,6 +121,7 @@ func GetAggregates(
 		HLC: make(map[int64]float32),
 		TVAL: make(map[int64]float32),
 		Spread: make(map[int64]float32),
+		Split: make(map[int64]float32),
 	}
 	// Panic recovery
 	/*
@@ -160,6 +161,8 @@ func GetAggregates(
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					// Store Split Ratio
+					ohlcv.Split[Epoch] = 1.0
 				}
 			}
 		} else if strings.Compare(marketType, "currency") == 0 {
@@ -186,6 +189,8 @@ func GetAggregates(
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					// Store Split Ratio
+					ohlcv.Split[Epoch] = 1.0
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
@@ -218,6 +223,8 @@ func GetAggregates(
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+					// Store Split Ratio
+					ohlcv.Split[Epoch] = 1.0
 				}
 			}
 		}
