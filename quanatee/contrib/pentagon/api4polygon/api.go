@@ -79,13 +79,13 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 			SplitEvents.Store(symbol, symbolSplits)
 		} else {
 			// Subsequence
-			symbolSplits := symbolSplits.(*map[time.Time]float32{})
+			symbolSplits := symbolSplits.(map[time.Time]float32)
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
 				if splits, ok := symbolSplits[issueDate]; ok {
 					// Check if splits is after plugin was started, in the future and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
-					upcomingIssueDate := upcomingSplit.(*time.Time)
+					upcomingIssueDate := upcomingSplit.(time.Time)
 					if issueDate.After(timeStarted) && issueDate.After(time.Now()) && upcomingIssueDate.IsZero() == false {
 						rebackfill = true
 						UpcomingSplitEvents.Store(symbol, nil)
@@ -177,7 +177,7 @@ func GetAggregates(
 				// Correct for Split Events
 				symbolSplits, _ := SplitEvents.Load(symbol)
 				if symbolSplits != nil {
-					symbolSplits := symbolSplits.(*map[time.Time]float32)
+					symbolSplits := symbolSplits.(map[time.Time]float32)
 					for issueDate, ratio := range symbolSplits {
 						// If data is before the split date
 						if Epoch < issueDate.Unix() {
