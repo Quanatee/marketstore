@@ -300,8 +300,8 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	if cs.Exists("Spread") {
 		params = append(params, accumParam{"Spread", "avgr", "Spread"})
     }
-	if cs.Exists("Split") {
-		params = append(params, accumParam{"Split", "last", "Split"})
+	if cs.Exists("Splitter") {
+		params = append(params, accumParam{"Splitter", "last", "Splitter"})
     }
 	accumGroup := newAccumGroup(cs, params)
 

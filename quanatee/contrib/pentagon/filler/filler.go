@@ -242,7 +242,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	cs.AddColumn("HLC", HLCs)
 	cs.AddColumn("TVAL", TVALs)
 	cs.AddColumn("Spread", Spreads)
-	cs.AddColumn("Split", Splits)
+	cs.AddColumn("Splitter", Splits)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
 	csm := io.NewColumnSeriesMap()
