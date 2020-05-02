@@ -165,7 +165,7 @@ func GetAggregates(
 	symbolSplits_, _ := SplitEvents.Load(symbol)
 	var symbolSplits map[time.Time]float32
 	if symbolSplits_ != nil {
-		symbolSplits = symbolSplits_.(*map[time.Time]float32)
+		symbolSplits = symbolSplits_.(map[time.Time]float32)
 	}
     for bar := 0; bar < length; bar++ {
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
@@ -178,6 +178,7 @@ func GetAggregates(
 				if len(symbolSplits) > 0 {
 					for issueDate, ratio := range symbolSplits {
 						if time.Unix(Epoch, 0).Before(issueDate) {
+							log.Info("Epoch: %v < Issue: %v", time.Unix(Epoch, 0), issueDate)
 							splitRatio = float32(splitRatio * ratio)
 						}
 					}
