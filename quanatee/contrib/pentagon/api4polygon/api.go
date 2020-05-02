@@ -162,15 +162,14 @@ func GetAggregates(
 	// Timestamped at 14:04
 	// We use Timestamp on close, so +60 to Timestamp
 	// Correct for Split Events
-	symbolSplits, hasSplits := SplitEvents.Load(symbol)
+	symbolSplits, haveSplits := SplitEvents.Load(symbol)
     for bar := 0; bar < length; bar++ {
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
 			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
 			(agg.PriceData[bar].High != agg.PriceData[bar].Low) ) {
 			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
 			if Epoch > from.Unix() && Epoch < to.Unix() {
-				if hasSplits == false {
-					log.Info("Does not have splits")
+				if haveSplits == false {
 					//OHLCV
 					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 					ohlcv.High[Epoch] = agg.PriceData[bar].High
@@ -188,7 +187,6 @@ func GetAggregates(
 					// Store Split Ratio
 					ohlcv.Split[Epoch] = float32(1)
 				} else {
-					log.Info("Have splits")
 					splitRatio := float32(1)
 					// Calculate the total split ratio for the epoch
 					for issueDate, ratio := range symbolSplits.(map[time.Time]float32) {
@@ -224,7 +222,7 @@ func GetAggregates(
 		}
 	}
 
-	log.Info("%v %v", len(ohlcv.HLC), len(ohlcv.Split))
+	log.Info("%s: %v %v, %v", len(ohlcv.HLC), len(ohlcv.Split), haveSplits)
 	
 	return ohlcv, nil
 	
