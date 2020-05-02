@@ -205,14 +205,14 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			}
 		}
 		if divisor > 1 {
-			Opens = append(Opens, open / float32(len(ohlcvs)))
-			Highs = append(Highs, high / float32(len(ohlcvs)))
-			Lows = append(Lows, low / float32(len(ohlcvs)))
-			Closes = append(Closes, close / float32(len(ohlcvs)))
+			Opens = append(Opens, open / float32(divisor))
+			Highs = append(Highs, high / float32(divisor))
+			Lows = append(Lows, low / float32(divisor))
+			Closes = append(Closes, close / float32(divisor))
 			Volumes = append(Volumes, volume)
-			HLCs = append(HLCs, hlc / float32(len(ohlcvs)))
+			HLCs = append(HLCs, hlc / float32(divisor))
 			TVALs = append(TVALs, tval)
-			Spreads = append(Spreads, spread / float32(len(ohlcvs)))
+			Spreads = append(Spreads, spread / float32(divisor))
 			Splits = append(Splits, split)
 		} else if divisor == 1 {
 			Opens = append(Opens, open)
@@ -224,7 +224,10 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread)
 			Splits = append(Splits, split)
+		} else {
+			log.Info("%v, %v, %v, %v", Epoch, ohlcv_.HLC[Epoch], ohlcv_.TVAL[Epoch], ohlcv_.Split[Epoch])
 		}
+
 	}
 	
 	if (to.Add(5*time.Minute)).After(time.Now()) {
