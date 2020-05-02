@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+	"sync"
 
 	"net/http"
 	"net/url"
@@ -52,7 +53,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", "daily")
-	q.Set("startDate", timeStarted.AddDate(-5, 0, 0)) // Hardcode to lookback up to 5 years
+	q.Set("startDate", timeStarted.AddDate(-5, 0, 0).Format("2006-01-02")) // Hardcode to lookback up to 5 years
 	
 	u.RawQuery = q.Encode()
 
