@@ -202,6 +202,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				spread += float32(ohlcv_.Spread[Epoch])
 				split *= float32(ohlcv_.Split[Epoch])
 				divisor += 1
+			} else {
+				log.Info("%v, %v, %v, %v", Epoch, ohlcv_.HLC[Epoch], ohlcv_.TVAL[Epoch], ohlcv_.Split[Epoch])
 			}
 		}
 		if divisor > 1 {
@@ -224,10 +226,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			TVALs = append(TVALs, tval)
 			Spreads = append(Spreads, spread)
 			Splits = append(Splits, split)
-		} else {
-			log.Info("%v, %v, %v, %v", Epoch, ohlcv_.HLC[Epoch], ohlcv_.TVAL[Epoch], ohlcv_.Split[Epoch])
 		}
-
 	}
 	
 	if (to.Add(5*time.Minute)).After(time.Now()) {
