@@ -42,24 +42,24 @@ bgworkers:
         - GBPUSD
         - USDJPY 
         - AUDUSD
-        - USDCAD
-        - USDCHF
-        - USDMXN 
-        - USDBRL
-        - USDDKK 
-        - USDNOK 
-        - USDSEK
-        - USDCNH 
-        - USDHKD
-        - USDRUB
-        - KRWUSD
-        - TWDUSD
-        - USDSGD
-        - USDINR 
-        - THBUSD
-        - VNDUSD
-        - PHPUSD
-        - AUDUSD
+        # - USDCAD
+        # - USDCHF
+        # - USDMXN 
+        # - USDBRL
+        # - USDDKK 
+        # - USDNOK 
+        # - USDSEK
+        # - USDCNH 
+        # - USDHKD
+        # - USDRUB
+        # - KRWUSD
+        # - TWDUSD
+        # - USDSGD
+        # - USDINR 
+        # - THBUSD
+        # - VNDUSD
+        # - PHPUSD
+        # - AUDUSD
         - NZDUSD
         - XAGUSD
         - XAUUSD
