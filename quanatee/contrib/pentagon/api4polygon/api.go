@@ -33,7 +33,6 @@ var (
 		"forex": "C:",
 		"equity": "",
 	}
-	
 	SplitEvents *sync.Map
 	UpcomingSplitEvents *sync.Map
 )
@@ -64,7 +63,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	}
 	
 	rebackfill := false
-		
+
 	if splitsItem.Count > 0 {
 
 		symbolSplits, _ := SplitEvents.Load(symbol)

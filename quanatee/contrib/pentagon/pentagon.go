@@ -74,8 +74,8 @@ func (qf *QuanateeFetcher) Run() {
 
 	for _, symbol := range qf.config.EquitySymbols {
 		// Initalize sync.Maps for split events
-		api4polygon.SplitEvents.LoadOrStore(symbol, nil)
-		api4polygon.UpcomingSplitEvents.LoadOrStore(symbol, nil)
+		//api4polygon.SplitEvents.LoadOrStore(symbol, nil)
+		//api4polygon.UpcomingSplitEvents.LoadOrStore(symbol, nil)
 		_ = api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 	}
 
