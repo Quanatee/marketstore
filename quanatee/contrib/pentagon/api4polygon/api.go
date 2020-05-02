@@ -181,33 +181,27 @@ func GetAggregates(
 					ohlcv.Volume[Epoch] = float32(1)
 				}
 				// Extra
-				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
-				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				ohlcv.HLC[Epoch] = float32((ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3)
+				ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
+				ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])
 
 				if symbolSplits != nil {
 					symbolSplits := symbolSplits.(map[time.Time]float32)
 					for issueDate, ratio := range symbolSplits {
 						// If data is before the split date
 						if Epoch < issueDate.Unix() {
-							if strings.Compare(symbol, "SGOL") == 0 {
-								log.Info("SGOL BEFORE %v", ohlcv.Open[Epoch])
-							}
 							//OHLCV Adjusted
-							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / ratio
-							if strings.Compare(symbol, "SGOL") == 0 {
-								log.Info("SGOL AFTER %v", ohlcv.Open[Epoch])
-							}
-							ohlcv.High[Epoch] = ohlcv.High[Epoch] / ratio
-							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / ratio
-							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / ratio
+							ohlcv.Open[Epoch] = float32(ohlcv.Open[Epoch] / ratio)
+							ohlcv.High[Epoch] = float32(ohlcv.High[Epoch] / ratio)
+							ohlcv.Low[Epoch] = float32(ohlcv.Low[Epoch] / ratio)
+							ohlcv.Close[Epoch] = float32(ohlcv.Close[Epoch] / ratio)
 							if ohlcv.Volume[Epoch] != float32(1) {
-								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * ratio
+								ohlcv.Volume[Epoch] = float32(ohlcv.Volume[Epoch] * ratio)
 							}
 							// Extra Adjusted
-							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / ratio
-							ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / ratio
-							ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / ratio
+							ohlcv.HLC[Epoch] = float32(ohlcv.HLC[Epoch] / ratio)
+							ohlcv.TVAL[Epoch] = float32(ohlcv.TVAL[Epoch] / ratio)
+							ohlcv.Spread[Epoch] = float32(ohlcv.Spread[Epoch] / ratio)
 						}
 					}
 				}
