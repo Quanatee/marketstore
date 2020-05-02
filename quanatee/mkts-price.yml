@@ -30,13 +30,13 @@ bgworkers:
       crypto_symbols:
         - BTCUSD
         - BNBUSD
-        - DASHUSD
-        - ETHUSD
-        - EOSUSD
-        - LTCUSD
-        - XLMUSD
-        - XMRUSD
-        - XRPUSD
+        # - DASHUSD
+        # - ETHUSD
+        # - EOSUSD
+        # - LTCUSD
+        # - XLMUSD
+        # - XMRUSD
+        # - XRPUSD
       forex_symbols:
         - EURUSD
         - GBPUSD
@@ -60,20 +60,20 @@ bgworkers:
         # - VNDUSD
         # - PHPUSD
         # - AUDUSD
-        - NZDUSD
-        - XAGUSD
-        - XAUUSD
+        # - NZDUSD
+        # - XAGUSD
+        # - XAUUSD
       equity_symbols:
-        - VXX 
-        - VIXY 
-        - VXZ 
-        - VIXM
-        - USO 
-        - UNG 
-        - DBO 
-        - BNO 
-        - UGA
-        - IAU 
+        # - VXX 
+        # - VIXY 
+        # - VXZ 
+        # - VIXM
+        # - USO 
+        # - UNG 
+        # - DBO 
+        # - BNO 
+        # - UGA
+        # - IAU 
         - SGOL
         # - SLV 
         # - SIVR
