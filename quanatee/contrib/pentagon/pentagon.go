@@ -253,7 +253,7 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 		next = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 6, 0, 0, 0, time.UTC).AddDate(0, 0, 1)
 		time.Sleep(next.Sub(time.Now()))
 		time.Sleep(1*time.Second)
-		
+		log.Info("Checking for stock splits happening today...")
 		wg := sync.WaitGroup{}
 		
 		for _, symbol := range qf.config.EquitySymbols {
@@ -264,13 +264,14 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 			nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
 
 			if ( rebackfill_pg == true || rebackfill_ti == true ) && nil_if_not_backfilling == nil {
+				
+				log.Info("%s has a stock split event today, removing history and restarting backfill...", symbol)
 				// Delete entire tbk
 				tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 				err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
 				if err != nil {
 					log.Error("removal of catalog entry failed: %s", err.Error())
 				}
-				
 				// Start new "firstLoop" request
 				from := time.Now().Add(time.Minute)
 				from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
@@ -285,7 +286,7 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 				}()
 			}
 		}
-		
+
 		wg.Wait()
 	}
 
