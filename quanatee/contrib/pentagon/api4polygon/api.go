@@ -75,7 +75,10 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
 				symbolSplits[issueDate] = splitData.Ratio
 			}
-			SplitEvents.Store(symbol, symbolSplits)
+			if len(symbolSplits) > 0 {
+				log.Info("1 %v", symbolSplits)
+				SplitEvents.Store(symbol, symbolSplits)
+			}
 		} else {
 			// Subsequence
 			symbolSplits := symbolSplits.(map[time.Time]float32)
@@ -98,7 +101,10 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 					UpcomingSplitEvents.Store(symbol, issueDate)
 				}
 			}
-			SplitEvents.Store(symbol, symbolSplits)
+			if len(symbolSplits) > 0 {
+				log.Info("2 %v", symbolSplits)
+				SplitEvents.Store(symbol, symbolSplits)
+			}
 		}
 	}
 	return rebackfill
@@ -156,6 +162,8 @@ func GetAggregates(
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04
 	// We use Timestamp on close, so +60 to Timestamp
+	// Correct for Split Events
+	symbolSplits, _ := SplitEvents.Load(symbol)
     for bar := 0; bar < length; bar++ {
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
 			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
@@ -176,10 +184,10 @@ func GetAggregates(
 				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-				// Correct for Split Events
-				symbolSplits, _ := SplitEvents.Load(symbol)
+
 				if symbolSplits != nil {
 					symbolSplits := symbolSplits.(map[time.Time]float32)
+					log.Info("3 %v", symbolSplits)
 					for issueDate, ratio := range symbolSplits {
 						// If data is before the split date
 						if Epoch < issueDate.Unix() {
