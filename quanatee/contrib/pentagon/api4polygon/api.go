@@ -177,7 +177,7 @@ func GetAggregates(
 				// Calculate the total split ratio for the epoch
 				if len(symbolSplits) > 0 {
 					for issueDate, ratio := range symbolSplits {
-						if Epoch < issueDate.Unix() {
+						if time.Unix(Epoch, 0).Before(IssueDate) {
 							splitRatio *= float32(ratio)
 						}
 					}
