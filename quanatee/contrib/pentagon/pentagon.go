@@ -76,7 +76,7 @@ func (qf *QuanateeFetcher) Run() {
 		// Initalize sync.Maps for split events
 		//api4polygon.SplitEvents.LoadOrStore(symbol, nil)
 		//api4polygon.UpcomingSplitEvents.LoadOrStore(symbol, nil)
-		_ := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
+		api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 	}
 
 	from := time.Now().Add(time.Minute)
