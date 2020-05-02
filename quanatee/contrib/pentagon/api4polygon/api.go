@@ -71,18 +71,18 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 		
 		if symbolSplits == nil {
 			// First time
-			var symbolSplits map[int64]float32
+			var symbolSplits map[time.Time]float32
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				symbolSplits[issueDate.Unix()] = splitData.Ratio
+				symbolSplits[issueDate] = splitData.Ratio
 			}
 			SplitEvents.Store(symbol, symbolSplits)
 		} else {
 			// Subsequence
-			symbolSplits := symbolSplits.(*map[int64]float32)
+			symbolSplits := symbolSplits.(*map[time.Time]float32{})
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				if splits, ok := symbolSplits[issueDate.Unix()]; ok {
+				if splits, ok := symbolSplits[issueDate]; ok {
 					// Check if splits is after plugin was started, in the future and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
 					upcomingIssueDate := upcomingSplit.(*time.Time)
@@ -92,7 +92,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 					}
 				} else {
 					// New split event detected, we only store 1 upcoming split event per symbol at any given time
-					symbolSplits[issueDate.Unix()] = splitData.Ratio
+					symbolSplits[issueDate] = splitData.Ratio
 					UpcomingSplitEvents.Store(symbol, issueDate)
 				}
 			}
@@ -177,10 +177,10 @@ func GetAggregates(
 				// Correct for Split Events
 				symbolSplits, _ := SplitEvents.Load(symbol)
 				if symbolSplits != nil {
-					symbolSplits := symbolSplits.(*map[int64]float32)
-					for issueDateEpoch, ratio := range symbolSplits {
+					symbolSplits := symbolSplits.(*map[time.Time]float32)
+					for issueDate, ratio := range symbolSplits {
 						// If data is before the split date
-						if Epoch < issueDateEpoch {
+						if Epoch < issueDate.Unix() {
 							//OHLCV Adjusted
 							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / ratio
 							ohlcv.High[Epoch] = ohlcv.High[Epoch] / ratio
