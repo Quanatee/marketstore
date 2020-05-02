@@ -199,7 +199,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				hlc += float32(ohlcv_.HLC[Epoch])
 				tval += float32(ohlcv_.TVAL[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch])
-				split *= float32(ohlcv_.Split[Epoch])
+				split = float32(split * ohlcv_.Split[Epoch])
 				divisor += 1
 			}
 		}
@@ -231,6 +231,9 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	} else {
 		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	}
+	
+	log.Info("%v", Splits)
+	log.Info("len %v", len(Splits))
 
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
@@ -241,7 +244,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	cs.AddColumn("Volume", Volumes)
 	cs.AddColumn("HLC", HLCs)
 	cs.AddColumn("TVAL", TVALs)
-	// cs.AddColumn("Spread", Spreads)
+	cs.AddColumn("Spread", Spreads)
 	cs.AddColumn("Split", Splits)
 
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
