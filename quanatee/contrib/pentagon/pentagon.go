@@ -73,7 +73,7 @@ func (qf *QuanateeFetcher) Run() {
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
 	for _, symbol := range qf.config.EquitySymbols {
-		_ := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
+		_ = api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 	}
 
 	from := time.Now().Add(time.Minute)
@@ -201,8 +201,8 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		if checkSplit == 0 {
 			for _, symbol := range qf.config.EquitySymbols {
 				rebackfill := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
-				currently_not_backfilling, _ := filler.BackfillMarket.Load(key)
-				if rebackfill == true && currently_not_backfilling == nil {
+				nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
+				if rebackfill == true && nil_if_not_backfilling == nil {
 					// Delete entire tbk
 					tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 					err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
