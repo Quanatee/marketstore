@@ -251,8 +251,8 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 		next := time.Now().AddDate(0, 0, 1)
 		next = time.Date(next.Year(), next.Month(), next.Day(), 7, 0, 0, 0, time.UTC)
 		time.Sleep(next.Sub(time.Now()))
-		
-		log.Info("Checking for stock splits happening today...")
+
+		log.Info("Checking for stock splits that are happening today...")
 		wg := sync.WaitGroup{}
 		
 		for _, symbol := range qf.config.EquitySymbols {
