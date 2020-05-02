@@ -144,7 +144,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 		}
 	}
-	defer wg2.Wait()
+	wg2.Wait()
 }
 
 func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
@@ -171,7 +171,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 			filler.BackfillMarket.LoadOrStore(symbol, "forex")
 		}
 	}
-	defer wg2.Wait()
+	wg2.Wait()
 }
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
@@ -200,7 +200,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		}
 	}
-	defer wg2.Wait()
+	wg2.Wait()
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
@@ -250,9 +250,11 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 	for {
 
 		// Run at 2:00 NY time
-		next := time.Date(t.Year(), t.Month(), t.Day(), 6, 0, 0, 0, time.UTC)
+		next = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 6, 0, 0, 0, time.UTC).AddDate(0, 0, 1)
 		time.Sleep(next.Sub(time.Now()))
 		time.Sleep(1*time.Second)
+		
+		wg := sync.WaitGroup{}
 		
 		for _, symbol := range qf.config.EquitySymbols {
 			
@@ -268,13 +270,23 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 				if err != nil {
 					log.Error("removal of catalog entry failed: %s", err.Error())
 				}
+				
 				// Start new "firstLoop" request
-				filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
-				// Retrigger Backfill
-				filler.BackfillFrom.Store(symbol, from)
-				filler.BackfillMarket.Store(symbol, "equity")
+				from := time.Now().Add(time.Minute)
+				from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
+				to := from.Add(time.Minute)
+				to = to.Add(1*time.Second)
+				go func() {
+					wg.Add(1)
+					filler.Bars(&wg, symbol, "equity", from.Add(-20000*time.Minute), to)
+					// Retrigger Backfill
+					filler.BackfillFrom.Store(symbol, from)
+					filler.BackfillMarket.Store(symbol, "equity")
+				}()
 			}
 		}
+		
+		wg.Wait()
 	}
 
 }
