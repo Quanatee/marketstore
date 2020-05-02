@@ -203,8 +203,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				(ohlcv_.Volume[Epoch] != 0) &&
 				(ohlcv_.HLC[Epoch] != 0) &&
 				(ohlcv_.TVAL[Epoch] != 0) &&
-				(ohlcv_.Spread[Epoch] != 0) &&
-				(ohlcv_.Split[Epoch] != 0) ) {
+				(ohlcv_.Spread[Epoch] != 0) {
 				open += float32(ohlcv_.Open[Epoch] / split)
 				high += float32(ohlcv_.High[Epoch] / split)
 				low += float32(ohlcv_.Low[Epoch] / split)
