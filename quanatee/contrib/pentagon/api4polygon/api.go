@@ -68,7 +68,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 
 		symbolSplits, ok := SplitEvents.Load(symbol)
 		
-		if ok == nil {
+		if ok == true {
 			// First time
 			var symbolSplits map[time.Time]float32
 			for _, splitData := range splitsItem.SplitData {
