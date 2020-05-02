@@ -179,10 +179,23 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 
 	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads, Splits []float32
 	
+	symbolSplits_, _ := api4polygon.SplitEvents.Load(symbol)
+	var symbolSplits map[time.Time]float32
+	if symbolSplits_ != nil {
+		symbolSplits = symbolSplits_.(map[time.Time]float32)
+	}
 	for _, Epoch := range Epochs {
 		var open, high, low, close, volume, hlc, tval, spread float32
-		split := float32(1)
 		divisor := 0
+		split := float32(1)
+		// Calculate the total split ratio for the epoch
+		if len(symbolSplits) > 0 {
+			for issueDate, ratio := range symbolSplits {
+				if time.Unix(Epoch, 0).Before(issueDate) {
+					split = float32(split * ratio)
+				}
+			}
+		}
 		for _, ohlcv_ := range ohlcvs {
 			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
 				(ohlcv_.Open[Epoch] != ohlcv_.Close[Epoch]) && 
@@ -192,37 +205,26 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				(ohlcv_.TVAL[Epoch] != 0) &&
 				(ohlcv_.Spread[Epoch] != 0) &&
 				(ohlcv_.Split[Epoch] != 0) ) {
-				open += float32(ohlcv_.Open[Epoch])
-				high += float32(ohlcv_.High[Epoch])
-				low += float32(ohlcv_.Low[Epoch])
-				close += float32(ohlcv_.Close[Epoch])
-				volume += float32(ohlcv_.Volume[Epoch])
-				hlc += float32(ohlcv_.HLC[Epoch])
+				open += float32(ohlcv_.Open[Epoch] / split)
+				high += float32(ohlcv_.High[Epoch] / split)
+				low += float32(ohlcv_.Low[Epoch] / split)
+				close += float32(ohlcv_.Close[Epoch] / split)
+				volume += float32(ohlcv_.Volume[Epoch] * split)
+				hlc += float32(ohlcv_.HLC[Epoch] / split)
 				tval += float32(ohlcv_.TVAL[Epoch])
-				spread += float32(ohlcv_.Spread[Epoch])
-				split = float32(split * ohlcv_.Split[Epoch])
+				spread += float32(ohlcv_.Spread[Epoch] / split)
 				divisor += 1
 			}
 		}
-		if divisor > 1 {
-			Opens = append(Opens, open / float32(divisor))
-			Highs = append(Highs, high / float32(divisor))
-			Lows = append(Lows, low / float32(divisor))
-			Closes = append(Closes, close / float32(divisor))
+		if divisor > 0 {
+			Opens = append(Opens, float32(open / divisor))
+			Highs = append(Highs, float32(high / divisor))
+			Lows = append(Lows, float32(low / divisor))
+			Closes = append(Closes, float32(close / divisor))
 			Volumes = append(Volumes, volume)
-			HLCs = append(HLCs, hlc / float32(divisor))
+			HLCs = append(HLCs, float32(hlc / divisor))
 			TVALs = append(TVALs, tval)
-			Spreads = append(Spreads, spread / float32(divisor))
-			Splits = append(Splits, split)
-		} else if divisor == 1 {
-			Opens = append(Opens, open)
-			Highs = append(Highs, high)
-			Lows = append(Lows, low)
-			Closes = append(Closes, close)
-			Volumes = append(Volumes, volume)
-			HLCs = append(HLCs, hlc)
-			TVALs = append(TVALs, tval)
-			Spreads = append(Spreads, spread)
+			Spreads = append(Spreads, float32(spread / divisor))
 			Splits = append(Splits, split)
 		}
 	}
