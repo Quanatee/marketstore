@@ -163,6 +163,7 @@ func GetAggregates(
 	// We use Timestamp on close, so +60 to Timestamp
 	// Correct for Split Events
 	symbolSplits, _ := SplitEvents.Load(symbol)
+	symbolSplits = symbolSplits.(map[time.Time]float32)
     for bar := 0; bar < length; bar++ {
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
 			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
@@ -171,8 +172,8 @@ func GetAggregates(
 			if Epoch > from.Unix() && Epoch < to.Unix() {
 				splitRatio := float32(1)
 				// Calculate the total split ratio for the epoch
-				if symbolSplits != nil {
-					for issueDate, ratio := range symbolSplits.(map[time.Time]float32) {
+				if len(symbolSplits) > 0 {
+					for issueDate, ratio := range symbolSplits {
 						if Epoch < issueDate.Unix() {
 							splitRatio *= float32(ratio)
 						}
