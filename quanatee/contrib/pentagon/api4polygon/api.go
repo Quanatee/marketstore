@@ -70,18 +70,18 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 		
 		if ok == false {
 			// First time
-			var newSymbolSplits map[time.Time]float32
+			var symbolSplits map[time.Time]float32
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				newSymbolSplits[issueDate] = splitData.Ratio
+				symbolSplits[issueDate] = splitData.Ratio
 			}
-			SplitEvents.Store(symbol, newSymbolSplits)
+			SplitEvents.Store(symbol, symbolSplits)
 		} else {
 			// Subsequence
-			newSymbolSplits := symbolSplits.(map[time.Time]float32)
+			symbolSplits := symbolSplits.(map[time.Time]float32)
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				if _, ok := newSymbolSplits[issueDate]; ok {
+				if _, ok := symbolSplits[issueDate]; ok {
 					// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
 					upcomingIssueDate := upcomingSplit.(time.Time)
@@ -92,11 +92,11 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 					}
 				} else {
 					// New split event detected, we only store 1 upcoming split event per symbol at any given time
-					newSymbolSplits[issueDate] = splitData.Ratio
+					symbolSplits[issueDate] = splitData.Ratio
 					UpcomingSplitEvents.Store(symbol, issueDate)
 				}
 			}
-			SplitEvents.Store(symbol, newSymbolSplits)
+			SplitEvents.Store(symbol, symbolSplits)
 		}
 	}
 	return rebackfill
@@ -177,8 +177,8 @@ func GetAggregates(
 				// Correct for Split Events
 				symbolSplits, _ := SplitEvents.Load(symbol)
 				if symbolSplits != nil {
-					newSymbolSplits := symbolSplits.(map[time.Time]float32)
-					for issueDate, ratio := range newSymbolSplits {
+					symbolSplits := symbolSplits.(map[time.Time]float32)
+					for issueDate, ratio := range symbolSplits {
 						// If data is before the split date
 						if Epoch < issueDate.Unix() {
 							//OHLCV Adjusted

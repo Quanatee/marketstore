@@ -50,7 +50,9 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	
 	filler.BackfillFrom = &sync.Map{}
 	filler.BackfillMarket = &sync.Map{}
-	
+	api4polygon.SplitEvents = &sync.Map{}
+	api4polygon.UpcomingSplitEvents = &sync.Map{}
+
 	startDate, _ := time.Parse("2006-01-02", config.QueryStart)
 	
 	return &QuanateeFetcher{
@@ -73,9 +75,6 @@ func (qf *QuanateeFetcher) Run() {
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
 	for _, symbol := range qf.config.EquitySymbols {
-		// Initalize sync.Maps for split events
-		//api4polygon.SplitEvents.LoadOrStore(symbol, nil)
-		//api4polygon.UpcomingSplitEvents.LoadOrStore(symbol, nil)
 		api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 	}
 
