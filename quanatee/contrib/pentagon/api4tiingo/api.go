@@ -151,14 +151,14 @@ func GetAggregates(
 					if aggCrypto[0].PriceData[bar].Volume != 0 {
 						ohlcv.Volume[Epoch] = aggCrypto[0].PriceData[bar].Volume
 					} else {
-						ohlcv.Volume[Epoch] = 1.0
+						ohlcv.Volume[Epoch] = float32(1)
 					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 					// Store Split Ratio
-					ohlcv.Split[Epoch] = 1.0
+					ohlcv.Split[Epoch] = float32(1)
 				}
 			}
 		} else if strings.Compare(marketType, "forex") == 0 {
@@ -180,13 +180,13 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = 1.0
+					ohlcv.Volume[Epoch] = float32(1)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 					// Store Split Ratio
-					ohlcv.Split[Epoch] = 1.0
+					ohlcv.Split[Epoch] = float32(1)
 				}
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
@@ -208,13 +208,13 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = 1.0
+					ohlcv.Volume[Epoch] = float32(1)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 					// Store Split Ratio
-					ohlcv.Split[Epoch] = 1.0
+					ohlcv.Split[Epoch] = float32(1)
 				}
 			}
 		}

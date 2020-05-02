@@ -101,7 +101,6 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 				}
 			}
 			if len(symbolSplits) > 0 {
-				log.Info("2 %v", symbolSplits)
 				SplitEvents.Store(symbol, symbolSplits)
 			}
 		}
@@ -186,7 +185,7 @@ func GetAggregates(
 					ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
 					ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])
 					// Store Split Ratio
-					ohlcv.Split[Epoch] = 1.0
+					ohlcv.Split[Epoch] = float32(1)
 				} else {
 					symbolSplits := symbolSplits.(map[time.Time]float32)
 					splitRatio := float32(1)
