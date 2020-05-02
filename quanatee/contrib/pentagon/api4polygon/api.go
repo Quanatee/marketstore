@@ -221,8 +221,6 @@ func GetAggregates(
 			log.Debug("%s [polygon] Data: %v", symbol, agg)
 		}
 	}
-
-	log.Info("%s: %v %v, %v", symbol, len(ohlcv.HLC), ohlcv.Split, haveSplits)
 	
 	return ohlcv, nil
 	

@@ -233,8 +233,6 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	}
 	
-	log.Info("%s: %v %v", symbol, len(HLCs), len(Splits))
-
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
 	cs.AddColumn("Open", Opens)
@@ -281,17 +279,12 @@ func GetDataFromProvider(
 					HLC: ohlcv.HLC,
 					TVAL: ohlcv.TVAL,
 					Spread: ohlcv.Spread,
+					Split: ohlcv.Split,
 				}
 				return reconstruct
 			}
 		}
 	case "tiingo":
-		// Disable backfill for Crypto and Forex (causes crashes)
-		/*
-		if strings.Compare(marketType, "equity") != 0 && (to.Add(5*time.Minute)).After(time.Now()) == false {
-			return OHLCV{}
-		}
-		*/
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			log.Error("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
@@ -306,6 +299,7 @@ func GetDataFromProvider(
 					HLC: ohlcv.HLC,
 					TVAL: ohlcv.TVAL,
 					Spread: ohlcv.Spread,
+					Split: ohlcv.Split,
 				}
 				return reconstruct
 			}
@@ -325,6 +319,7 @@ func GetDataFromProvider(
 					HLC: ohlcv.HLC,
 					TVAL: ohlcv.TVAL,
 					Spread: ohlcv.Spread,
+					Split: ohlcv.Split,
 				}
 				return reconstruct
 			}
