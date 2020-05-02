@@ -64,9 +64,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	}
 	
 	rebackfill := false
-
-	SplitEvents.LoadOrStore(symbol, nil)
-	
+		
 	if splitsItem.Count > 0 {
 
 		symbolSplits, _ := SplitEvents.Load(symbol)
