@@ -260,9 +260,7 @@ func GetDataFromProvider(
 	case "polygon":
 		ohlcv, err := api4polygon.GetAggregates(symbol, marketType, "1", "minute", from, to)
 		if err != nil {
-			if !strings.Contains(err.Error(), "status code 400") {
-				log.Error("[polygon] bars %s failure for: [%s] (%v)", filltype, symbol, err)
-			}
+			log.Error("[polygon] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
 				reconstruct := OHLCV{
@@ -287,9 +285,7 @@ func GetDataFromProvider(
 		*/
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
-			if !strings.Contains(err.Error(), "status code 400") {
-				log.Error("[tiingo] bars %s failure for: [%s] (%v)", filltype, symbol, err)
-			}
+			log.Error("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
 				reconstruct := OHLCV{
@@ -308,9 +304,7 @@ func GetDataFromProvider(
 	case "twelve":
 		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
-			if !strings.Contains(err.Error(), "status code 400") {
-				log.Error("[twelve] bars %s failure for: [%s] (%v)", filltype, symbol, err)
-			}
+			log.Error("[twelve] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
 				reconstruct := OHLCV{
