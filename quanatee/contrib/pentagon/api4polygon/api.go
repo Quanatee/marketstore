@@ -222,7 +222,7 @@ func GetAggregates(
 		}
 	}
 
-	log.Info("%s: %v %v, %v", symbol, len(ohlcv.HLC), len(ohlcv.Split), haveSplits)
+	log.Info("%s: %v %v, %v", symbol, len(ohlcv.HLC), ohlcv.Split, haveSplits)
 	
 	return ohlcv, nil
 	
