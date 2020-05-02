@@ -203,7 +203,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				split *= float32(ohlcv_.Split[Epoch])
 				divisor += 1
 			} else {
-				log.Info("%v, %v, %v, %v", Epoch, ohlcv_.HLC[Epoch], ohlcv_.TVAL[Epoch], ohlcv_.Split[Epoch])
+				log.Info("%s, %v, %v, %v, %v", symbol, Epoch, ohlcv_.HLC[Epoch], ohlcv_.TVAL[Epoch], ohlcv_.Split[Epoch])
 			}
 		}
 		if divisor > 1 {

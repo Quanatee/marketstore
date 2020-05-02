@@ -52,5 +52,5 @@ type OHLCV struct {
 	HLC       map[int64]float32
 	TVAL      map[int64]float32
 	Spread    map[int64]float32
-	Split     map[int64]float32// Unused in Tiingo
+	Split     map[int64]float32
 }
