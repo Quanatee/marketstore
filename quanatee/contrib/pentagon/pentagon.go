@@ -3,8 +3,6 @@ package main
 import (
 	//"encoding/json"
 	"fmt"
-	//"runtime"
-	"math/rand"
 	"sync"
 	"time"
 	
@@ -250,9 +248,10 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 	for {
 
 		// Run at 2:00 NY time
-		next = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 6, 0, 0, 0, time.UTC).AddDate(0, 0, 1)
+		next := time.Now().AddDate(0, 0, 1)
+		next = time.Date(next.Year(), next.Month(), next.Day(), 7, 0, 0, 0, time.UTC)
 		time.Sleep(next.Sub(time.Now()))
-		time.Sleep(1*time.Second)
+		
 		log.Info("Checking for stock splits happening today...")
 		wg := sync.WaitGroup{}
 		
