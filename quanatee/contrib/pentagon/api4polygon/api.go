@@ -163,7 +163,7 @@ func GetAggregates(
 	// We use Timestamp on close, so +60 to Timestamp
 	// Correct for Split Events
 	symbolSplits_, _ := SplitEvents.Load(symbol)
-	symbolSplits = symbolSplits_.(map[time.Time]float32)
+	symbolSplits := symbolSplits_.(map[time.Time]float32)
     for bar := 0; bar < length; bar++ {
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
 			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
