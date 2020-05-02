@@ -1,7 +1,5 @@
 package api4polygon
 
-import "time"
-
 type SplitData struct {
 	Symbol 		string 		`json:"ticker"`
 	Expiry 		string 		`json:"exDate"`
