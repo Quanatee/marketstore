@@ -200,29 +200,6 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 	}
 	defer wg2.Wait()
-	if filler.IsMarketOpen("equity", from) == false && firstLoop == false {
-		rand.Seed(filler.GetRandSeed())
-		checkSplit := rand.Intn(60)
-		if checkSplit == 0 {
-			for _, symbol := range qf.config.EquitySymbols {
-				rebackfill := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
-				nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
-				if rebackfill == true && nil_if_not_backfilling == nil {
-					// Delete entire tbk
-					tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
-					err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
-					if err != nil {
-						log.Error("removal of catalog entry failed: %s", err.Error())
-					}
-					// Start new "firstLoop" request
-					filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
-					// Retrigger Backfill
-					filler.BackfillFrom.Store(symbol, from)
-					filler.BackfillMarket.Store(symbol, "equity")
-				}
-			}
-		}
-	}
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
@@ -265,6 +242,40 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		wg.Wait()
 		
 	}
+}
+
+func (qf *QuanateeFetcher) checkStockSplits() {
+	
+	for {
+
+		// Run at 2:00 NY time
+		next := time.Date(t.Year(), t.Month(), t.Day(), 6, 0, 0, 0, time.UTC)
+		time.Sleep(next.Sub(time.Now()))
+		time.Sleep(1*time.Second)
+		
+		for _, symbol := range qf.config.EquitySymbols {
+			
+			rebackfill_pg := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
+			rebackfill_ti := api4tiingo.UpdateSplits(symbol, qf.TimeStarted)
+			
+			nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
+
+			if ( rebackfill_pg == true || rebackfill_ti == true ) && nil_if_not_backfilling == nil {
+				// Delete entire tbk
+				tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
+				err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
+				if err != nil {
+					log.Error("removal of catalog entry failed: %s", err.Error())
+				}
+				// Start new "firstLoop" request
+				filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
+				// Retrigger Backfill
+				filler.BackfillFrom.Store(symbol, from)
+				filler.BackfillMarket.Store(symbol, "equity")
+			}
+		}
+	}
+
 }
 
 // Backfill bars from start

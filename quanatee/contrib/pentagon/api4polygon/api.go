@@ -85,11 +85,15 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 			for _, splitData := range splitsItem.SplitData {
 				expiryDate, _ := time.Parse("2006-01-02", splitData.Expiry)
 				if _, ok := symbolSplits[expiryDate]; ok {
-					// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
 					if upcomingSplit != nil {
 						upcomingExpiryDate := upcomingSplit.(time.Time)
-						if expiryDate.After(timeStarted) && expiryDate.After(time.Now()) && upcomingExpiryDate.IsZero() == false {
+						// There are two ways to trigger a backfill
+						// 1. ExpiryDate is after the time plugin was started and registered as an upcoming split event; or
+						// 2. ExpiryDate is after the time plugin was started and ExpiryDate is the same date as current date.
+						// We can do this because we only checkStockSplits() (in pentagon.go) once a day 02:00 New York time
+						if ( ( expiryDate.After(timeStarted) || upcomingExpiryDate.IsZero() == false ) || 
+							( expiryDate.After(timeStarted) || (expiryDate.Day() == time.Now().Day() && expiryDate.Month() == time.Now().Month() && expiryDate.Year() == time.Now().Year()) ) ) {
 							rebackfill = true
 							// Deregister as an upcoming split event
 							UpcomingSplitEvents.Store(symbol, nil)

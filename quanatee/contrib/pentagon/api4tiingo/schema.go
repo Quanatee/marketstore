@@ -2,7 +2,7 @@ package api4tiingo
 
 type SplitData struct {
 	Date            string  `json:"date"` // "2017-12-19T00:00:00Z"
-	Close           string  `json:"close"`
+	Close           float32 `json:"close"`
 	High            float32 `json:"high"`
 	Low        	    float32 `json:"low"`
 	Open            float32 `json:"open"`
