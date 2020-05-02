@@ -53,7 +53,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	api4polygon.SplitEvents = &sync.Map{}
 	api4polygon.UpcomingSplitEvents = &sync.Map{}
 
-	startDate, _ := time.Parse("2006-01-02", config.QueryStart)
+	startDate, _ := time.Parse("2006-01-02 03:04", config.QueryStart)
 	
 	return &QuanateeFetcher{
 		config: config,
@@ -281,9 +281,11 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	
 	switch marketType {
 	case "equity":
-		q.SetEnd(end.Add(-20000*time.Minute).Unix() - int64(time.Minute.Seconds()))
+		end = end.Add(-20000*time.Minute).Add(-1*time.Minute)
+		q.SetEnd(end.Unix())
     default:
-		q.SetEnd(end.Add(-5000*time.Minute).Unix() - int64(time.Minute.Seconds()))
+		end = end.Add(-5000*time.Minute).Add(-1*time.Minute)
+		q.SetEnd(end.Unix())
 	}
 	parsed, err := q.Parse()
 	if err != nil {
