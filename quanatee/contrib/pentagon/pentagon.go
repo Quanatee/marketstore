@@ -110,6 +110,7 @@ func (qf *QuanateeFetcher) Run() {
 		// Start backfill and disable first loop
 		if firstLoop == true {
 			go qf.workBackfillBars()
+			go qf.checkStockSplits()
 			firstLoop = false
 		}
 		// Update from and to dates
