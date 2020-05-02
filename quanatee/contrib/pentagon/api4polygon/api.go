@@ -162,14 +162,14 @@ func GetAggregates(
 	// Timestamped at 14:04
 	// We use Timestamp on close, so +60 to Timestamp
 	// Correct for Split Events
-	symbolSplits, _ := SplitEvents.Load(symbol)
+	symbolSplits, hasSplits := SplitEvents.Load(symbol)
     for bar := 0; bar < length; bar++ {
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
 			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
 			(agg.PriceData[bar].High != agg.PriceData[bar].Low) ) {
 			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
 			if Epoch > from.Unix() && Epoch < to.Unix() {
-				if symbolSplits == nil {
+				if hasSplits == false {
 					//OHLCV
 					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 					ohlcv.High[Epoch] = agg.PriceData[bar].High
