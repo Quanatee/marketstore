@@ -82,7 +82,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 			}
 			if len(symbolSplits) > 0 {
 				SplitEvents.Store(symbol, symbolSplits)
-				log.Info("%s: %v", symbol, symbolSplits)
+				log.Info("[tiingo] %s: %v", symbol, symbolSplits)
 			}
 		} else {
 			// Subsequence

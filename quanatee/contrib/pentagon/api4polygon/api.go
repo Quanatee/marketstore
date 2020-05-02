@@ -77,7 +77,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 			}
 			if len(symbolSplits) > 0 {
 				SplitEvents.Store(symbol, symbolSplits)
-				log.Info("%s: %v", symbol, symbolSplits)
+				log.Info("[polygon] %s: %v", symbol, symbolSplits)
 			}
 		} else {
 			// Subsequence
@@ -171,7 +171,7 @@ func GetAggregates(
 			(agg.PriceData[bar].High != agg.PriceData[bar].Low) ) {
 			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
 			if Epoch > from.Unix() && Epoch < to.Unix() {
-				//OHLCV Unadjusted
+				//OHLCV
 				ohlcv.Open[Epoch] = float32(agg.PriceData[bar].Open)
 				ohlcv.High[Epoch] = float32(agg.PriceData[bar].High)
 				ohlcv.Low[Epoch] = float32(agg.PriceData[bar].Low)
@@ -181,7 +181,7 @@ func GetAggregates(
 				} else {
 					ohlcv.Volume[Epoch] = float32(1)
 				}
-				// Extra Unadjusted
+				// Extra
 				ohlcv.HLC[Epoch] = float32((ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3)
 				ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
 				ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])

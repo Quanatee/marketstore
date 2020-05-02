@@ -74,11 +74,13 @@ func (qf *QuanateeFetcher) Run() {
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
+	log.Info("Scanning for previous stock split events:")
 	for _, symbol := range qf.config.EquitySymbols {
 		api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 		api4tiingo.UpdateSplits(symbol, qf.TimeStarted)
 	}
-
+	log.Info("Scan complete.")
+	
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
