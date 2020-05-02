@@ -68,17 +68,17 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 
 		symbolSplits, ok := SplitEvents.Load(symbol)
 		
-		if ok == true {
+		if ok == false {
 			// First time
-			var symbolSplits map[time.Time]float32
+			var newSymbolSplits map[time.Time]float32
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				symbolSplits[issueDate] = splitData.Ratio
+				newSymbolSplits[issueDate] = splitData.Ratio
 			}
-			SplitEvents.Store(symbol, symbolSplits)
+			SplitEvents.Store(symbol, newSymbolSplits)
 		} else {
 			// Subsequence
-			symbolSplits := symbolSplits.(map[time.Time]float32)
+			symbolSplits = symbolSplits.(map[time.Time]float32)
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
 				if _, ok := symbolSplits[issueDate]; ok {
