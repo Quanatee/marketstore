@@ -187,12 +187,17 @@ func GetAggregates(
 
 				if symbolSplits != nil {
 					symbolSplits := symbolSplits.(map[time.Time]float32)
-					log.Info("3 %v", symbolSplits)
 					for issueDate, ratio := range symbolSplits {
 						// If data is before the split date
 						if Epoch < issueDate.Unix() {
+							if strings.Compare(symbol, "SGOL") == 0 {
+								log.Info("SGOL BEFORE %v", ohlcv.Open[Epoch])
+							}
 							//OHLCV Adjusted
 							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / ratio
+							if strings.Compare(symbol, "SGOL") == 0 {
+								log.Info("SGOL AFTER %v", ohlcv.Open[Epoch])
+							}
 							ohlcv.High[Epoch] = ohlcv.High[Epoch] / ratio
 							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / ratio
 							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / ratio
