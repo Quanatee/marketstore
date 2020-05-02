@@ -70,7 +70,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 		
 		if ok == false {
 			// First time
-			var symbolSplits map[time.Time]float32
+			symbolSplits := map[time.Time]float32{}
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
 				symbolSplits[issueDate] = splitData.Ratio
