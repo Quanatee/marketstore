@@ -84,11 +84,13 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 				if _, ok := symbolSplits[issueDate]; ok {
 					// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
-					upcomingIssueDate := upcomingSplit.(time.Time)
-					if issueDate.After(timeStarted) && issueDate.After(time.Now()) && upcomingIssueDate.IsZero() == false {
-						rebackfill = true
-						// Deregister as an upcoming split event
-						UpcomingSplitEvents.Store(symbol, nil)
+					if upcomingSplit != nil {
+						upcomingIssueDate := upcomingSplit.(time.Time)
+						if issueDate.After(timeStarted) && issueDate.After(time.Now()) && upcomingIssueDate.IsZero() == false {
+							rebackfill = true
+							// Deregister as an upcoming split event
+							UpcomingSplitEvents.Store(symbol, nil)
+						}
 					}
 				} else {
 					// New split event detected, we only store 1 upcoming split event per symbol at any given time
