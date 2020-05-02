@@ -180,6 +180,8 @@ func GetAggregates(
 						if time.Unix(Epoch, 0).Before(issueDate) {
 							log.Info("Epoch: %v < Issue: %v", time.Unix(Epoch, 0), issueDate)
 							splitRatio = float32(splitRatio * ratio)
+						} else {
+							log.Info("Epoch: %v >? Issue: %v", time.Unix(Epoch, 0), issueDate)
 						}
 					}
 				}
