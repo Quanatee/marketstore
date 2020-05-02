@@ -280,7 +280,6 @@ func GetDataFromProvider(
 					HLC: ohlcv.HLC,
 					TVAL: ohlcv.TVAL,
 					Spread: ohlcv.Spread,
-					Split: ohlcv.Split,
 				}
 				return reconstruct
 			}
@@ -300,7 +299,6 @@ func GetDataFromProvider(
 					HLC: ohlcv.HLC,
 					TVAL: ohlcv.TVAL,
 					Spread: ohlcv.Spread,
-					Split: ohlcv.Split,
 				}
 				return reconstruct
 			}
@@ -320,7 +318,6 @@ func GetDataFromProvider(
 					HLC: ohlcv.HLC,
 					TVAL: ohlcv.TVAL,
 					Spread: ohlcv.Spread,
-					Split: ohlcv.Split,
 				}
 				return reconstruct
 			}
