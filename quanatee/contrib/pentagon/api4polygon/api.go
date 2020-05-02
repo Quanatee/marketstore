@@ -170,6 +170,7 @@ func GetAggregates(
 			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
 			if Epoch > from.Unix() && Epoch < to.Unix() {
 				if hasSplits == false {
+					log.Info("Does not have splits")
 					//OHLCV
 					ohlcv.Open[Epoch] = agg.PriceData[bar].Open
 					ohlcv.High[Epoch] = agg.PriceData[bar].High
@@ -187,6 +188,7 @@ func GetAggregates(
 					// Store Split Ratio
 					ohlcv.Split[Epoch] = float32(1)
 				} else {
+					log.Info("Have splits")
 					splitRatio := float32(1)
 					// Calculate the total split ratio for the epoch
 					for issueDate, ratio := range symbolSplits.(map[time.Time]float32) {
@@ -221,6 +223,8 @@ func GetAggregates(
 			log.Debug("%s [polygon] Data: %v", symbol, agg)
 		}
 	}
+
+	log.Info("%v %v", len(ohlcv.HLC), len(ohlcv.Split))
 	
 	return ohlcv, nil
 	
