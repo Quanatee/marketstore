@@ -34,9 +34,8 @@ var (
 		"equity": "",
 	}
 	
-	//previousSplits *sync.Map
-	//upcomingSplits *sync.Map
-	previousSplits = map[string][]Split
+	SplitEvents *sync.Map
+	UpcomingSplitEvents *sync.Map
 )
 
 func SetAPIKey(key string) {
@@ -67,34 +66,42 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	rebackfill := false
 
 	if splitsItem.Count > 0 {
+
+		symbolSplits, _ := SplitEvents.Load(symbol)
 		
-		if (previousSplits) == 0 {
-			splits := make([]Split, len(splitsItem.SplitData))
+		if symbolSplits == nil {
+			// First time
+			var symbolSplits map[time.Time]float32
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				// Check if splits is after plugin was started and in the future
-				if issueDate.After(timeStarted) && issueDate.After(time.Now()) {
-					rebackfill = true
-				}
-				split := Split{
-								Issue: issueDate,
-								Ratio: splitData.Ratio,
-								Done: true,
-								}
-				splits[issueDate.Unix()] = split
+				symbolSplits[issueDate] = splitData.Ratio
 			}
-			previousSplits[symbol] = splits
+			SplitEvents.Store(symbol, symbolSplits)
 		} else {
-			//
+			// Subsequence
+			symbolSplits := symbolSplits.(*map[time.Time]float32)
 			for _, splitData := range splitsItem.SplitData {
-
+				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
+				if splits, ok := symbolSplits[issueDate]; ok {
+					// Check if splits is after plugin was started, in the future and was registered as an upcoming split event
+					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
+					upcomingIssueDate := upcomingSplit.(*time.Time)
+					if issueDate.After(timeStarted) && issueDate.After(time.Now()) && upcomingIssueDate.IsZero() == false {
+						rebackfill = true
+						UpcomingSplitEvents.Store(symbol, nil)
+					}
+				} else {
+					// New split event detected, we only store 1 upcoming split event per symbol at any given time
+					symbolSplits[issueDate] = splitData.Ratio
+					UpcomingSplitEvents.Store(symbol, issueDate)
+				}
 			}
+			SplitEvents.Store(symbol, symbolSplits)
 		}
 	}
-
 	return rebackfill
-	
 }
+
 func GetAggregates(
 	symbol, marketType, multiplier, resolution string,
 	from, to time.Time) (*OHLCV, error) {
@@ -167,25 +174,25 @@ func GetAggregates(
 				ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 				ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
 				ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-				// Correct for Splits if required
-				if splits, ok := previousSplits[symbol]; ok {
-					if len(splits) > 0 {
-						for _, split := range splits {
-							if Epoch < split.Issue.Unix() {
-								// data is before the split date
-								//OHLCV Adjusted
-								ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / split.Ratio
-								ohlcv.High[Epoch] = ohlcv.High[Epoch] / split.Ratio
-								ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / split.Ratio
-								ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / split.Ratio
-								if ohlcv.Volume[Epoch] != float32(1) {
-									ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * split.Ratio
-								}
-								// Extra Adjusted
-								ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / split.Ratio
-								ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / split.Ratio
-								ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / split.Ratio
+				// Correct for Split Events
+				symbolSplits, _ := SplitEvents.Load(symbol)
+				if symbolSplits != nil {
+					symbolSplits := symbolSplits.(*map[time.Time]float32)
+					for issueDate, ratio := range symbolSplits {
+						// If data is before the split date
+						if Epoch < issueDate.Unix() {
+							//OHLCV Adjusted
+							ohlcv.Open[Epoch] = ohlcv.Open[Epoch] / ratio
+							ohlcv.High[Epoch] = ohlcv.High[Epoch] / ratio
+							ohlcv.Low[Epoch] = ohlcv.Low[Epoch] / ratio
+							ohlcv.Close[Epoch] = ohlcv.Close[Epoch] / ratio
+							if ohlcv.Volume[Epoch] != float32(1) {
+								ohlcv.Volume[Epoch] = ohlcv.Volume[Epoch] * ratio
 							}
+							// Extra Adjusted
+							ohlcv.HLC[Epoch] = ohlcv.HLC[Epoch] / ratio
+							ohlcv.TVAL[Epoch] = ohlcv.TVAL[Epoch] / ratio
+							ohlcv.Spread[Epoch] = ohlcv.Spread[Epoch] / ratio
 						}
 					}
 				}

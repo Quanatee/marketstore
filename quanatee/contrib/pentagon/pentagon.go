@@ -203,8 +203,6 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 				rebackfill := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
 				currently_not_backfilling, _ := filler.BackfillMarket.Load(key)
 				if rebackfill == true && currently_not_backfilling == nil {
-					// Delete bookmark of future split event
-					api4polygon.DeleteUpcomingSplits(symbol)
 					// Delete entire tbk
 					tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 					err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)

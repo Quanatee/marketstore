@@ -18,11 +18,6 @@ type SplitsItem struct {
 	SplitData   []SplitData	`json:"results"`
 }
 
-type Split struct {
-	Issue	 	time.Time
-	Ratio		float32
-}
-
 type Agg1 struct {
 	Ticker         string  `json:"T"`
 	Volume         float32 `json:"v"`
