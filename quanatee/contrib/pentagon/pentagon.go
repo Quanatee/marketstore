@@ -199,7 +199,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	defer wg2.Wait()
 	if filler.IsMarketOpen("equity", from) == false && firstLoop == false {
 		rand.Seed(filler.GetRandSeed())
-		checkSplit := rand.Intn(3)
+		checkSplit := rand.Intn(60)
 		if checkSplit == 0 {
 			for _, symbol := range qf.config.EquitySymbols {
 				rebackfill := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
