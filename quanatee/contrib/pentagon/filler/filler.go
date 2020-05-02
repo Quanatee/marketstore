@@ -186,7 +186,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	}
 	for _, Epoch := range Epochs {
 		var open, high, low, close, volume, hlc, tval, spread float32
-		divisor := 0
+		divisor := float32(0)
 		split := float32(1)
 		// Calculate the total split ratio for the epoch
 		if len(symbolSplits) > 0 {
@@ -213,7 +213,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				hlc += float32(ohlcv_.HLC[Epoch] / split)
 				tval += float32(ohlcv_.TVAL[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch] / split)
-				divisor += 1
+				divisor += float32(1)
 			}
 		}
 		if divisor > 0 {
