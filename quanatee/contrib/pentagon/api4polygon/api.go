@@ -192,7 +192,7 @@ func GetAggregates(
 					// Calculate the total split ratio for the epoch
 					for issueDate, ratio := range symbolSplits {
 						if Epoch < issueDate.Unix() {
-							splitRatio *= float32(ratio)
+							splitRatio = float32(splitRatio * ratio)
 						}
 					}
 					//OHLCV Adjusted
