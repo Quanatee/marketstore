@@ -177,7 +177,7 @@ func GetAggregates(
 				// Correct for Split Events
 				symbolSplits, _ := SplitEvents.Load(symbol)
 				if symbolSplits != nil {
-					newSymbolSplits = symbolSplits.(map[time.Time]float32)
+					newSymbolSplits := symbolSplits.(map[time.Time]float32)
 					for issueDate, ratio := range newSymbolSplits {
 						// If data is before the split date
 						if Epoch < issueDate.Unix() {
