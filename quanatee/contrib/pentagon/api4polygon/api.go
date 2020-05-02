@@ -82,12 +82,13 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 			symbolSplits := symbolSplits.(map[time.Time]float32)
 			for _, splitData := range splitsItem.SplitData {
 				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				if splits, ok := symbolSplits[issueDate]; ok {
-					// Check if splits is after plugin was started, in the future and was registered as an upcoming split event
+				if _, ok := symbolSplits[issueDate]; ok {
+					// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
 					upcomingIssueDate := upcomingSplit.(time.Time)
 					if issueDate.After(timeStarted) && issueDate.After(time.Now()) && upcomingIssueDate.IsZero() == false {
 						rebackfill = true
+						// Deregister as an upcoming split event
 						UpcomingSplitEvents.Store(symbol, nil)
 					}
 				} else {
