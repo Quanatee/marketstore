@@ -197,7 +197,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 	}
 	defer wg2.Wait()
-	if filler.IsMarketOpen("equity", from) == false {
+	if filler.IsMarketOpen("equity", from) == false && firstLoop == false {
 		rand.Seed(filler.GetRandSeed())
 		checkSplit := rand.Intn(60)
 		if checkSplit == 0 {
