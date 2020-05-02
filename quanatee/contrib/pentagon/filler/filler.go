@@ -180,7 +180,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads, Splits []float32
 	
 	for _, Epoch := range Epochs {
-		var open, high, low, close, volume, hlc, tval, spread, split float32
+		var open, high, low, close, volume, hlc, tval, spread float32
+		split := float32(1)
 		divisor := 0
 		for _, ohlcv_ := range ohlcvs {
 			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
@@ -199,7 +200,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				hlc += float32(ohlcv_.HLC[Epoch])
 				tval += float32(ohlcv_.TVAL[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch])
-				split = float32(split * ohlcv_.Split[Epoch])
+				split *= float32(ohlcv_.Split[Epoch])
 				divisor += 1
 			}
 		}
@@ -232,9 +233,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	}
 	
-	log.Info("%v", len(Spreads))
-	log.Info("len %v", len(Splits))
-	
+	log.Info("%s: %v %v", symbol, len(HLCs), len(Splits))
+
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
 	cs.AddColumn("Open", Opens)
