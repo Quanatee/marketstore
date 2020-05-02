@@ -64,31 +64,32 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	
 	rebackfill := false
 
-	if splitsItem.Count > 0 {
-
+	if len(splitsItem.SplitData) > 0 {
+		
 		symbolSplits, ok := SplitEvents.Load(symbol)
 		
 		if ok == false {
 			// First time
 			symbolSplits := map[time.Time]float32{}
 			for _, splitData := range splitsItem.SplitData {
-				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				symbolSplits[issueDate] = splitData.Ratio
+				expiryDate, _ := time.Parse("2006-01-02", splitData.Expiry)
+				symbolSplits[expiryDate] = splitData.Ratio
 			}
 			if len(symbolSplits) > 0 {
 				SplitEvents.Store(symbol, symbolSplits)
+				log.Info("%s: %v", symbol, symbolSplits)
 			}
 		} else {
 			// Subsequence
 			symbolSplits := symbolSplits.(map[time.Time]float32)
 			for _, splitData := range splitsItem.SplitData {
-				issueDate, _ := time.Parse("2006-01-02", splitData.Issue)
-				if _, ok := symbolSplits[issueDate]; ok {
+				expiryDate, _ := time.Parse("2006-01-02", splitData.Expiry)
+				if _, ok := symbolSplits[expiryDate]; ok {
 					// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
 					upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
 					if upcomingSplit != nil {
-						upcomingIssueDate := upcomingSplit.(time.Time)
-						if issueDate.After(timeStarted) && issueDate.After(time.Now()) && upcomingIssueDate.IsZero() == false {
+						upcomingExpiryDate := upcomingSplit.(time.Time)
+						if expiryDate.After(timeStarted) && expiryDate.After(time.Now()) && upcomingExpiryDate.IsZero() == false {
 							rebackfill = true
 							// Deregister as an upcoming split event
 							UpcomingSplitEvents.Store(symbol, nil)
@@ -96,8 +97,8 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 					}
 				} else {
 					// New split event detected, we only store 1 upcoming split event per symbol at any given time
-					symbolSplits[issueDate] = splitData.Ratio
-					UpcomingSplitEvents.Store(symbol, issueDate)
+					symbolSplits[expiryDate] = splitData.Ratio
+					UpcomingSplitEvents.Store(symbol, expiryDate)
 				}
 			}
 			if len(symbolSplits) > 0 {

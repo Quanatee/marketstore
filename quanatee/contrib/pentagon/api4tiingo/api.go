@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	tickersURL = "%v/v2/reference/tickers"
+	splitsURL = "%v/tiingo/daily/%v/prices"
 	retryCount = 10
 )
 
@@ -33,10 +33,86 @@ var (
 	start time.Time
 	apiKey 	 string
 	length = 0
+	SplitEvents *sync.Map
+	UpcomingSplitEvents *sync.Map
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
+}
+
+func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
+	
+	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))
+
+	if err != nil {
+		log.Error("%s %v", symbol, err)
+	}
+	
+	q := u.Query()
+	q.Set("token", apiKey)
+	q.Set("resampleFreq", "daily")
+	q.Set("startDate", timeStarted.AddDate(-5, 0, 0)) // Hardcode to lookback up to 5 years
+	
+	u.RawQuery = q.Encode()
+
+	var splitsItem []SplitData
+
+	err = downloadAndUnmarshal(u.String(), retryCount, &splitsItem)
+
+	if err != nil {
+		log.Error("%s %v", symbol, err)
+	}
+	
+	rebackfill := false
+
+	if len(splitsItem) > 0 {
+
+		symbolSplits, ok := SplitEvents.Load(symbol)
+		
+		if ok == false {
+			// First time
+			symbolSplits := map[time.Time]float32{}
+			for _, splitData := range splitsItem {
+				if splitData.SplitFactor != 1 {
+					expiryDate, _ := time.Parse(time.RFC3339, splitData.Date)
+					symbolSplits[expiryDate] = splitData.SplitFactor
+				}
+			}
+			if len(symbolSplits) > 0 {
+				SplitEvents.Store(symbol, symbolSplits)
+				log.Info("%s: %v", symbol, symbolSplits)
+			}
+		} else {
+			// Subsequence
+			symbolSplits := symbolSplits.(map[time.Time]float32)
+			for _, splitData := range splitsItem {
+				if splitData.SplitFactor != 1 {
+					expiryDate, _ := time.Parse(time.RFC3339, splitData.Date)
+					if _, ok := symbolSplits[expiryDate]; ok {
+						// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
+						upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
+						if upcomingSplit != nil {
+							upcomingExpiryDate := upcomingSplit.(time.Time)
+							if expiryDate.After(timeStarted) && expiryDate.After(time.Now()) && upcomingExpiryDate.IsZero() == false {
+								rebackfill = true
+								// Deregister as an upcoming split event
+								UpcomingSplitEvents.Store(symbol, nil)
+							}
+						}
+					} else {
+						// New split event detected, we only store 1 upcoming split event per symbol at any given time
+						symbolSplits[expiryDate] = splitData.SplitFactor
+						UpcomingSplitEvents.Store(symbol, expiryDate)
+					}
+				}
+			}
+			if len(symbolSplits) > 0 {
+				SplitEvents.Store(symbol, symbolSplits)
+			}
+		}
+	}
+	return rebackfill
 }
 
 func GetAggregates(

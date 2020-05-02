@@ -3,7 +3,7 @@ package api4polygon
 type SplitData struct {
 	Symbol 		string 		`json:"ticker"`
 	Expiry 		string 		`json:"exDate"`
-	Issue	 	string 		`json:"paymentDate"`
+	Payment	 	string 		`json:"paymentDate"`
 	Announce	string		`json:"declaredDate"` // optional
 	Ratio		float32		`json:"ratio"`
 	ToFactor    float32		`json:"tofactor"` // optional

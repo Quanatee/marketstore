@@ -1,5 +1,21 @@
 package api4tiingo
 
+type SplitData struct {
+	Date            string  `json:"date"` // "2017-12-19T00:00:00Z"
+	Close           string  `json:"close"`
+	High            float32 `json:"high"`
+	Low        	    float32 `json:"low"`
+	Open            float32 `json:"open"`
+	Volume          float32 `json:"volume"`
+	AdjClose		float32 `json:"adjClose"`
+	AdjHigh			float32 `json:"adjHigh"`
+	AdjLow			float32 `json:"adjLow"`
+	AdjOpen			float32 `json:"adjOpen"`
+	AdjVolume		float32 `json:"adjVolume"`
+	DivCash			float32 `json:"divCash"`
+	SplitFactor		float32 `json:"splitFactor"`
+}
+
 type AggCryptoData struct {
 	High           float32 `json:"high"`
 	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"

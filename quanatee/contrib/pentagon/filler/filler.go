@@ -190,8 +190,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		split := float32(1)
 		// Calculate the total split ratio for the epoch
 		if len(symbolSplits) > 0 {
-			for issueDate, ratio := range symbolSplits {
-				if time.Unix(Epoch, 0).Before(issueDate) {
+			for expiryDate, ratio := range symbolSplits {
+				if time.Unix(Epoch, 0).Before(expiryDate) {
 					split = float32(split * ratio)
 				}
 			}
@@ -208,7 +208,11 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				high += float32(ohlcv_.High[Epoch] / split)
 				low += float32(ohlcv_.Low[Epoch] / split)
 				close += float32(ohlcv_.Close[Epoch] / split)
-				volume += float32(ohlcv_.Volume[Epoch] * split)
+				if ohlcv_.Volume[Epoch] == 1 {
+					volume += float32(ohlcv_.Volume[Epoch])
+				} else {
+					volume += float32(ohlcv_.Volume[Epoch] * split)
+				}
 				hlc += float32(ohlcv_.HLC[Epoch] / split)
 				tval += float32(ohlcv_.TVAL[Epoch])
 				spread += float32(ohlcv_.Spread[Epoch] / split)
@@ -220,9 +224,9 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			Highs = append(Highs, float32(high / divisor))
 			Lows = append(Lows, float32(low / divisor))
 			Closes = append(Closes, float32(close / divisor))
-			Volumes = append(Volumes, volume)
+			Volumes = append(Volumes, float32(volume / divisor))
 			HLCs = append(HLCs, float32(hlc / divisor))
-			TVALs = append(TVALs, tval)
+			TVALs = append(TVALs, float32(tval / divisor))
 			Spreads = append(Spreads, float32(spread / divisor))
 			Splits = append(Splits, split)
 		}
