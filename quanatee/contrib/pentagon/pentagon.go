@@ -95,7 +95,6 @@ func (qf *QuanateeFetcher) Run() {
 				break
 			} else {
 				time.Sleep(to.Sub(time.Now()))
-				time.Sleep(1*time.Second)
 			}
 		}
 		
@@ -115,7 +114,7 @@ func (qf *QuanateeFetcher) Run() {
 		}
 		// Update from and to dates
 		from = from.Add(time.Minute)
-		to = to.Add(time.Minute)
+		to = from.Add(time.Minute)
 	}
 
 }
