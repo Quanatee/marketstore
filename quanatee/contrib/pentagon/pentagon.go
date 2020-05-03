@@ -307,13 +307,13 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	
 	switch marketType {
 	case "crypto":
-		end = end.Add(-crypto_limit*time.Minute).Add(-1*time.Day)
+		end = end.Add(-crypto_limit*time.Minute).Add(-1440*time.Minute)
 	case "forex":
-		end = end.Add(-forex_limit*time.Minute).Add(-1*time.Day)
+		end = end.Add(-forex_limit*time.Minute).Add(-1440*time.Minute)
 	case "equity":
-		end = end.Add(-equity_limit*time.Minute).Add(-1*time.Day)
+		end = end.Add(-equity_limit*time.Minute).Add(-1440*time.Minute)
 	default:
-		end = end.Add(-equity_limit*time.Minute).Add(-1*time.Day)
+		end = end.Add(-equity_limit*time.Minute).Add(-1440*time.Minute)
 	}
 	q.SetEnd(end.Unix())
 	
