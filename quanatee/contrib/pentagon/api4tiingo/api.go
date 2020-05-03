@@ -223,7 +223,7 @@ func GetAggregates(
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 						if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
-							ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 						} else {
 							ohlcv.Volume[Epoch] = float32(1)
 						}
