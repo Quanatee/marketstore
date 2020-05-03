@@ -50,9 +50,8 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	filler.BackfillMarket = &sync.Map{}
 	api4polygon.SplitEvents = &sync.Map{}
 	api4polygon.UpcomingSplitEvents = &sync.Map{}
-	api4tiingo.SplitEvents = &sync.Map{}
-	api4tiingo.UpcomingSplitEvents = &sync.Map{}
-
+	api4tiingo.DailyVolumes = &sync.Map{}
+	
 	startDate, _ := time.Parse("2006-01-02 03:04", config.QueryStart)
 	
 	return &QuanateeFetcher{
@@ -81,10 +80,13 @@ func (qf *QuanateeFetcher) Run() {
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
-	log.Info("Scanning for previous stock split events:")
+	log.Info("Scanning for previous stock split events and fetching historical daily volume:")
+	for _, symbol := range qf.config.ForexSymbols {
+		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
+	}
 	for _, symbol := range qf.config.EquitySymbols {
-		api4polygon.UpdateSplits(symbol, qf.TimeStarted)
-		api4tiingo.UpdateSplits(symbol, qf.TimeStarted)
+		api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
 	}
 	log.Info("Scan complete.")
 	
@@ -256,8 +258,9 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 		
 		for _, symbol := range qf.config.EquitySymbols {
 			
-			rebackfill_pg := api4polygon.UpdateSplits(symbol, qf.TimeStarted)
-			rebackfill_ti := api4tiingo.UpdateSplits(symbol, qf.TimeStarted)
+			rebackfill_pg := api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+			// Piggyback update daily volume for Tiingo
+			api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
 			
 			nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
 

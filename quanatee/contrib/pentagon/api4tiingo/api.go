@@ -34,15 +34,14 @@ var (
 	start time.Time
 	apiKey 	 string
 	length = 0
-	SplitEvents *sync.Map
-	UpcomingSplitEvents *sync.Map
+	DailyVolumes *sync.Map
 )
 
 func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
+func UpdateDailyVolumes(symbol string, queryStart time.Time) {
 	
 	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))
 
@@ -53,7 +52,7 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", "daily")
-	q.Set("startDate", timeStarted.AddDate(-10, 0, 0).Format("2006-01-02")) // Hardcode to lookback up to 30 years
+	q.Set("startDate", queryStart.Format("2006-01-02"))
 	
 	u.RawQuery = q.Encode()
 
@@ -64,61 +63,20 @@ func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
 	if err != nil {
 		log.Error("%s %v", symbol, err)
 	}
-	
-	rebackfill := false
 
 	if len(splitsItem) > 0 {
-
-		symbolSplits, ok := SplitEvents.Load(symbol)
 		
-		if ok == false {
-			// First time
-			symbolSplits := map[time.Time]float32{}
-			for _, splitData := range splitsItem {
-				if splitData.SplitFactor != 1 {
-					expiryDate, _ := time.Parse(time.RFC3339, splitData.Date)
-					symbolSplits[expiryDate] = splitData.SplitFactor
-				}
-			}
-			if len(symbolSplits) > 0 {
-				SplitEvents.Store(symbol, symbolSplits)
-				log.Info("[tiingo] %s: %v", symbol, symbolSplits)
-			}
-		} else {
-			// Subsequence
-			symbolSplits := symbolSplits.(map[time.Time]float32)
-			for _, splitData := range splitsItem {
-				if splitData.SplitFactor != 1 {
-					expiryDate, _ := time.Parse(time.RFC3339, splitData.Date)
-					if _, ok := symbolSplits[expiryDate]; ok {
-						// Check if splits is after plugin was started, after the current time and was registered as an upcoming split event
-						upcomingSplit, _ := UpcomingSplitEvents.Load(symbol)
-						if upcomingSplit != nil {
-							upcomingExpiryDate := upcomingSplit.(time.Time)
-							// There are two ways to trigger a backfill
-							// 1. ExpiryDate is after the time plugin was started and registered as an upcoming split event; or
-							// 2. ExpiryDate is after the time plugin was started and ExpiryDate is the same date as current date.
-							// We can do this because we only checkStockSplits() (in pentagon.go) once a day 02:00 New York time
-							if ( ( expiryDate.After(timeStarted) || upcomingExpiryDate.IsZero() == false ) || 
-								( expiryDate.After(timeStarted) || (expiryDate.Day() == time.Now().Day() && expiryDate.Month() == time.Now().Month() && expiryDate.Year() == time.Now().Year()) ) ) {
-								rebackfill = true
-								// Deregister as an upcoming split event
-								UpcomingSplitEvents.Store(symbol, nil)
-							}
-						}
-					} else {
-						// New split event detected, we only store 1 upcoming split event per symbol at any given time
-						symbolSplits[expiryDate] = splitData.SplitFactor
-						UpcomingSplitEvents.Store(symbol, expiryDate)
-					}
-				}
-			}
-			if len(symbolSplits) > 0 {
-				SplitEvents.Store(symbol, symbolSplits)
+		symbolDailyVolume := map[time.Time]float32{}
+		for _, splitData := range splitsItem {
+			if splitData.Volume != 0 {
+				date, _ := time.Parse(time.RFC3339, splitData.Date)
+				symbolDailyVolume[date] = splitData.Volume
 			}
 		}
+		if len(symbolDailyVolume) > 0 {
+			DailyVolumes.Store(symbol, symbolDailyVolume)
+		}
 	}
-	return rebackfill
 }
 
 func GetAggregates(
@@ -259,7 +217,19 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = float32(1)
+					// Tiingo does not provide intraday volume so we take historical daily volume and divide by six and half hours (Data is only available for backfilling)
+					// Livefilling volume is dependent on Polygon (Which should be fine)
+					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+					if symbolDailyVolume_ != nil {
+						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+						if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+							ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
+					} else {
+						ohlcv.Volume[Epoch] = float32(1)
+					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -285,7 +255,19 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = float32(1)
+					// Tiingo does not provide intraday volume so we take historical daily volume and divide by six and half hours (Data is only available for backfilling)
+					// Livefilling volume is dependent on Polygon (Which should be fine)
+					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+					if symbolDailyVolume_ != nil {
+						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+						if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+							ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
+					} else {
+						ohlcv.Volume[Epoch] = float32(1)
+					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]

@@ -41,7 +41,7 @@ func SetAPIKey(key string) {
 	apiKey = key
 }
 
-func UpdateSplits(symbol string, timeStarted time.Time) (bool) {
+func UpdateSplitEvents(symbol string, timeStarted time.Time) (bool) {
 		
 	u, err := url.Parse(fmt.Sprintf(splitsURL, baseURL, symbol))
 
