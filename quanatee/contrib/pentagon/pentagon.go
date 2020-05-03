@@ -128,7 +128,6 @@ func (qf *QuanateeFetcher) Run() {
 func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
 	var wg2 sync.WaitGroup
-	count := 0
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
 		if filler.IsMarketOpen("crypto", from) == true {
@@ -151,7 +150,6 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
 	var wg2 sync.WaitGroup
-	count := 0
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
 		if filler.IsMarketOpen("forex", from) == true {
@@ -173,8 +171,6 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
 	var wg2 sync.WaitGroup
-	count := 0
-	
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
 		if filler.IsMarketOpen("equity", from) == true {
