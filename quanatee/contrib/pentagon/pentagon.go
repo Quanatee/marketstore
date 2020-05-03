@@ -264,7 +264,7 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 			
 			nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
 
-			if ( rebackfill_pg == true || rebackfill_ti == true ) && nil_if_not_backfilling == nil {
+			if rebackfill_pg == true && nil_if_not_backfilling == nil {
 				
 				log.Info("%s has a stock split event today, removing history and restarting backfill...", symbol)
 				// Delete entire tbk
