@@ -62,6 +62,13 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	}, nil
 }
 
+const (
+	
+	crypto_limit = 5000
+	forex_limit  = 5000
+	equity_limit = 20000
+)
+
 // Run the QuanateeFetcher. It starts the streaming API as well as the
 // asynchronous backfilling routine.
 func (qf *QuanateeFetcher) Run() {
@@ -137,7 +144,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "crypto", from.Add(-5000*time.Minute), to)
+			go filler.Bars(&wg2, symbol, "crypto", from.Add(-crypto_limit*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -160,7 +167,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from.Add(-5000*time.Minute), to)
+			go filler.Bars(&wg2, symbol, "forex", from.Add(-forex_limit*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -182,7 +189,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		} else if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from.Add(-20000*time.Minute), to)
+			go filler.Bars(&wg2, symbol, "equity", from.Add(-equity_limit*time.Minute), to)
 		}
 		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
@@ -270,7 +277,7 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 				to = to.Add(1*time.Second)
 				go func() {
 					wg.Add(1)
-					filler.Bars(&wg, symbol, "equity", from.Add(-20000*time.Minute), to)
+					filler.Bars(&wg, symbol, "equity", from.Add(-equity_limit*time.Minute), to)
 					// Retrigger Backfill
 					filler.BackfillFrom.Store(symbol, from)
 					filler.BackfillMarket.Store(symbol, "equity")
@@ -299,13 +306,16 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	q.SetRowLimit(io.LAST, 1)
 	
 	switch marketType {
+	case "crypto":
+		end = end.Add(-crypto_limit*time.Minute).Add(-1*time.Day)
+	case "forex":
+		end = end.Add(-forex_limit*time.Minute).Add(-1*time.Day)
 	case "equity":
-		end = end.Add(-20000*time.Minute).Add(-1*time.Minute)
-		q.SetEnd(end.Unix())
-    default:
-		end = end.Add(-5000*time.Minute).Add(-1*time.Minute)
-		q.SetEnd(end.Unix())
+		end = end.Add(-equity_limit*time.Minute).Add(-1*time.Day)
+	default:
+		end = end.Add(-equity_limit*time.Minute).Add(-1*time.Day)
 	}
+	q.SetEnd(end.Unix())
 	
 	parsed, err := q.Parse()
 	if err != nil {
@@ -338,10 +348,14 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	to := from
 	// Keep requests under 5000 rows (Twelvedata limit). Equity gets more due to operating hours
 	switch marketType {
+	case "crypto":
+		to = to.Add(crypto_limit*time.Minute)
+	case "forex":
+		to = to.Add(forex_limit*time.Minute)
 	case "equity":
-		to = to.Add(20000*time.Minute)
+		to = to.Add(equity_limit*time.Minute)
 	default:
-		to = to.Add(5000*time.Minute)
+		to = to.Add(equity_limit*time.Minute)
 	}
 	if to.Unix() >= end.Unix() {
 		to = end
