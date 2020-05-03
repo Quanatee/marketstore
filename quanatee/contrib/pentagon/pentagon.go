@@ -108,7 +108,7 @@ func (qf *QuanateeFetcher) Run() {
 		wg.Add(1)
 		go qf.liveEquity(&wg, from, to, firstLoop)
 		wg.Wait()
-		log.Info("Livefill cycle copleted.")
+		log.Info("Livefill cycle completed.")
 
 		// Start backfill and disable first loop
 		if firstLoop == true {
@@ -145,6 +145,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 	}
 	wg2.Wait()
+	log.Info("Livefill crypto completed.")
 }
 
 func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
@@ -167,6 +168,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 		}
 	}
 	wg2.Wait()
+	log.Info("Livefill forex completed.")
 }
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
@@ -188,6 +190,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		}
 	}
 	wg2.Wait()
+	log.Info("Livefill equity completed.")
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
