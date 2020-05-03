@@ -21,7 +21,7 @@ import (
 
 const (
 	splitsURL = "%v/tiingo/daily/%v/prices"
-	retryCount = 10
+	retryCount = 3
 )
 
 var (

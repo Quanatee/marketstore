@@ -108,6 +108,7 @@ func (qf *QuanateeFetcher) Run() {
 		wg.Add(1)
 		go qf.liveEquity(&wg, from, to, firstLoop)
 		wg.Wait()
+		log.Info("Livefill cycle copleted.")
 
 		// Start backfill and disable first loop
 		if firstLoop == true {
@@ -119,6 +120,7 @@ func (qf *QuanateeFetcher) Run() {
 		from = from.Add(time.Minute)
 		to = from.Add(time.Minute)
 		to = to.Add(1*time.Second)
+
 	}
 
 }
@@ -129,10 +131,6 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	count := 0
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
-		count++
-		if count % 3 == 0 {
-			time.Sleep(1*time.Second)
-		}
 		if filler.IsMarketOpen("crypto", from) == true {
 			// Market is open
 			wg2.Add(1)
@@ -156,10 +154,6 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	count := 0
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
-		count++
-		if count % 7 == 0 {
-			time.Sleep(1*time.Second)
-		}
 		if filler.IsMarketOpen("forex", from) == true {
 			// Market is open
 			wg2.Add(1)
@@ -183,12 +177,6 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
-
-		// Slow down requests
-		count++
-		if count % 13 == 0 {
-			time.Sleep(1*time.Second)
-		}
 		if filler.IsMarketOpen("equity", from) == true {
 			// Market is open
 			wg2.Add(1)

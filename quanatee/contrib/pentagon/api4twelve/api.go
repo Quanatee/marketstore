@@ -20,7 +20,7 @@ import (
 
 const (
 	tickersURL = "%v/v2/reference/tickers"
-	retryCount = 10
+	retryCount = 3
 )
 
 var (

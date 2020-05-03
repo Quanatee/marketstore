@@ -21,7 +21,7 @@ import (
 const (
 	aggURL     = "%v/v2/aggs/ticker/%v/range/%v/%v/%v/%v"
 	splitsURL  = "%v/v2/reference/splits/%v"
-	retryCount = 10
+	retryCount = 3
 )
 	
 var (
