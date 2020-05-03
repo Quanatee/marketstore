@@ -313,6 +313,7 @@ func GetDataFromProvider(
 			}
 		}
 	case "twelve":
+		// Twelve is not stable
 		return OHLCV{}
 		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
