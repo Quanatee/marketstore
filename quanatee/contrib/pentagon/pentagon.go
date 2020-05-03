@@ -94,9 +94,12 @@ func (qf *QuanateeFetcher) Run() {
 			if time.Now().Unix() >= to.Unix() {
 				break
 			} else {
+				log.Info("Sleeping for %v s", to.Sub(time.Now()))
 				time.Sleep(to.Sub(time.Now()))
 			}
 		}
+		
+		log.Info("Waking up to process from %v to %v", from, to)
 		
 		wg.Add(1)
 		go qf.liveCrypto(&wg, from, to, firstLoop)
