@@ -134,257 +134,257 @@ bgworkers:
         - VGIT 
         - SCHR
         - VGLT
-        # TOP 100 ETFs by Trading Volume and Market Cap
-        - EEM
-        - GDX
-        - UWT
-        - XOP
-        - SQQQ
-        - EFA
-        - HYG
-        - TQQQ
-        - IWM
-        - UVXY
-        - IEMG
-        - UWTI # Not available on polygon
-        - GDXJ
-        - VWO
-        - VEA
-        - SPXS
-        - DUST
-        - DWT
-        - NUGT
-        - TLT
-        - LQD
-        - IEFA
-        - SPXU
-        - GUSH
-        - SH
-        - SDS
-        - OIH
-        - TVIX
-        - SPXL
-        - JNUG
-        - BKLN
-        - RSX
-        - IYR
-        - JNK
-        - ASHR
-        - JDST
-        - GOVT
-        - UCO
-        - KRE
-        - OILU
-        - GASL
-        - AGG
-        - IVV
-        - VNQ
-        - PFF
-        - QID
-        - UPRO
-        - XBI
-        - SCHF
-        - PSQ
-        - VTI
-        - VOO
-        - BND
-        - ERX
-        - USMV
-        - SOXS
-        - IJR
-        - SPLV
-        - XRT
-        - VEU
-        - SMH
-        - BRZU
-        - PGX
-        - SJNK
-        - EMB
-        - VTV
-        - IWF
-        - VUG
-        - VIG
-        - IJH
-        - IWD
-        - BNDX
-        - BSV
-        - MBB
-        - VYM
-        - VO
-        - VGT
-        - TIP
-        - ITOT
-        - IVW
-        - VB
-        - IWB
-        - SCHX
-        - VXUS
-        - MUB
-        - IWR
-        - IXUS
-        - SDY
-        - QUAL
-        - MINT
-        - IGSB
-        - VV
-        - BIV
-        - DVY
-        - IVE
-        - SCHB
-        - VMBS
-        - IEI
-        - MDY
-        - VT
-        - JPST
-        - RSP
-        - EFAV
-        - XLY
-        - SCHD
-        - VBR
-        - SCHP
-        - FLOT
-        - ACWI
-        - IWP
-        - IGIB
-        - DGRO
-        - VHT
-        - SCHZ
-        - MTUM
-        - FVD
-        - IWS
-        - SCHG
-        - VTIP
-        - IAGG
-        - ICSH
-        # DJI AND NASDAQ 100
-        - WTI
-        - ICE
-        - NG
-        - AAPL
-        - UNH
-        - HD
-        - V
-        - MCD
-        - GS
-        - MSFT
-        - MMM
-        - JNJ
-        - WMT
-        - PG
-        - CAT
-        - IBM
-        - BA
-        - DIS
-        - TRV
-        - JPM
-        - UTX
-        - AXP
-        - MRK
-        - NKE
-        - CVX
-        - VZ
-        - WBA
-        - INTC
-        - KO
-        - CSCO
-        - XOM
-        - PFE
-        - DOW
-        - AMZN
-        - GOOG
-        - GOOGL
-        - FB
-        - CMCSA
-        - NFLX
-        - PEP
-        - ADBE
-        - COST
-        - NVDA
-        - AMGN
-        - PYPL
-        - GILD
-        - TXN
-        - CHTR
-        - TSLA
-        - AVGO
-        - QCOM
-        - SBUX
-        - TMUS
-        - MDLZ
-        - FISV
-        - VRTX
-        - INTU
-        - BIIB
-        - BKNG
-        - ADP
-        - REGN
-        - ISRG
-        - AMD
-        - ATVI
-        - MU
-        - CSX
-        - ILMN
-        - AMAT
-        - JD
-        - ADSK
-        - ADI
-        - EXC
-        - MNST
-        - LRCX
-        - KHC
-        - XEL
-        - EA
-        - BIDU
-        - MAR
-        - CTSH
-        - ROST
-        - MELI
-        - EBAY
-        - NTES
-        - NXPI
-        - WDAY
-        - LULU
-        - VRSK
-        - CSGP
-        - ORLY
-        - WLTW
-        - SIRI
-        - PAYX
-        - VRSN
-        - CTAS
-        - XLNX
-        - PCAR
-        - DLTR
-        - KLAC
-        - ANSS
-        - ALXN
-        - CERN
-        - SGEN
-        - SPLK
-        - SNPS
-        - FAST
-        - ASML
-        - IDXX
-        - CTXS
-        - CDNS
-        - INCY
-        - MCHP
-        - CPRT
-        - CHKP
-        - BMRN
-        - SWKS
-        - TCOM
-        - MXIM
-        - ALGN
-        - CDW
-        - TTWO
-        - WDC
-        - ULTA
-        - NTAP
-        - FOXA
-        - LBTYK
-        - EXPE
-        - UAL
-        - FOX
-        - AAL
-        - LBTYA
+        # # TOP 100 ETFs by Trading Volume and Market Cap
+        # - EEM
+        # - GDX
+        # - UWT
+        # - XOP
+        # - SQQQ
+        # - EFA
+        # - HYG
+        # - TQQQ
+        # - IWM
+        # - UVXY
+        # - IEMG
+        # - UWTI # Not available on polygon
+        # - GDXJ
+        # - VWO
+        # - VEA
+        # - SPXS
+        # - DUST
+        # - DWT
+        # - NUGT
+        # - TLT
+        # - LQD
+        # - IEFA
+        # - SPXU
+        # - GUSH
+        # - SH
+        # - SDS
+        # - OIH
+        # - TVIX
+        # - SPXL
+        # - JNUG
+        # - BKLN
+        # - RSX
+        # - IYR
+        # - JNK
+        # - ASHR
+        # - JDST
+        # - GOVT
+        # - UCO
+        # - KRE
+        # - OILU
+        # - GASL
+        # - AGG
+        # - IVV
+        # - VNQ
+        # - PFF
+        # - QID
+        # - UPRO
+        # - XBI
+        # - SCHF
+        # - PSQ
+        # - VTI
+        # - VOO
+        # - BND
+        # - ERX
+        # - USMV
+        # - SOXS
+        # - IJR
+        # - SPLV
+        # - XRT
+        # - VEU
+        # - SMH
+        # - BRZU
+        # - PGX
+        # - SJNK
+        # - EMB
+        # - VTV
+        # - IWF
+        # - VUG
+        # - VIG
+        # - IJH
+        # - IWD
+        # - BNDX
+        # - BSV
+        # - MBB
+        # - VYM
+        # - VO
+        # - VGT
+        # - TIP
+        # - ITOT
+        # - IVW
+        # - VB
+        # - IWB
+        # - SCHX
+        # - VXUS
+        # - MUB
+        # - IWR
+        # - IXUS
+        # - SDY
+        # - QUAL
+        # - MINT
+        # - IGSB
+        # - VV
+        # - BIV
+        # - DVY
+        # - IVE
+        # - SCHB
+        # - VMBS
+        # - IEI
+        # - MDY
+        # - VT
+        # - JPST
+        # - RSP
+        # - EFAV
+        # - XLY
+        # - SCHD
+        # - VBR
+        # - SCHP
+        # - FLOT
+        # - ACWI
+        # - IWP
+        # - IGIB
+        # - DGRO
+        # - VHT
+        # - SCHZ
+        # - MTUM
+        # - FVD
+        # - IWS
+        # - SCHG
+        # - VTIP
+        # - IAGG
+        # - ICSH
+        # # DJI AND NASDAQ 100
+        # - WTI
+        # - ICE
+        # - NG
+        # - AAPL
+        # - UNH
+        # - HD
+        # - V
+        # - MCD
+        # - GS
+        # - MSFT
+        # - MMM
+        # - JNJ
+        # - WMT
+        # - PG
+        # - CAT
+        # - IBM
+        # - BA
+        # - DIS
+        # - TRV
+        # - JPM
+        # - UTX
+        # - AXP
+        # - MRK
+        # - NKE
+        # - CVX
+        # - VZ
+        # - WBA
+        # - INTC
+        # - KO
+        # - CSCO
+        # - XOM
+        # - PFE
+        # - DOW
+        # - AMZN
+        # - GOOG
+        # - GOOGL
+        # - FB
+        # - CMCSA
+        # - NFLX
+        # - PEP
+        # - ADBE
+        # - COST
+        # - NVDA
+        # - AMGN
+        # - PYPL
+        # - GILD
+        # - TXN
+        # - CHTR
+        # - TSLA
+        # - AVGO
+        # - QCOM
+        # - SBUX
+        # - TMUS
+        # - MDLZ
+        # - FISV
+        # - VRTX
+        # - INTU
+        # - BIIB
+        # - BKNG
+        # - ADP
+        # - REGN
+        # - ISRG
+        # - AMD
+        # - ATVI
+        # - MU
+        # - CSX
+        # - ILMN
+        # - AMAT
+        # - JD
+        # - ADSK
+        # - ADI
+        # - EXC
+        # - MNST
+        # - LRCX
+        # - KHC
+        # - XEL
+        # - EA
+        # - BIDU
+        # - MAR
+        # - CTSH
+        # - ROST
+        # - MELI
+        # - EBAY
+        # - NTES
+        # - NXPI
+        # - WDAY
+        # - LULU
+        # - VRSK
+        # - CSGP
+        # - ORLY
+        # - WLTW
+        # - SIRI
+        # - PAYX
+        # - VRSN
+        # - CTAS
+        # - XLNX
+        # - PCAR
+        # - DLTR
+        # - KLAC
+        # - ANSS
+        # - ALXN
+        # - CERN
+        # - SGEN
+        # - SPLK
+        # - SNPS
+        # - FAST
+        # - ASML
+        # - IDXX
+        # - CTXS
+        # - CDNS
+        # - INCY
+        # - MCHP
+        # - CPRT
+        # - CHKP
+        # - BMRN
+        # - SWKS
+        # - TCOM
+        # - MXIM
+        # - ALGN
+        # - CDW
+        # - TTWO
+        # - WDC
+        # - ULTA
+        # - NTAP
+        # - FOXA
+        # - LBTYK
+        # - EXPE
+        # - UAL
+        # - FOX
+        # - AAL
+        # - LBTYA

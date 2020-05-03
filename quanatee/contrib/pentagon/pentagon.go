@@ -306,6 +306,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 		end = end.Add(-5000*time.Minute).Add(-1*time.Minute)
 		q.SetEnd(end.Unix())
 	}
+	
 	parsed, err := q.Parse()
 	if err != nil {
 		log.Error("%s query parse failure (%v), symbol data not available.", err)
