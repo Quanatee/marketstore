@@ -118,6 +118,7 @@ func (qf *QuanateeFetcher) Run() {
 		// Update from and to dates
 		from = from.Add(time.Minute)
 		to = from.Add(time.Minute)
+		to = to.Add(1*time.Second)
 	}
 
 }
