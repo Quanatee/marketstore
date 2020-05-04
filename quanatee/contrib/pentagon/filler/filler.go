@@ -243,6 +243,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesUnordered(sources), from, to, len(Epochs))
 	}
 	
+	log.Info("%v %v %v %v %v %v %v %v %v %v", len(Epochs), len(Opens), len(Highs), len(Lows), len(Closes), len(Volumes), len(HLCs), len(TVALs), len(Spreads), len(Splits))
+
 	cs := io.NewColumnSeries()
 	cs.AddColumn("Epoch", Epochs)
 	cs.AddColumn("Open", Opens)
