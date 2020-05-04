@@ -4,8 +4,8 @@ import "sync"
 
 var (
 	// Served by Polygon
-	SplitEvents *sync.Map
-	UpcomingSplitEvents *sync.Map
+	PolygonSplitEvents *sync.Map
+	PolygonUpcomingSplitEvents *sync.Map
 	PolygonDailyVolumes *sync.Map
 	// Served by Tiingo
 	TiingoDailyVolumes *sync.Map
