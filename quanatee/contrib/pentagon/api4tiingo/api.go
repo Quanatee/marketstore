@@ -169,9 +169,9 @@ func GetAggregates(
 	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
-			if len(aggCrypto[0].PriceData) <= bar {
-				// Unknown issue that causes index out of range (Probably malformed json)
-				return &OHLCV{}, err
+			if len(agg.PriceData) <= bar {
+				// Unknown issue that causes index out of range
+				continue
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 			if err_dt != nil {

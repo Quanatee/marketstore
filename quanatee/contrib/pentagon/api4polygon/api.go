@@ -206,6 +206,10 @@ func GetAggregates(
 	// Timestamped at 14:04
 	// We use Timestamp on close, so +60 to Timestamp
 	for bar := 0; bar < length; bar++ {
+		if len(agg.PriceData) <= bar {
+			// Unknown issue that causes index out of range
+			continue
+		}
 		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
 			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
 			(agg.PriceData[bar].High != agg.PriceData[bar].Low) ) {
