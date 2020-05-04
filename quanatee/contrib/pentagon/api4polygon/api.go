@@ -201,10 +201,10 @@ func GetAggregates(
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04
 	// We use Timestamp on close, so +60 to Timestamp
-	for bar := 0; bar < length; bar++ {
+	for bar := 0; bar < len(agg.PriceData); bar++ {
 		if len(agg.PriceData) <= bar {
 			// Unknown issue that causes index out of range
-			log.Info("[polygon] %s bar went too far %v/%v", symbol, bar, length)
+			log.Info("[polygon] %s bar went too far %v/%v", symbol, bar, len(agg.PriceData))
 			break
 		}
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
