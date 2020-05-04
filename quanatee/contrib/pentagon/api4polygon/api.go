@@ -142,7 +142,8 @@ func UpdateDailyVolumes(symbol, marketType string, queryStart time.Time) {
 		symbolDailyVolume := map[time.Time]float32{}
 		for _, priceData := range agg.PriceData {
 			if priceData.Volume != 0 {
-				date, _ := time.Parse(time.RFC3339, priceData.Date)
+				date := time.Unix(priceData.Timestamp / 1000, 0)
+				date = time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)
 				symbolDailyVolume[date] = priceData.Volume
 			}
 		}
