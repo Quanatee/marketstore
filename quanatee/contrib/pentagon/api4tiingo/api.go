@@ -171,7 +171,7 @@ func GetAggregates(
 		if strings.Compare(marketType, "crypto") == 0 {
 			if len(agg.PriceData) <= bar {
 				// Unknown issue that causes index out of range
-				continue
+				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 			if err_dt != nil {
@@ -212,11 +212,11 @@ func GetAggregates(
 		} else if strings.Compare(marketType, "forex") == 0 {
 			if len(aggForex.PriceData) <= bar {
 				// Unknown issue that causes index out of range (Probably malformed json)
-				return &OHLCV{}, err
+				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
 			if err_dt != nil {
-				return &OHLCV{}, err
+				break
 			}
 			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) &&
 				(aggForex.PriceData[bar].Open != aggForex.PriceData[bar].Close) && 
@@ -249,12 +249,11 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
 			if len(aggEquity.PriceData) <= bar {
-				return &OHLCV{}, err
+				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
 			if err_dt != nil {
-				// Unknown issue that causes index out of range (Probably malformed json)
-				return &OHLCV{}, err
+				break
 			}
 			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) &&
 				(aggEquity.PriceData[bar].Open != aggEquity.PriceData[bar].Close) && 
