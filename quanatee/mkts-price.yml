@@ -46,21 +46,21 @@ bgworkers:
         - USDCHF
         - USDMXN 
         - USDBRL
-        - USDDKK 
-        - USDNOK 
-        - USDSEK
-        - USDCNH 
-        - USDHKD
-        - USDRUB
-        - KRWUSD
-        - TWDUSD
-        - USDSGD
-        - USDINR 
-        - THBUSD
-        - VNDUSD
-        - PHPUSD
-        - AUDUSD
-        - NZDUSD
+        # - USDDKK 
+        # - USDNOK 
+        # - USDSEK
+        # - USDCNH 
+        # - USDHKD
+        # - USDRUB
+        # - KRWUSD
+        # - TWDUSD
+        # - USDSGD
+        # - USDINR 
+        # - THBUSD
+        # - VNDUSD
+        # - PHPUSD
+        # - AUDUSD
+        # - NZDUSD
         - XAGUSD
         - XAUUSD
       equity_symbols:
