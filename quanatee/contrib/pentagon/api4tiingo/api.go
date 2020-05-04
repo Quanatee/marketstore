@@ -278,7 +278,7 @@ func GetAggregates(
 	}
 	
 	if len(ohlcv.HLC) == 0 {
-		log.Debug("%s [tiingo] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+		log.Info("%s [tiingo] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
 		if length == 1 {
 			if strings.Compare(marketType, "crypto") == 0 {
 				log.Debug("%s [tiingo] Data: %v", symbol, aggCrypto[0])
