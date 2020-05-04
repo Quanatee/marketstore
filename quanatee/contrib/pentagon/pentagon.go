@@ -238,7 +238,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 						symbolPolygonDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
 						if symbolPolygonDailyVolume_ != nil {
 							symbolDailyVolume := symbolPolygonDailyVolume_.(map[time.Time]float32)
-							newDailyVolume := map[time.Time]float32
+							var newDailyVolume map[time.Time]float32
 							for date, volume := range symbolDailyVolume {
 								if date.After(qf.TimeStarted) {
 									newDailyVolume[date] = volume
@@ -249,7 +249,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 						symbolTiingoDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
 						if symbolTiingoDailyVolume_ != nil {
 							symbolDailyVolume := symbolTiingoDailyVolume_.(map[time.Time]float32)
-							newDailyVolume := map[time.Time]float32
+							var newDailyVolume map[time.Time]float32
 							for date, volume := range symbolDailyVolume {
 								if date.After(qf.TimeStarted) {
 									newDailyVolume[date] = volume
