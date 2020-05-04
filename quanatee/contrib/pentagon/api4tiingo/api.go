@@ -165,11 +165,12 @@ func GetAggregates(
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:05
 	// We use Timestamp on close, so no change
-    for bar := 0; bar < length; bar++ {
-		if strings.Compare(marketType, "crypto") == 0 {
+
+	if strings.Compare(marketType, "crypto") == 0 {
+		for bar := 0; bar < len(aggCrypto[0].PriceData); bar++ {
 			if len(aggCrypto[0].PriceData) <= bar {
 				// Unknown issue that causes index out of range
-				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, length)
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, len(aggCrypto[0].PriceData))
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
@@ -269,10 +270,12 @@ func GetAggregates(
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				}
 			}
-		} else if strings.Compare(marketType, "forex") == 0 {
+		}
+	} else if strings.Compare(marketType, "forex") == 0 {
+		for bar := 0; bar < len(aggForex.PriceData); bar++ {
 			if len(aggForex.PriceData) <= bar {
 				// Unknown issue that causes index out of range
-				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, length)
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, len(aggForex.PriceData))
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
@@ -367,9 +370,11 @@ func GetAggregates(
 					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				}
 			}
-		} else if strings.Compare(marketType, "equity") == 0 {
+		}
+	} else if strings.Compare(marketType, "equity") == 0 {
+		for bar := 0; bar < len(aggEquity.PriceData); bar++ {
 			if len(aggEquity.PriceData) <= bar {
-				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, length)
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, len(aggEquity.PriceData))
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
