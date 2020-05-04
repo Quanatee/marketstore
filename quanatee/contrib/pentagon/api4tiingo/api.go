@@ -61,7 +61,7 @@ func UpdateDailyVolumes(symbol string, queryStart time.Time) {
 	err = downloadAndUnmarshal(u.String(), retryCount, &splitsItem)
 
 	if err != nil {
-		log.Error("%s %v", symbol, err)
+		log.Error("[tiingo] %s %v", symbol, err)
 	}
 
 	if len(splitsItem) > 0 {

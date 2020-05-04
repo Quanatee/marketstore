@@ -120,7 +120,7 @@ func GetAggregates(
 	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, multiplier, resolution, from.Unix()*1000, to.Unix()*1000))
 
 	if err != nil {
-		log.Error("%s %v", symbol, err)
+		log.Error("[polygon] %s %v", symbol, err)
 	}
 	
 	q := u.Query()
@@ -140,7 +140,7 @@ func GetAggregates(
 	length := len(agg.PriceData)
 
 	if length == 0 {
-		log.Debug("%s [polygon] returned 0 results between %v and %v", symbol, from, to)
+		log.Info("%s [polygon] returned 0 results between %v and %v", symbol, from, to)
 		return &OHLCV{}, nil
 	}
 	
@@ -190,7 +190,7 @@ func GetAggregates(
 	}
 	
 	if len(ohlcv.HLC) == 0 {
-		log.Debug("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
+		log.Info("%s [polygon] returned %v results and validated %v results between %v and %v", symbol, length, len(ohlcv.HLC), from, to)
 		if length == 1 {
 			log.Debug("%s [polygon] Data: %v", symbol, agg)
 		}

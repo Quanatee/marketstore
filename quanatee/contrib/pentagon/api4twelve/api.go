@@ -96,6 +96,7 @@ func GetAggregates(
 	}
 
 	if err != nil {
+		log.Error("[twelve] %s %v", symbol, err)
 		return &OHLCV{}, err
 	}
 	
