@@ -29,6 +29,7 @@ var (
 	baseURL = "https://api.polygon.io"
 	start time.Time
 	apiKey  	string
+	length = 0
 	symbolPrefix = map[string]string{
 		"crypto": "X:",
 		"forex": "C:",
@@ -146,19 +147,17 @@ func GetAggregates(
 		return &OHLCV{}, err
 	}
 	
-	length := len(agg.PriceData)
-
-	if length == 0 {
-		log.Info("%s [polygon] returned 0 results between %v and %v | Link: %s", symbol, from, to, u.String())
-		return &OHLCV{}, nil
-	}
-	
 	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto.PriceData)
 	} else if strings.Compare(marketType, "forex") == 0 {
 		length = len(aggForex.PriceData)
 	} else if strings.Compare(marketType, "equity") == 0 {
 		length = len(aggEquity.PriceData)
+	}
+
+	if length == 0 {
+		log.Info("%s [polygon] returned 0 results between %v and %v | Link: %s", symbol, from, to, u.String())
+		return &OHLCV{}, nil
 	}
 
 	ohlcv := &OHLCV{
