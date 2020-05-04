@@ -195,11 +195,11 @@ func GetAggregates(
 		Spread: make(map[int64]float32),
 	}
 	// Panic recovery
-    defer func() {
-        if err := recover(); err != nil {
-            log.Error("Panic occurred:", err)
-        }
-	}()
+    // defer func() {
+    //     if err := recover(); err != nil {
+    //         log.Error("Panic occurred:", err)
+    //     }
+	// }()
 	// Polygon candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
@@ -208,6 +208,7 @@ func GetAggregates(
 	for bar := 0; bar < length; bar++ {
 		if len(agg.PriceData) <= bar {
 			// Unknown issue that causes index out of range
+			log.Info("%s bar went too far %v/%v", bar, length)
 			break
 		}
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
