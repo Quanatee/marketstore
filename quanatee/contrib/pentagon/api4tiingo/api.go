@@ -191,7 +191,7 @@ func GetAggregates(
 					if aggCrypto[0].PriceData[bar].Volume > float32(1) {
 						ohlcv.Volume[Epoch] = float32(aggCrypto[0].PriceData[bar].Volume)
 					} else {
-						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
