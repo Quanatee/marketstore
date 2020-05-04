@@ -224,13 +224,27 @@ func GetAggregates(
 				if agg.PriceData[bar].Volume > float32(1) {
 					ohlcv.Volume[Epoch] = float32(agg.PriceData[bar].Volume)
 				} else {
-					// Try provider daily volume, or set to 1
+					// Try provider daily volume with options for livefill and backfill
 					volume_alt := false
 					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 						dt := time.Unix(Epoch, 0)
-						if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+						dailyVolume := float32(1)
+						if (to.Add(5*time.Minute)).After(time.Now()) {
+							// Livefill, get the last daily volume
+							last_date := time.Time{}
+							for date := range symbolDailyVolume {
+								if date.After(last_date) {
+									last_date = date
+								}
+							}
+							dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+						} else {
+							// Backfill, directly retrieve the daily volume
+							dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+						}
+						if dailyVolume != 0 {
 							switch marketType {
 							case "crytpo":
 								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
@@ -253,7 +267,21 @@ func GetAggregates(
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							dt := time.Unix(Epoch, 0)
-							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+							dailyVolume := float32(1)
+							if (to.Add(5*time.Minute)).After(time.Now()) {
+								// Livefill, get the last daily volume
+								last_date := time.Time{}
+								for date := range symbolDailyVolume {
+									if date.After(last_date) {
+										last_date = date
+									}
+								}
+								dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+							} else {
+								// Backfill, directly retrieve the daily volume
+								dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+							}
+							if dailyVolume != 0 {
 								switch marketType {
 								case "crytpo":
 									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)

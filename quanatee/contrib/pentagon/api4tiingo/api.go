@@ -189,16 +189,79 @@ func GetAggregates(
 					if aggCrypto[0].PriceData[bar].Volume > float32(1) {
 						ohlcv.Volume[Epoch] = float32(aggCrypto[0].PriceData[bar].Volume)
 					} else {
+						// Try provider daily volume with options for livefill and backfill
+						volume_alt := false
 						symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
-							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
-								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							dailyVolume := float32(1)
+							if (to.Add(5*time.Minute)).After(time.Now()) {
+								// Livefill, get the last daily volume
+								last_date := time.Time{}
+								for date := range symbolDailyVolume {
+									if date.After(last_date) {
+										last_date = date
+									}
+								}
+								dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+							} else {
+								// Backfill, directly retrieve the daily volume
+								dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+							}
+							if dailyVolume != 0 {
+								switch marketType {
+								case "crytpo":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "forex":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "equity":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								default:
+									volume_alt = true
+								}
+							} else {
+								volume_alt = true
+							}
+						} else {
+							volume_alt = true
+						}
+						if volume_alt == true {
+							// Try alternative daily volume, or set to 1
+							symbolDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+							if symbolDailyVolume_ != nil {
+								symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+								dt := time.Unix(Epoch, 0)
+								dailyVolume := float32(1)
+								if (to.Add(5*time.Minute)).After(time.Now()) {
+									// Livefill, get the last daily volume
+									last_date := time.Time{}
+									for date := range symbolDailyVolume {
+										if date.After(last_date) {
+											last_date = date
+										}
+									}
+									dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+								} else {
+									// Backfill, directly retrieve the daily volume
+									dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+								}
+								if dailyVolume != 0 {
+									switch marketType {
+									case "crytpo":
+										ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+									case "forex":
+										ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+									case "equity":
+										ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+									default:
+										ohlcv.Volume[Epoch] = float32(1)
+									}
+								} else {
+									ohlcv.Volume[Epoch] = float32(1)
+								}
 							} else {
 								ohlcv.Volume[Epoch] = float32(1)
 							}
-						} else {
-							ohlcv.Volume[Epoch] = float32(1)
 						}
 					}
 					// Extra
@@ -224,18 +287,79 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
-					// Tiingo does not provide intraday volume so we take historical daily volume and divide by six and half hours (Data is only available for backfilling)
-					// Livefilling volume is dependent on Polygon (Which should be fine)
+					// Try provider daily volume with options for livefill and backfill
+					volume_alt := false
 					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
-						if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
-							ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+						dailyVolume := float32(1)
+						if (to.Add(5*time.Minute)).After(time.Now()) {
+							// Livefill, get the last daily volume
+							last_date := time.Time{}
+							for date := range symbolDailyVolume {
+								if date.After(last_date) {
+									last_date = date
+								}
+							}
+							dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+						} else {
+							// Backfill, directly retrieve the daily volume
+							dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+						}
+						if dailyVolume != 0 {
+							switch marketType {
+							case "crytpo":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							case "forex":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							case "equity":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							default:
+								volume_alt = true
+							}
+						} else {
+							volume_alt = true
+						}
+					} else {
+						volume_alt = true
+					}
+					if volume_alt == true {
+						// Try alternative daily volume, or set to 1
+						symbolDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							dt := time.Unix(Epoch, 0)
+							dailyVolume := float32(1)
+							if (to.Add(5*time.Minute)).After(time.Now()) {
+								// Livefill, get the last daily volume
+								last_date := time.Time{}
+								for date := range symbolDailyVolume {
+									if date.After(last_date) {
+										last_date = date
+									}
+								}
+								dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+							} else {
+								// Backfill, directly retrieve the daily volume
+								dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+							}
+							if dailyVolume != 0 {
+								switch marketType {
+								case "crytpo":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "forex":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "equity":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								default:
+									ohlcv.Volume[Epoch] = float32(1)
+								}
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
 						} else {
 							ohlcv.Volume[Epoch] = float32(1)
 						}
-					} else {
-						ohlcv.Volume[Epoch] = float32(1)
 					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
@@ -259,18 +383,79 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					// Tiingo does not provide intraday volume so we take historical daily volume and divide by six and half hours (Data is only available for backfilling)
-					// Livefilling volume is dependent on Polygon (Which should be fine)
+					// Try provider daily volume with options for livefill and backfill
+					volume_alt := false
 					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
-						if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
-							ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+						dailyVolume := float32(1)
+						if (to.Add(5*time.Minute)).After(time.Now()) {
+							// Livefill, get the last daily volume
+							last_date := time.Time{}
+							for date := range symbolDailyVolume {
+								if date.After(last_date) {
+									last_date = date
+								}
+							}
+							dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+						} else {
+							// Backfill, directly retrieve the daily volume
+							dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+						}
+						if dailyVolume != 0 {
+							switch marketType {
+							case "crytpo":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							case "forex":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							case "equity":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							default:
+								volume_alt = true
+							}
+						} else {
+							volume_alt = true
+						}
+					} else {
+						volume_alt = true
+					}
+					if volume_alt == true {
+						// Try alternative daily volume, or set to 1
+						symbolDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							dt := time.Unix(Epoch, 0)
+							dailyVolume := float32(1)
+							if (to.Add(5*time.Minute)).After(time.Now()) {
+								// Livefill, get the last daily volume
+								last_date := time.Time{}
+								for date := range symbolDailyVolume {
+									if date.After(last_date) {
+										last_date = date
+									}
+								}
+								dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+							} else {
+								// Backfill, directly retrieve the daily volume
+								dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+							}
+							if dailyVolume != 0 {
+								switch marketType {
+								case "crytpo":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "forex":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "equity":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								default:
+									ohlcv.Volume[Epoch] = float32(1)
+								}
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
 						} else {
 							ohlcv.Volume[Epoch] = float32(1)
 						}
-					} else {
-						ohlcv.Volume[Epoch] = float32(1)
 					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3

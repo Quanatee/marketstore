@@ -130,7 +130,7 @@ func (qf *QuanateeFetcher) Run() {
 		// Start backfill and disable first loop
 		if firstLoop == true {
 			go qf.workBackfillBars()
-			go qf.checkStockSplits()
+			go qf.DailyChecker()
 			firstLoop = false
 		}
 		// Update from and to dates
@@ -236,6 +236,29 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					if stop == true {
 						log.Info("%s backfill stopped. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
+						// Remove historical daily volume, keep only daily volume after time start just in case livefeed volume fails
+						symbolPolygonDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+						if symbolPolygonDailyVolume_ != nil {
+							symbolDailyVolume := symbolPolygonDailyVolume_.(map[time.Time]float32)
+							newDailyVolume := map[time.Time]float32
+							for date, volume := range symbolDailyVolume {
+								if date.After(qf.TimeStarted) {
+									newDailyVolume[date] = volume
+								}
+							}
+							api4polygon.DailyVolumes.Store(symbol, symbolDailyVolume)
+						}
+						symbolTiingoDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						if symbolTiingoDailyVolume_ != nil {
+							symbolDailyVolume := symbolTiingoDailyVolume_.(map[time.Time]float32)
+							newDailyVolume := map[time.Time]float32
+							for date, volume := range symbolDailyVolume {
+								if date.After(qf.TimeStarted) {
+									newDailyVolume[date] = volume
+								}
+							}
+							api4tiingo.DailyVolumes.Store(symbol, symbolDailyVolume)
+						}
 					}
 				}()
 			}
@@ -246,7 +269,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 	}
 }
 
-func (qf *QuanateeFetcher) checkStockSplits() {
+func (qf *QuanateeFetcher) DailyChecker() {
 	
 	for {
 
@@ -255,15 +278,25 @@ func (qf *QuanateeFetcher) checkStockSplits() {
 		next = time.Date(next.Year(), next.Month(), next.Day(), 7, 0, 0, 0, time.UTC)
 		time.Sleep(next.Sub(time.Now()))
 
-		log.Info("Checking for stock splits that are happening today...")
 		wg := sync.WaitGroup{}
-		
+		log.Info("Updating recent daily volumes...")
+		for _, symbol := range qf.config.CryptoSymbols {
+			api4polygon.UpdateDailyVolumes(symbol, "crypto", qf.TimeStarted)
+			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
+		}
+		for _, symbol := range qf.config.ForexSymbols {
+			api4polygon.UpdateDailyVolumes(symbol, "forex", qf.TimeStarted)
+			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
+		}
+		for _, symbol := range qf.config.EquitySymbols {
+			api4polygon.UpdateDailyVolumes(symbol, "equity", qf.TimeStarted)
+			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
+			api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+		}
+		log.Info("Checking for stock splits...")
 		for _, symbol := range qf.config.EquitySymbols {
 			
 			rebackfill_pg := api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
-			// Piggyback update daily volume for Tiingo
-			api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
-			
 			nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
 
 			if rebackfill_pg == true && nil_if_not_backfilling == nil {

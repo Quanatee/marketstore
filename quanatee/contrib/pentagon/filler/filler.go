@@ -161,22 +161,22 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	}
 
 	// Get the Epoch slice of the largest OHLCV set
-	Epochs := make([]int64, 0)
-
+	Epochs_ := make([]int64, 0)
+	
     for _, ohlcv_ := range ohlcvs {
-		if len(ohlcv_.HLC) > len(Epochs) {
-			// Epochs = make([]string, 0, len(len(ohlcv_.HLC)))
+		if len(ohlcv_.HLC) > len(Epochs_) {
+			// Epochs_ = make([]string, 0, len(len(ohlcv_.HLC)))
 			for key := range ohlcv_.HLC {
-				Epochs = append(Epochs, key)
+				Epochs_ = append(Epochs_, key)
 			}
 		}
 	}
 
 	// If length is 0, no data was returned
-	if len(Epochs) == 0 {
+	if len(Epochs_) == 0 {
 		return
 	}
-
+	var Epochs []int64
 	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads, Splits []float32
 	
 	symbolSplits_, _ := api4polygon.SplitEvents.Load(symbol)
@@ -184,7 +184,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	if symbolSplits_ != nil {
 		symbolSplits = symbolSplits_.(map[time.Time]float32)
 	}
-	for _, Epoch := range Epochs {
+	for _, Epoch := range Epochs_ {
 		var open, high, low, close, volume, hlc, tval, spread float32
 		divisor := float32(0)
 		volume_divisor := float32(0)
@@ -218,6 +218,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			}
 		}
 		if divisor > 0 {
+			Epochs = append(Epochs, Epoch)
 			Opens = append(Opens, float32(open / divisor))
 			Highs = append(Highs, float32(high / divisor))
 			Lows = append(Lows, float32(low / divisor))
