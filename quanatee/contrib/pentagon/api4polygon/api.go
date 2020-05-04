@@ -140,7 +140,7 @@ func GetAggregates(
 	length := len(agg.PriceData)
 
 	if length == 0 {
-		log.Info("%s [polygon] returned 0 results between %v and %v", symbol, from, to)
+		log.Info("%s [polygon] returned 0 results between %v and %v | Link: %s", symbol, from, to, u.String())
 		return &OHLCV{}, nil
 	}
 	

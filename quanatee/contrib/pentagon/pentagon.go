@@ -105,6 +105,7 @@ func (qf *QuanateeFetcher) Run() {
 			} else {
 				log.Info("Sleeping for %v s", to.Sub(time.Now()))
 				time.Sleep(to.Sub(time.Now()))
+				time.Sleep(4*time.Second)
 			}
 		}
 		

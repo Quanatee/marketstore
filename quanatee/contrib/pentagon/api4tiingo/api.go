@@ -140,7 +140,7 @@ func GetAggregates(
 	}
 
 	if length == 0 {
-		log.Debug("%s [tiingo] returned 0 results between %v and %v", symbol, from, to)
+		log.Debug("%s [tiingo] returned 0 results between %v and %v | Link: %s", symbol, from, to, u.String())
 		return &OHLCV{}, nil
 	}
 	
