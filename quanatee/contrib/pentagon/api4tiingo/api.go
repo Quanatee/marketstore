@@ -201,10 +201,10 @@ func GetAggregates(
 										last_date = date
 									}
 								}
-								dailyVolume, _ := symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+								dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
 							} else {
 								// Backfill, directly retrieve the daily volume
-								dailyVolume, _ := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+								dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
 							}
 							if dailyVolume != 0 {
 								switch marketType {
