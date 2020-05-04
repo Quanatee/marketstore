@@ -210,7 +210,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		next := time.Now().Add(time.Minute)
 		next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 30, 0, time.UTC)
 		time.Sleep(next.Sub(time.Now()))
-
+		
 		wg := sync.WaitGroup{}
 		count := 0
 		// range over symbols that need backfilling, and
