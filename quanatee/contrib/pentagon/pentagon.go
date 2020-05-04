@@ -65,7 +65,7 @@ const (
 	
 	crypto_limit = 10000
 	forex_limit  = 10000
-	equity_limit = 30000
+	equity_limit = 40000
 )
 
 // Run the QuanateeFetcher. It starts the streaming API as well as the
