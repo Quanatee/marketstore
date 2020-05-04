@@ -10,6 +10,7 @@ import (
 	crypto_rand "crypto/rand"
     "encoding/binary"
 	
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4twelve"
