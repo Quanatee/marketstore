@@ -351,7 +351,7 @@ func download(url string, retryCount int) (*http.Response, error) {
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return nil, fmt.Errorf("status code %v", resp.StatusCode)
+		return nil, fmt.Errorf("status code %v, | Link: %s", resp.StatusCode, url)
 	}
 
 	return resp, nil
