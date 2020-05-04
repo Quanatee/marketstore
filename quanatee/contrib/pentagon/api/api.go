@@ -1,5 +1,7 @@
 package api
 
+import "sync"
+
 var (
 	// Served by Polygon
 	SplitEvents *sync.Map
@@ -8,3 +10,10 @@ var (
 	// Served by Tiingo
 	TiingoDailyVolumes *sync.Map
 )
+
+func InitalizeSharedMaps() {
+	PolygonSplitEvents = &sync.Map{}
+	PolygonUpcomingSplitEvents = &sync.Map{}
+	PolygonDailyVolumes = &sync.Map{}
+	TiingoDailyVolumes = &sync.Map{}
+}

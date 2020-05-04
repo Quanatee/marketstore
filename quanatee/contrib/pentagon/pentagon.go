@@ -49,10 +49,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	
 	filler.BackfillFrom = &sync.Map{}
 	filler.BackfillMarket = &sync.Map{}
-	api.PolygonSplitEvents = &sync.Map{}
-	api.PolygonUpcomingSplitEvents = &sync.Map{}
-	api.PolygonDailyVolumes = &sync.Map{}
-	api.TiingoDailyVolumes = &sync.Map{}
+	api.InitalizeSharedMaps()
 	
 	startDate, _ := time.Parse("2006-01-02 03:04", config.QueryStart)
 	
