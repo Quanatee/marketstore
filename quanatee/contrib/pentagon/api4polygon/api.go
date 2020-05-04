@@ -14,6 +14,7 @@ import (
 	//"strconv"
 	"time"
 
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/utils/log"
 	"gopkg.in/matryer/try.v1"
 )
@@ -186,7 +187,7 @@ func GetAggregates(
 			if ( (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) &&
 				(aggCrypto.PriceData[bar].Open != aggCrypto.PriceData[bar].Close) && 
 				(aggCrypto.PriceData[bar].High != aggCrypto.PriceData[bar].Low) ) {
-				Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+				Epoch := (aggCrypto.PriceData[bar].Timestamp / 1000) + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
@@ -201,6 +202,7 @@ func GetAggregates(
 						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							dt := time.Unix(Epoch, 0)
 							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
 								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							} else {
@@ -220,7 +222,7 @@ func GetAggregates(
 			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) &&
 				(aggForex.PriceData[bar].Open != aggForex.PriceData[bar].Close) && 
 				(aggForex.PriceData[bar].High != aggForex.PriceData[bar].Low) ) {
-				Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+				Epoch := (aggForex.PriceData[bar].Timestamp / 1000) + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
@@ -235,6 +237,7 @@ func GetAggregates(
 						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							dt := time.Unix(Epoch, 0)
 							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
 								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							} else {
@@ -254,7 +257,7 @@ func GetAggregates(
 			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) &&
 				(aggEquity.PriceData[bar].Open != aggEquity.PriceData[bar].Close) && 
 				(aggEquity.PriceData[bar].High != aggEquity.PriceData[bar].Low) ) {
-				Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+				Epoch := (aggEquity.PriceData[bar].Timestamp / 1000) + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
@@ -269,6 +272,7 @@ func GetAggregates(
 						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							dt := time.Unix(Epoch, 0)
 							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
 								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
 							} else {
