@@ -199,8 +199,6 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		}
 		for _, ohlcv_ := range ohlcvs {
 			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
-				(ohlcv_.Open[Epoch] != ohlcv_.Close[Epoch]) && 
-				(ohlcv_.High[Epoch] != ohlcv_.Low[Epoch]) &&
 				(ohlcv_.Volume[Epoch] != 0) &&
 				(ohlcv_.HLC[Epoch] != 0) &&
 				(ohlcv_.TVAL[Epoch] != 0) &&
@@ -212,7 +210,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 				hlc += float32(ohlcv_.HLC[Epoch] / split)
 				spread += float32(ohlcv_.Spread[Epoch] / split)
 				divisor += float32(1)
-				if ohlcv_.Volume[Epoch] != 1 {
+				if ohlcv_.Volume[Epoch] > 1 {
 					volume += float32(ohlcv_.Volume[Epoch] * split)
 					tval += float32(ohlcv_.TVAL[Epoch])
 					volume_divisor += float32(1)
@@ -227,13 +225,13 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 			HLCs = append(HLCs, float32(hlc / divisor))
 			Spreads = append(Spreads, float32(spread / divisor))
 			Splits = append(Splits, split)
-		}
-		if volume_divisor > 0 {
-			Volumes = append(Volumes, float32(volume / volume_divisor))
-			TVALs = append(TVALs, float32(tval / volume_divisor))
-		} else {
-			Volumes = append(Volumes, float32(1))
-			TVALs = append(TVALs, float32(hlc / divisor))
+			if volume_divisor > 0 {
+				Volumes = append(Volumes, float32(volume / volume_divisor))
+				TVALs = append(TVALs, float32(tval / volume_divisor))
+			} else {
+				Volumes = append(Volumes, float32(1))
+				TVALs = append(TVALs, float32(hlc / divisor))
+			}
 		}
 	}
 	
