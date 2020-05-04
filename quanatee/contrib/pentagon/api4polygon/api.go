@@ -37,6 +37,7 @@ var (
 	}
 	SplitEvents *sync.Map
 	UpcomingSplitEvents *sync.Map
+	DailyVolumes *sync.Map
 )
 
 func SetAPIKey(key string) {
@@ -117,7 +118,7 @@ func UpdateSplitEvents(symbol string, timeStarted time.Time) (bool) {
 
 func UpdateDailyVolumes(symbol, marketType string, queryStart time.Time) {
 	
-	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, "24", "hour", queryStart.Unix()*1000, time.Now()*1000))
+	u, err := url.Parse(fmt.Sprintf(aggURL, baseURL, symbolPrefix[marketType]+symbol, "24", "hour", queryStart.Unix()*1000, time.Now().Unix()*1000))
 	
 	if err != nil {
 		log.Error("[polygon] %s %v", symbol, err)
@@ -139,7 +140,7 @@ func UpdateDailyVolumes(symbol, marketType string, queryStart time.Time) {
 
 	if len(agg.PriceData) > 0 {
 		symbolDailyVolume := map[time.Time]float32{}
-		for _, priceData := range agg {
+		for _, priceData := range agg.PriceData {
 			if priceData.Volume != 0 {
 				date, _ := time.Parse(time.RFC3339, priceData.Date)
 				symbolDailyVolume[date] = priceData.Volume
@@ -244,7 +245,7 @@ func GetAggregates(
 					}
 					if volume_alt == true {
 						// Try alternative daily volume, or set to 1
-						symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							dt := time.Unix(Epoch, 0)
