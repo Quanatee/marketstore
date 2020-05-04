@@ -66,7 +66,7 @@ func UpdateSplitEvents(symbol string, timeStarted time.Time) (bool) {
 
 	if len(splitsItem.SplitData) > 0 {
 		
-		symbolSplits, ok := api.SplitEvents.Load(symbol)
+		symbolSplits, ok := api.PolygonSplitEvents.Load(symbol)
 		
 		if ok == false {
 			// First time
@@ -76,7 +76,7 @@ func UpdateSplitEvents(symbol string, timeStarted time.Time) (bool) {
 				symbolSplits[expiryDate] = splitData.Ratio
 			}
 			if len(symbolSplits) > 0 {
-				api.SplitEvents.Store(symbol, symbolSplits)
+				api.PolygonSplitEvents.Store(symbol, symbolSplits)
 				log.Info("[polygon] %s: %v", symbol, symbolSplits)
 			}
 		} else {
@@ -85,7 +85,7 @@ func UpdateSplitEvents(symbol string, timeStarted time.Time) (bool) {
 			for _, splitData := range splitsItem.SplitData {
 				expiryDate, _ := time.Parse("2006-01-02", splitData.Expiry)
 				if _, ok := symbolSplits[expiryDate]; ok {
-					upcomingSplit, _ := api.UpcomingSplitEvents.Load(symbol)
+					upcomingSplit, _ := api.PolygonUpcomingSplitEvents.Load(symbol)
 					if upcomingSplit != nil {
 						upcomingExpiryDate := upcomingSplit.(time.Time)
 						// There are two ways to trigger a backfill
@@ -96,17 +96,17 @@ func UpdateSplitEvents(symbol string, timeStarted time.Time) (bool) {
 							( expiryDate.After(timeStarted) || (expiryDate.Day() == time.Now().Day() && expiryDate.Month() == time.Now().Month() && expiryDate.Year() == time.Now().Year()) ) ) {
 							rebackfill = true
 							// Deregister as an upcoming split event
-							api.UpcomingSplitEvents.Store(symbol, nil)
+							api.PolygonUpcomingSplitEvents.Store(symbol, nil)
 						}
 					}
 				} else {
 					// New split event detected, we only store 1 upcoming split event per symbol at any given time
 					symbolSplits[expiryDate] = splitData.Ratio
-					api.UpcomingSplitEvents.Store(symbol, expiryDate)
+					api.PolygonUpcomingSplitEvents.Store(symbol, expiryDate)
 				}
 			}
 			if len(symbolSplits) > 0 {
-				api.SplitEvents.Store(symbol, symbolSplits)
+				api.PolygonSplitEvents.Store(symbol, symbolSplits)
 			}
 		}
 	}
