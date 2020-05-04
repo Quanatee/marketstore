@@ -187,10 +187,21 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggCrypto[0].PriceData[bar].High
 					ohlcv.Low[Epoch] = aggCrypto[0].PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggCrypto[0].PriceData[bar].Close
-					if aggCrypto[0].PriceData[bar].Volume != 0 {
-						ohlcv.Volume[Epoch] = aggCrypto[0].PriceData[bar].Volume
+					// If Tiingo fails to provide intraday volume, we try to take from Tiingo historical daily volume (pro-rated)
+					if aggCrypto[0].PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggCrypto[0].PriceData[bar].Volume)
 					} else {
-						ohlcv.Volume[Epoch] = float32(1)
+						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
 					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3

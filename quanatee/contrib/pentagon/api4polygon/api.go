@@ -129,14 +129,22 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
-	var agg Agg
+	var aggCrypto AggCrypto
+	var aggForex AggForex
+	var aggEquity AggEquity
 
-	err = downloadAndUnmarshal(u.String(), retryCount, &agg)
+	if strings.Compare(marketType, "crypto") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
+	} else if strings.Compare(marketType, "forex") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex)
+	} else if strings.Compare(marketType, "equity") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
+	}
 	
 	if err != nil {
 		return &OHLCV{}, err
 	}
-
+	
 	length := len(agg.PriceData)
 
 	if length == 0 {
@@ -144,6 +152,14 @@ func GetAggregates(
 		return &OHLCV{}, nil
 	}
 	
+	if strings.Compare(marketType, "crypto") == 0 {
+		length = len(aggCrypto.PriceData)
+	} else if strings.Compare(marketType, "forex") == 0 {
+		length = len(aggForex.PriceData)
+	} else if strings.Compare(marketType, "equity") == 0 {
+		length = len(aggEquity.PriceData)
+	}
+
 	ohlcv := &OHLCV{
 		Open: make(map[int64]float32),
 		High: make(map[int64]float32),
@@ -165,30 +181,111 @@ func GetAggregates(
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:04
 	// We use Timestamp on close, so +60 to Timestamp
-    for bar := 0; bar < length; bar++ {
-		if ( (agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0) &&
-			(agg.PriceData[bar].Open != agg.PriceData[bar].Close) && 
-			(agg.PriceData[bar].High != agg.PriceData[bar].Low) ) {
-			Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
-			if Epoch > from.Unix() && Epoch < to.Unix() {
-				//OHLCV
-				ohlcv.Open[Epoch] = float32(agg.PriceData[bar].Open)
-				ohlcv.High[Epoch] = float32(agg.PriceData[bar].High)
-				ohlcv.Low[Epoch] = float32(agg.PriceData[bar].Low)
-				ohlcv.Close[Epoch] = float32(agg.PriceData[bar].Close)
-				if agg.PriceData[bar].Volume != float32(0) {
-					ohlcv.Volume[Epoch] = float32(agg.PriceData[bar].Volume)
-				} else {
-					ohlcv.Volume[Epoch] = float32(1)
+	for bar := 0; bar < length; bar++ {
+		if strings.Compare(marketType, "crypto") == 0 {
+			if ( (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) &&
+				(aggCrypto.PriceData[bar].Open != aggCrypto.PriceData[bar].Close) && 
+				(aggCrypto.PriceData[bar].High != aggCrypto.PriceData[bar].Low) ) {
+				Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+				if Epoch > from.Unix() && Epoch < to.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggCrypto.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggCrypto.PriceData[bar].Close
+					// If Polygon fails to provide intraday volume, we try to take from Tiingo historical daily volume (pro-rated)
+					// Livefilling volume is dependent on Polygon (Which should be fine)
+					if aggCrypto.PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggCrypto.PriceData[bar].Volume)
+					} else {
+						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
 				}
-				// Extra
-				ohlcv.HLC[Epoch] = float32((ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3)
-				ohlcv.TVAL[Epoch] = float32(ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch])
-				ohlcv.Spread[Epoch] = float32(ohlcv.High[Epoch] - ohlcv.Low[Epoch])
+			}
+		} else if strings.Compare(marketType, "forex") == 0 {
+			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) &&
+				(aggForex.PriceData[bar].Open != aggForex.PriceData[bar].Close) && 
+				(aggForex.PriceData[bar].High != aggForex.PriceData[bar].Low) ) {
+				Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+				if Epoch > from.Unix() && Epoch < to.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
+					// If Polygon fails to provide intraday volume, we try to take from Tiingo historical daily volume (pro-rated)
+					// Livefilling volume is dependent on Polygon (Which should be fine)
+					if aggForex.PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggForex.PriceData[bar].Volume)
+					} else {
+						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				}
+			}
+		} else if strings.Compare(marketType, "equity") == 0 {
+			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) &&
+				(aggEquity.PriceData[bar].Open != aggEquity.PriceData[bar].Close) && 
+				(aggEquity.PriceData[bar].High != aggEquity.PriceData[bar].Low) ) {
+				Epoch := (agg.PriceData[bar].Timestamp / 1000) + 60
+				if Epoch > from.Unix() && Epoch < to.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
+					// If Polygon fails to provide intraday volume, we try to take from Tiingo historical daily volume (pro-rated)
+					// Livefilling volume is dependent on Polygon (Which should be fine)
+					if aggEquity.PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggEquity.PriceData[bar].Volume)
+					} else {
+						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							if dailyVolume, ok := symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]; ok {
+								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				}
 			}
 		}
 	}
-	
 	if len(ohlcv.HLC) == 0 {
 		log.Info("%s [polygon] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
 		if length == 1 {

@@ -81,6 +81,9 @@ func (qf *QuanateeFetcher) Run() {
 	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
 
 	log.Info("Scanning for previous stock split events and fetching historical daily volume:")
+	for _, symbol := range qf.config.CryptoSymbols {
+		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
+	}
 	for _, symbol := range qf.config.ForexSymbols {
 		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
 	}
