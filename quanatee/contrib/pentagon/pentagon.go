@@ -139,18 +139,16 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	var wg2 sync.WaitGroup
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
-		if filler.IsMarketOpen("crypto", from) == true {
-			// Market is open
-			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "crypto", from, to)
-		} else if firstLoop == true {
+		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "crypto", from.Add(-crypto_limit*time.Minute), to)
-		}
-		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
 			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
+		} else if filler.IsMarketOpen("crypto", from) == true {
+			// Market is open
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "crypto", from, to)
 		}
 	}
 	wg2.Wait()
@@ -162,18 +160,16 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	var wg2 sync.WaitGroup
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
-		if filler.IsMarketOpen("forex", from) == true {
-			// Market is open
-			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from, to)
-		} else if firstLoop == true {
+		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "forex", from.Add(-forex_limit*time.Minute), to)
-		}
-		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
 			filler.BackfillMarket.LoadOrStore(symbol, "forex")
+		} else if filler.IsMarketOpen("forex", from) == true {
+			// Market is open
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "forex", from, to)
 		}
 	}
 	wg2.Wait()
@@ -184,18 +180,16 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	var wg2 sync.WaitGroup
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
-		if filler.IsMarketOpen("equity", from) == true {
-			// Market is open
-			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from, to)
-		} else if firstLoop == true {
+		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "equity", from.Add(-equity_limit*time.Minute), to)
-		}
-		if firstLoop == true {
 			filler.BackfillFrom.LoadOrStore(symbol, from)
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
+		} else if filler.IsMarketOpen("equity", from) == true {
+			// Market is open
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "equity", from, to)
 		}
 	}
 	wg2.Wait()
