@@ -50,6 +50,7 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	filler.BackfillMarket = &sync.Map{}
 	api4polygon.SplitEvents = &sync.Map{}
 	api4polygon.UpcomingSplitEvents = &sync.Map{}
+	api4polygon.DailyVolumes = &sync.Map{}
 	api4tiingo.DailyVolumes = &sync.Map{}
 	
 	startDate, _ := time.Parse("2006-01-02 03:04", config.QueryStart)
@@ -82,14 +83,17 @@ func (qf *QuanateeFetcher) Run() {
 
 	log.Info("Scanning for previous stock split events and fetching historical daily volume:")
 	for _, symbol := range qf.config.CryptoSymbols {
+		api4polygon.UpdateDailyVolumes(symbol, "crypto", qf.QueryStart)
 		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
 	}
 	for _, symbol := range qf.config.ForexSymbols {
+		api4polygon.UpdateDailyVolumes(symbol, "forex", qf.QueryStart)
 		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
 	}
 	for _, symbol := range qf.config.EquitySymbols {
-		api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+		api4polygon.UpdateDailyVolumes(symbol, "equity", qf.QueryStart)
 		api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
+		api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
 	}
 	log.Info("Scan complete.")
 	
