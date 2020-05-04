@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
-	"sync"
 
 	"net/http"
 	"net/url"
