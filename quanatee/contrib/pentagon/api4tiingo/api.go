@@ -169,6 +169,7 @@ func GetAggregates(
 		if strings.Compare(marketType, "crypto") == 0 {
 			if len(aggCrypto[0].PriceData) <= bar {
 				// Unknown issue that causes index out of range
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, length)
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
@@ -270,7 +271,8 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "forex") == 0 {
 			if len(aggForex.PriceData) <= bar {
-				// Unknown issue that causes index out of range (Probably malformed json)
+				// Unknown issue that causes index out of range
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, length)
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
@@ -367,6 +369,7 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
 			if len(aggEquity.PriceData) <= bar {
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, length)
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)

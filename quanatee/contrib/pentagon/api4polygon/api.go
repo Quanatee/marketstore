@@ -204,7 +204,7 @@ func GetAggregates(
 	for bar := 0; bar < length; bar++ {
 		if len(agg.PriceData) <= bar {
 			// Unknown issue that causes index out of range
-			log.Info("%s bar went too far %v/%v", bar, length)
+			log.Info("[polygon] %s bar went too far %v/%v", symbol, bar, length)
 			break
 		}
 		if agg.PriceData[bar].Open != 0 && agg.PriceData[bar].High != 0 && agg.PriceData[bar].Low != 0 && agg.PriceData[bar].Close != 0 {
