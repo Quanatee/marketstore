@@ -179,7 +179,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	var Epochs []int64
 	var Opens, Highs, Lows, Closes, Volumes, HLCs, TVALs, Spreads, Splits []float32
 	
-	symbolSplits_, _ := api4polygon.SplitEvents.Load(symbol)
+	symbolSplits_, _ := api.PolygonSplitEvents.Load(symbol)
 	var symbolSplits map[time.Time]float32
 	if symbolSplits_ != nil {
 		symbolSplits = symbolSplits_.(map[time.Time]float32)
