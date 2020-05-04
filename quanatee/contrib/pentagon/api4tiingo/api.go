@@ -169,13 +169,13 @@ func GetAggregates(
 	// We use Timestamp on close, so no change
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
-			if len(agg.PriceData) <= bar {
+			if len(aggCrypto[0].PriceData) <= bar {
 				// Unknown issue that causes index out of range
 				break
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggCrypto[0].PriceData[bar].Date)
 			if err_dt != nil {
-				return &OHLCV{}, err
+				continue
 			}
 			if ( (aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0) &&
 				(aggCrypto[0].PriceData[bar].Open != aggCrypto[0].PriceData[bar].Close) && 
@@ -216,7 +216,7 @@ func GetAggregates(
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggForex.PriceData[bar].Date)
 			if err_dt != nil {
-				break
+				continue
 			}
 			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) &&
 				(aggForex.PriceData[bar].Open != aggForex.PriceData[bar].Close) && 
@@ -253,7 +253,7 @@ func GetAggregates(
 			}
 			dt, err_dt := time.Parse(time.RFC3339, aggEquity.PriceData[bar].Date)
 			if err_dt != nil {
-				break
+				continue
 			}
 			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) &&
 				(aggEquity.PriceData[bar].Open != aggEquity.PriceData[bar].Close) && 
