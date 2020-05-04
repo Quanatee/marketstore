@@ -235,7 +235,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 						log.Info("%s backfill stopped. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
 						// Remove historical daily volume, keep only daily volume after time start just in case livefeed volume fails
-						symbolPolygonDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+						symbolPolygonDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
 						if symbolPolygonDailyVolume_ != nil {
 							symbolDailyVolume := symbolPolygonDailyVolume_.(map[time.Time]float32)
 							newDailyVolume := map[time.Time]float32
@@ -244,9 +244,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 									newDailyVolume[date] = volume
 								}
 							}
-							api4polygon.DailyVolumes.Store(symbol, symbolDailyVolume)
+							api.PolygonDailyVolumes.Store(symbol, symbolDailyVolume)
 						}
-						symbolTiingoDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						symbolTiingoDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
 						if symbolTiingoDailyVolume_ != nil {
 							symbolDailyVolume := symbolTiingoDailyVolume_.(map[time.Time]float32)
 							newDailyVolume := map[time.Time]float32
@@ -255,7 +255,7 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 									newDailyVolume[date] = volume
 								}
 							}
-							api4tiingo.DailyVolumes.Store(symbol, symbolDailyVolume)
+							api.TiingoDailyVolumes.Store(symbol, symbolDailyVolume)
 						}
 					}
 				}()
