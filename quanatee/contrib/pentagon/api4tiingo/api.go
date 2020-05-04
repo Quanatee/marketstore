@@ -14,7 +14,7 @@ import (
 	//"strconv"
 	"time"
 
-	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
 	"github.com/alpacahq/marketstore/utils/log"
 	"gopkg.in/matryer/try.v1"
 )
@@ -34,7 +34,6 @@ var (
 	start time.Time
 	apiKey 	 string
 	length = 0
-	DailyVolumes *sync.Map
 )
 
 func SetAPIKey(key string) {
@@ -74,7 +73,7 @@ func UpdateDailyVolumes(symbol string, queryStart time.Time) {
 			}
 		}
 		if len(symbolDailyVolume) > 0 {
-			DailyVolumes.Store(symbol, symbolDailyVolume)
+			api.TiingoDailyVolumes.Store(symbol, symbolDailyVolume)
 		}
 	}
 }
@@ -191,7 +190,7 @@ func GetAggregates(
 					} else {
 						// Try provider daily volume with options for livefill and backfill
 						volume_alt := false
-						symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+						symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							dailyVolume := float32(1)
@@ -227,7 +226,7 @@ func GetAggregates(
 						}
 						if volume_alt == true {
 							// Try alternative daily volume, or set to 1
-							symbolDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+							symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
 							if symbolDailyVolume_ != nil {
 								symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 								dt := time.Unix(Epoch, 0)
@@ -289,7 +288,7 @@ func GetAggregates(
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
 					// Try provider daily volume with options for livefill and backfill
 					volume_alt := false
-					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+					symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 						dailyVolume := float32(1)
@@ -325,7 +324,7 @@ func GetAggregates(
 					}
 					if volume_alt == true {
 						// Try alternative daily volume, or set to 1
-						symbolDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+						symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							dt := time.Unix(Epoch, 0)
@@ -385,7 +384,7 @@ func GetAggregates(
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
 					// Try provider daily volume with options for livefill and backfill
 					volume_alt := false
-					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+					symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 						dailyVolume := float32(1)
@@ -421,7 +420,7 @@ func GetAggregates(
 					}
 					if volume_alt == true {
 						// Try alternative daily volume, or set to 1
-						symbolDailyVolume_, _ := api4polygon.DailyVolumes.Load(symbol)
+						symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							dt := time.Unix(Epoch, 0)

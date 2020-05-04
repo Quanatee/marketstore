@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 	
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4twelve"
@@ -48,10 +49,10 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 	
 	filler.BackfillFrom = &sync.Map{}
 	filler.BackfillMarket = &sync.Map{}
-	api4polygon.SplitEvents = &sync.Map{}
-	api4polygon.UpcomingSplitEvents = &sync.Map{}
-	api4polygon.DailyVolumes = &sync.Map{}
-	api4tiingo.DailyVolumes = &sync.Map{}
+	api.PolygonSplitEvents = &sync.Map{}
+	api.PolygonUpcomingSplitEvents = &sync.Map{}
+	api.PolygonDailyVolumes = &sync.Map{}
+	api.TiingoDailyVolumes = &sync.Map{}
 	
 	startDate, _ := time.Parse("2006-01-02 03:04", config.QueryStart)
 	

@@ -14,7 +14,7 @@ import (
 	//"strconv"
 	"time"
 
-	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4tiingo"
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
 	"github.com/alpacahq/marketstore/utils/log"
 	"gopkg.in/matryer/try.v1"
 )
@@ -35,9 +35,6 @@ var (
 		"forex": "C:",
 		"equity": "",
 	}
-	SplitEvents *sync.Map
-	UpcomingSplitEvents *sync.Map
-	DailyVolumes *sync.Map
 )
 
 func SetAPIKey(key string) {
@@ -148,7 +145,7 @@ func UpdateDailyVolumes(symbol, marketType string, queryStart time.Time) {
 			}
 		}
 		if len(symbolDailyVolume) > 0 {
-			DailyVolumes.Store(symbol, symbolDailyVolume)
+			api.PolygonDailyVolumes.Store(symbol, symbolDailyVolume)
 		}
 	}
 }
@@ -226,7 +223,7 @@ func GetAggregates(
 				} else {
 					// Try provider daily volume with options for livefill and backfill
 					volume_alt := false
-					symbolDailyVolume_, _ := DailyVolumes.Load(symbol)
+					symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
 					if symbolDailyVolume_ != nil {
 						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 						dt := time.Unix(Epoch, 0)
@@ -263,7 +260,7 @@ func GetAggregates(
 					}
 					if volume_alt == true {
 						// Try alternative daily volume, or set to 1
-						symbolDailyVolume_, _ := api4tiingo.DailyVolumes.Load(symbol)
+						symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
 						if symbolDailyVolume_ != nil {
 							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 							dt := time.Unix(Epoch, 0)
