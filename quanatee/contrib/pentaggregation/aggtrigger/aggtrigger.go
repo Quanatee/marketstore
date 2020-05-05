@@ -290,12 +290,10 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	if cs.Exists("HLC") {
 		params = append(params, accumParam{"HLC", "avgr", "HLC"})
 		params = append(params, accumParam{"HLC", "roc", "ROC"}) // Original output
-		params = append(params, accumParam{"HLC", "std", "STD"}) // Original Output
     }
 	if cs.Exists("TVAL") {
 		params = append(params, accumParam{"TVAL", "sum", "TVAL"})
 		params = append(params, accumParam{"TVAL", "roc", "TROC"}) // Original output
-		params = append(params, accumParam{"TVAL", "std", "TSTD"}) // Original Output
     }
 	if cs.Exists("Spread") {
 		params = append(params, accumParam{"Spread", "avgr", "Spread"})

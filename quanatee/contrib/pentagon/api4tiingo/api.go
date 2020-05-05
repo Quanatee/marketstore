@@ -28,6 +28,7 @@ var (
 		"crypto": "%v/tiingo/crypto/prices",
 		"forex": "%v/tiingo/fx/%v/prices",
 		"equity": "%v/iex/%v/prices",
+		"futures": "%v/iex/%v/prices",
 	}
 	baseURL = "https://api.tiingo.com"
 	start time.Time
