@@ -99,7 +99,7 @@ func GetAggregates(
 	q := u.Query()
 	q.Set("token", apiKey)
 	q.Set("resampleFreq", multiplier+resolution)
-	q.Set("startDate", from.AddDate(0, 0, -1).Format("2006-01-02"))
+	q.Set("startDate", from.Format("2006-01-02"))
 	q.Set("endDate", to.AddDate(0, 0, 1).Format("2006-01-02"))
 	if strings.Compare(marketType, "crypto") == 0 {
 		q.Set("tickers", symbol)
@@ -593,7 +593,7 @@ func GetAggregates(
 	}
 
 	if len(ohlcv.HLC) == 0 {
-		log.Info("%s [tiingo] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
+		log.Debug("%s [tiingo] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
 	}
 	
 	return ohlcv, nil
