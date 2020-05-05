@@ -414,17 +414,17 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Tim
 		parsed, err := q.Parse()
 		if err != nil {
 			log.Error("%s query parse failure (%v), symbol data not available.", err)
-			return true
+			from = qf.QueryStart
 		}
 		scanner, err := executor.NewReader(parsed)
 		if err != nil {
 			log.Error("%s new scanner failure (%v)", err)
-			return true
+			from = qf.QueryStart
 		}
 		csm, err := scanner.Read()
 		if err != nil {
 			log.Error("%s scanner read failure (%v)", err)
-			return true
+			from = qf.QueryStart
 		}
 		epoch := csm[*tbk].GetEpoch()
 		if len(epoch) != 0 {
