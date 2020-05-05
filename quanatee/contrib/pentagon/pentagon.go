@@ -63,10 +63,10 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 
 const (
 	
-	crypto_limit = 167
-	forex_limit  = 167
-	equity_limit = 501
-	futures_limit  = 167
+	crypto_limit = 7
+	forex_limit  = 7
+	equity_limit = 21
+	futures_limit  = 7
 )
 
 // Run the QuanateeFetcher. It starts the streaming API as well as the
