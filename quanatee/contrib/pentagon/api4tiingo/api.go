@@ -112,6 +112,7 @@ func GetAggregates(
 	var aggCrypto []AggCrypto
 	var aggForex AggForex
 	var aggEquity AggEquity
+	var aggFutures AggFutures
 
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
@@ -119,6 +120,8 @@ func GetAggregates(
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex.PriceData)
 	} else if strings.Compare(marketType, "equity") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity.PriceData)
+	} else if strings.Compare(marketType, "futures") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggFutures.PriceData)
 	}
 
 	if err != nil {
@@ -135,6 +138,8 @@ func GetAggregates(
 		length = len(aggForex.PriceData)
 	} else if strings.Compare(marketType, "equity") == 0 {
 		length = len(aggEquity.PriceData)
+	} else if strings.Compare(marketType, "futures") == 0 {
+		length = len(aggFutures.PriceData)
 	}
 
 	if length == 0 {
@@ -165,7 +170,6 @@ func GetAggregates(
 	// Candle built from 14:04 to 14:05
 	// Timestamped at 14:05
 	// We use Timestamp on close, so no change
-
 	if strings.Compare(marketType, "crypto") == 0 {
 		for bar := 0; bar < len(aggCrypto[0].PriceData); bar++ {
 			if len(aggCrypto[0].PriceData) <= bar {
@@ -216,6 +220,8 @@ func GetAggregates(
 									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								case "equity":
 									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								case "futures":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								default:
 									volume_alt = true
 								}
@@ -253,6 +259,8 @@ func GetAggregates(
 										ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 									case "equity":
 										ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+									case "futures":
+										ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 									default:
 										ohlcv.Volume[Epoch] = float32(1)
 									}
@@ -317,6 +325,8 @@ func GetAggregates(
 								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							case "equity":
 								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							case "futures":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							default:
 								volume_alt = true
 							}
@@ -354,6 +364,8 @@ func GetAggregates(
 									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								case "equity":
 									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								case "futures":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								default:
 									ohlcv.Volume[Epoch] = float32(1)
 								}
@@ -416,6 +428,8 @@ func GetAggregates(
 								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							case "equity":
 								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							case "futures":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							default:
 								volume_alt = true
 							}
@@ -453,6 +467,111 @@ func GetAggregates(
 									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								case "equity":
 									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								case "futures":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								default:
+									ohlcv.Volume[Epoch] = float32(1)
+								}
+							} else {
+								ohlcv.Volume[Epoch] = float32(1)
+							}
+						} else {
+							ohlcv.Volume[Epoch] = float32(1)
+						}
+					}
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				}
+			}
+		}
+	} else if strings.Compare(marketType, "futures") == 0 {
+		for bar := 0; bar < len(aggFutures.PriceData); bar++ {
+			if len(aggFutures.PriceData) <= bar {
+				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, len(aggFutures.PriceData))
+				break
+			}
+			dt, err_dt := time.Parse(time.RFC3339, aggFutures.PriceData[bar].Date)
+			if err_dt != nil {
+				continue
+			}
+			if aggFutures.PriceData[bar].Open != 0 && aggFutures.PriceData[bar].High != 0 && aggFutures.PriceData[bar].Low != 0 && aggFutures.PriceData[bar].Close != 0 {
+				Epoch := dt.Unix()
+				if Epoch > from.Unix() && Epoch < to.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggFutures.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggFutures.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggFutures.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggFutures.PriceData[bar].Close
+					// Try provider daily volume with options for livefill and backfill
+					volume_alt := false
+					symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
+					if symbolDailyVolume_ != nil {
+						symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+						dailyVolume := float32(1)
+						if (to.Add(5*time.Minute)).After(time.Now()) {
+							// Livefill, get the last daily volume
+							last_date := time.Time{}
+							for date := range symbolDailyVolume {
+								if date.After(last_date) {
+									last_date = date
+								}
+							}
+							dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+						} else {
+							// Backfill, directly retrieve the daily volume
+							dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+						}
+						if dailyVolume != 0 {
+							switch marketType {
+							case "crytpo":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							case "forex":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							case "equity":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							case "futures":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+							default:
+								volume_alt = true
+							}
+						} else {
+							volume_alt = true
+						}
+					} else {
+						volume_alt = true
+					}
+					if volume_alt == true {
+						// Try alternative daily volume, or set to 1
+						symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
+						if symbolDailyVolume_ != nil {
+							symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+							dt := time.Unix(Epoch, 0)
+							dailyVolume := float32(1)
+							if (to.Add(5*time.Minute)).After(time.Now()) {
+								// Livefill, get the last daily volume
+								last_date := time.Time{}
+								for date := range symbolDailyVolume {
+									if date.After(last_date) {
+										last_date = date
+									}
+								}
+								dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+							} else {
+								// Backfill, directly retrieve the daily volume
+								dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+							}
+							if dailyVolume != 0 {
+								switch marketType {
+								case "crytpo":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "forex":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
+								case "equity":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								case "futures":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								default:
 									ohlcv.Volume[Epoch] = float32(1)
 								}
@@ -471,18 +590,9 @@ func GetAggregates(
 			}
 		}
 	}
-	
+
 	if len(ohlcv.HLC) == 0 {
 		log.Info("%s [tiingo] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
-		if length == 1 {
-			if strings.Compare(marketType, "crypto") == 0 {
-				log.Debug("%s [tiingo] Data: %v", symbol, aggCrypto[0])
-			} else if strings.Compare(marketType, "forex") == 0 {
-				log.Debug("%s [tiingo] Data: %v", symbol, aggForex)
-			} else if strings.Compare(marketType, "equity") == 0 {
-				log.Debug("%s [tiingo] Data: %v", symbol, aggEquity)
-			}
-		}
 	}
 	
 	return ohlcv, nil

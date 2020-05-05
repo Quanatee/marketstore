@@ -63,6 +63,12 @@ bgworkers:
         - NZDUSD
         - XAGUSD
         - XAUUSD
+      futures_symbols:
+       - DX
+       - CL
+       - NG
+       - ES
+       - NQ
       equity_symbols:
         - VXX 
         - VIXY 
@@ -259,7 +265,6 @@ bgworkers:
         # # DJI AND NASDAQ 100
         - WTI
         - ICE
-        - NG
         # - AAPL
         # - UNH
         # - HD

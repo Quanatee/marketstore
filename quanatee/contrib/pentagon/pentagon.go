@@ -35,6 +35,7 @@ type FetcherConfig struct {
 	CryptoSymbols	[]string `yaml:"crypto_symbols"`
 	ForexSymbols 	[]string `yaml:"forex_symbols"`
 	EquitySymbols   []string `yaml:"equity_symbols"`
+	FuturesSymbols  []string `yaml:"futures_symbols"`
 }
 
 // NewBgWorker returns a new instances of QuanateeFetcher. See FetcherConfig
@@ -62,9 +63,10 @@ func NewBgWorker(conf map[string]interface{}) (w bgworker.BgWorker, err error) {
 
 const (
 	
-	crypto_limit = 10000
-	forex_limit  = 10000
-	equity_limit = 40000
+	crypto_limit = 167
+	forex_limit  = 167
+	equity_limit = 501
+	futures_limit  = 167
 )
 
 // Run the QuanateeFetcher. It starts the streaming API as well as the
@@ -93,6 +95,11 @@ func (qf *QuanateeFetcher) Run() {
 		//api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
 		api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
 	}
+	for _, symbol := range qf.config.FuturesSymbols {
+		api4polygon.UpdateDailyVolumes(symbol, "futures", qf.QueryStart)
+		//api4tiingo.UpdateDailyVolumes(symbol, qf.QueryStart)
+		api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+	}
 	log.Info("Scan complete.")
 	
 	from := time.Now().Add(time.Minute)
@@ -110,7 +117,6 @@ func (qf *QuanateeFetcher) Run() {
 			} else {
 				log.Info("Sleeping for %v s", to.Sub(time.Now()))
 				time.Sleep(to.Sub(time.Now()))
-				time.Sleep(4*time.Second)
 			}
 		}
 		
@@ -122,6 +128,8 @@ func (qf *QuanateeFetcher) Run() {
 		go qf.liveForex(&wg, from, to, firstLoop)
 		wg.Add(1)
 		go qf.liveEquity(&wg, from, to, firstLoop)
+		wg.Add(1)
+		go qf.liveFutures(&wg, from, to, firstLoop)
 		wg.Wait()
 		log.Info("Livefill cycle completed.")
 
@@ -148,8 +156,8 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "crypto", from.Add(-crypto_limit*time.Minute), to)
-			filler.BackfillFrom.LoadOrStore(symbol, from)
+			go filler.Bars(&wg2, symbol, "crypto", from.AddDate(0, 0, -crypto_limit), to)
+			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 		} else if filler.IsMarketOpen("crypto", from) == true {
 			// Market is open
@@ -169,8 +177,8 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from.Add(-forex_limit*time.Minute), to)
-			filler.BackfillFrom.LoadOrStore(symbol, from)
+			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -forex_limit), to)
+			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "forex")
 		} else if filler.IsMarketOpen("forex", from) == true {
 			// Market is open
@@ -181,6 +189,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	wg2.Wait()
 	log.Debug("Livefill forex completed.")
 }
+
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
 	var wg2 sync.WaitGroup
@@ -189,8 +198,8 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from.Add(-equity_limit*time.Minute), to)
-			filler.BackfillFrom.LoadOrStore(symbol, from)
+			go filler.Bars(&wg2, symbol, "equity", from.AddDate(0, 0, -equity_limit), to)
+			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		} else if filler.IsMarketOpen("equity", from) == true {
 			// Market is open
@@ -200,6 +209,27 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	}
 	wg2.Wait()
 	log.Debug("Livefill equity completed.")
+}
+
+func (qf *QuanateeFetcher) liveFutures(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
+	defer wg.Done()
+	var wg2 sync.WaitGroup
+	// Loop Futures Symbols
+	for _, symbol := range qf.config.FuturesSymbols {
+		if firstLoop == true {
+			// Market is closed but we just started pentagon
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "futures", from.AddDate(0, 0, -futures_limit), to)
+			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
+			filler.BackfillMarket.LoadOrStore(symbol, "futures")
+		} else if filler.IsMarketOpen("futures", from) == true {
+			// Market is open
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "futures", from, to)
+		}
+	}
+	wg2.Wait()
+	log.Debug("Livefill futures completed.")
 }
 
 func (qf *QuanateeFetcher) workBackfillBars() {
@@ -230,8 +260,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 					wg.Add(1)
 					defer wg.Done()
 					// backfill the symbol
-					stop := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
-					if stop == true {
+					to := qf.backfillBars(symbol, marketType.(string), value.(time.Time))
+					if to.Unix() >= qf.TimeStarted.Unix() {
 						log.Info("%s backfill stopped. Last input: %v", symbol, value.(time.Time))
 						filler.BackfillFrom.Store(key, nil)
 						// Remove historical daily volume, keep only daily volume after time start just in case livefeed volume fails
@@ -257,6 +287,9 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 							}
 							api.TiingoDailyVolumes.Store(symbol, symbolDailyVolume)
 						}
+					} else {
+						// Set to as the next from
+						filler.BackfillFrom.Store(key, to)
 					}
 				}()
 			}
@@ -291,7 +324,12 @@ func (qf *QuanateeFetcher) DailyChecker() {
 			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
 			api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
 		}
-		log.Info("Checking for stock splits...")
+		for _, symbol := range qf.config.FuturesSymbols {
+			api4polygon.UpdateDailyVolumes(symbol, "futures", qf.TimeStarted)
+			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
+			api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+		}
+		log.Info("Checking for split events...")
 		for _, symbol := range qf.config.EquitySymbols {
 			
 			rebackfill_pg := api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
@@ -299,7 +337,7 @@ func (qf *QuanateeFetcher) DailyChecker() {
 
 			if rebackfill_pg == true && nil_if_not_backfilling == nil {
 				
-				log.Info("%s has a stock split event today, removing history and restarting backfill...", symbol)
+				log.Info("%s has a equity split event today, removing history and restarting backfill...", symbol)
 				// Delete entire tbk
 				tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 				err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
@@ -313,10 +351,38 @@ func (qf *QuanateeFetcher) DailyChecker() {
 				to = to.Add(1*time.Second)
 				go func() {
 					wg.Add(1)
-					filler.Bars(&wg, symbol, "equity", from.Add(-equity_limit*time.Minute), to)
+					filler.Bars(&wg, symbol, "equity", from.AddDate(0, 0, -equity_limit), to)
 					// Retrigger Backfill
 					filler.BackfillFrom.Store(symbol, from)
 					filler.BackfillMarket.Store(symbol, "equity")
+				}()
+			}
+		}
+		for _, symbol := range qf.config.FuturesSymbols {
+			
+			rebackfill_pg := api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+			nil_if_not_backfilling, _ := filler.BackfillMarket.Load(symbol)
+
+			if rebackfill_pg == true && nil_if_not_backfilling == nil {
+				
+				log.Info("%s has a futures split event today, removing history and restarting backfill...", symbol)
+				// Delete entire tbk
+				tbk  := io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
+				err := executor.ThisInstance.CatalogDir.RemoveTimeBucket(tbk)
+				if err != nil {
+					log.Error("removal of catalog entry failed: %s", err.Error())
+				}
+				// Start new "firstLoop" request
+				from := time.Now().Add(time.Minute)
+				from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
+				to := from.Add(time.Minute)
+				to = to.Add(1*time.Second)
+				go func() {
+					wg.Add(1)
+					filler.Bars(&wg, symbol, "futures", from.AddDate(0, 0, -futures_limit), to)
+					// Retrigger Backfill
+					filler.BackfillFrom.Store(symbol, from)
+					filler.BackfillMarket.Store(symbol, "futures")
 				}()
 			}
 		}
@@ -327,10 +393,9 @@ func (qf *QuanateeFetcher) DailyChecker() {
 }
 
 // Backfill bars from start
-func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time) bool {
+func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Time) (time.Time) {
 
 	var (
-		from time.Time
 		tbk  = io.NewTimeBucketKey(fmt.Sprintf("%s/1Min/Price", symbol))
 	)
 	
@@ -341,62 +406,49 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	q.AddTargetKey(tbk)
 	q.SetRowLimit(io.LAST, 1)
 	
-	switch marketType {
-	case "crypto":
-		end = end.Add(-crypto_limit*time.Minute).Add(-1440*time.Minute)
-	case "forex":
-		end = end.Add(-forex_limit*time.Minute).Add(-1440*time.Minute)
-	case "equity":
-		end = end.Add(-equity_limit*time.Minute).Add(-1440*time.Minute)
-	default:
-		end = end.Add(-equity_limit*time.Minute).Add(-1440*time.Minute)
-	}
+	end := qf.TimeStarted
 	q.SetEnd(end.Unix())
 	
-	parsed, err := q.Parse()
-	if err != nil {
-		log.Error("%s query parse failure (%v), symbol data not available.", err)
-		return true
+	if from.IsZero() {
+		// Dynamically find missing values
+		parsed, err := q.Parse()
+		if err != nil {
+			log.Error("%s query parse failure (%v), symbol data not available.", err)
+			return true
+		}
+		scanner, err := executor.NewReader(parsed)
+		if err != nil {
+			log.Error("%s new scanner failure (%v)", err)
+			return true
+		}
+		csm, err := scanner.Read()
+		if err != nil {
+			log.Error("%s scanner read failure (%v)", err)
+			return true
+		}
+		epoch := csm[*tbk].GetEpoch()
+		if len(epoch) != 0 {
+			from = time.Unix(epoch[len(epoch)-1], 0)
+		} else {
+			from = qf.QueryStart
+		}
 	}
-
-	scanner, err := executor.NewReader(parsed)
-	if err != nil {
-		log.Error("%s new scanner failure (%v)", err)
-		return true
-	}
-
-	csm, err := scanner.Read()
-	if err != nil {
-		log.Error("%s scanner read failure (%v)", err)
-		return true
-	}
-
-	epoch := csm[*tbk].GetEpoch()
-	stop := false
-
-	// has gap to fill
-	if len(epoch) != 0 {
-		from = time.Unix(epoch[len(epoch)-1], 0)
-	} else {
-		from = qf.QueryStart
-	}
-		
+	
 	to := from
 	// Keep requests under 5000 rows (Twelvedata limit). Equity gets more due to operating hours
 	switch marketType {
 	case "crypto":
-		to = to.Add(crypto_limit*time.Minute)
+		to = to.AddDate(0, 0, crypto_limit)
 	case "forex":
-		to = to.Add(forex_limit*time.Minute)
+		to = to.AddDate(0, 0, forex_limit)
 	case "equity":
-		to = to.Add(equity_limit*time.Minute)
+		to = to.AddDate(0, 0, equity_limit)
+	case "futures":
+		to = to.AddDate(0, 0, futures_limit)
 	default:
-		to = to.Add(equity_limit*time.Minute)
+		to = to.AddDate(0, 0, equity_limit)
 	}
-	if to.Unix() >= end.Unix() {
-		to = end
-		stop = true
-	}
+	
 	// log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
 	
 	// request & write the missing bars
@@ -404,7 +456,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, end time.Time
 	wg2.Add(1)
 	go filler.Bars(&wg2, symbol, marketType, from, to)
 	wg2.Wait()
-	return stop
+	return to
 }
 
 func main() {}

@@ -33,6 +33,7 @@ var (
 		"crypto": "X:",
 		"forex": "C:",
 		"equity": "",
+		"futures": "",
 	}
 )
 
@@ -248,6 +249,8 @@ func GetAggregates(
 								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							case "equity":
 								ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+							case "futures":
+								ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 							default:
 								volume_alt = true
 							}
@@ -285,6 +288,8 @@ func GetAggregates(
 									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								case "equity":
 									ohlcv.Volume[Epoch] = float32(dailyVolume/390)
+								case "futures":
+									ohlcv.Volume[Epoch] = float32(dailyVolume/1440)
 								default:
 									ohlcv.Volume[Epoch] = float32(1)
 								}
