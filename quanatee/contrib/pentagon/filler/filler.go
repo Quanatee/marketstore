@@ -56,37 +56,20 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		sources = append(sources, "polygon")
 		log.Debug("Adding Polygon %s A %v", symbol, len(ohlcvs))
 	}
-	if len(ohlcv.HLC) > 0 {
-		// Randomly run alt providers to ease api usage
-		rand.Seed(GetRandSeed())
-		if rand.Intn(3) <= 1 {
-			ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
-			if len(ohlcv_ti.HLC) > 0 {
-				ohlcvs = append(ohlcvs, ohlcv_ti)
-				sources = append(sources, "tiingo")
-				log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
-			}
-		} else {
-			ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
-			if len(ohlcv_tw.HLC) > 0 {
-				ohlcvs = append(ohlcvs, ohlcv_tw)
-				sources = append(sources, "twelve")
-				log.Debug("Adding Twelve %s R %v", symbol, len(ohlcvs))
-			}
-		}
-	} else {
-		// Run all alt providers since main provider failed to pull data
-		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
-		if len(ohlcv_ti.HLC) > 0 {
-			ohlcvs = append(ohlcvs, ohlcv_ti)
-			sources = append(sources, "tiingo")
-			log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
-		}
+	ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+	if len(ohlcv_ti.HLC) > 0 {
+		ohlcvs = append(ohlcvs, ohlcv_ti)
+		sources = append(sources, "tiingo")
+		log.Debug("Adding Tiingo %s R %v", symbol, len(ohlcvs))
+	}
+	// Randomly run alt providers to ease api usage
+	rand.Seed(GetRandSeed())
+	if rand.Intn(3) <= 1 {
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
 			ohlcvs = append(ohlcvs, ohlcv_tw)
 			sources = append(sources, "twelve")
-			log.Debug("Adding Tiingo %s F %v", symbol, len(ohlcvs))
+			log.Debug("Adding Twelve %s R %v", symbol, len(ohlcvs))
 		}
 	}
 	
