@@ -233,7 +233,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	executor.WriteCSM(csm, false)
 	
 	for _, timeframe := range timeframes {
-		err := api.writeAggregates(marketType, symbol, timeframe, "Price", cs, from, to)
+		err := api.WriteAggregates(marketType, symbol, timeframe, "Price", cs, from, to)
 		if err != nil {
 			log.Error("%s %s bars from: %v to %v WriteAggregates() failure: (%v)", symbol, filltype, from, to, err)
 		}
