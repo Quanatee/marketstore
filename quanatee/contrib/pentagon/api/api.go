@@ -201,8 +201,6 @@ func WriteAggregates(
 		}
 	}
 	
-	log.Info("%s, %v", tbk.String, cs)
-
 	for _, timeframe := range timeframes {
 
 		aggTbk := io.NewTimeBucketKeyFromString(symbol + "/" + timeframe + "/" + bucket)
