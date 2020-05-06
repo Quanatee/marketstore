@@ -131,7 +131,7 @@ func writeAggregates(
 			// Trim cs to keep only one days worth and store it
 			start := to.AddDate(0, 0, -1).Unix()
 			end := to.Unix()
-			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(&min_cs, &start, &end)
+			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(min_cs, &start, &end)
 			LivefillAggCache.Store(tbk.String(), &cachedAgg{
 				cs:   trimmed_cs,
 				from: to.AddDate(0, 0, -1),
@@ -145,7 +145,7 @@ func writeAggregates(
 			// Trim cs to keep only one days worth and store it
 			start := to.AddDate(0, 0, -1).Unix()
 			end := to.Unix()
-			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(&min_cs, &start, &end)
+			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(min_cs, &start, &end)
 			BackfillAggCache.Store(tbk.String(), &cachedAgg{
 				cs:   trimmed_cs,
 				from: to.AddDate(0, 0, -1),
@@ -161,7 +161,7 @@ func writeAggregates(
 	window := utils.CandleDurationFromString(timeframe_duration.String)
 	start := window.Truncate(from).Unix()
 	end := window.Ceil(to).Add(-time.Second).Unix()
-	slc, err := io.SliceColumnSeriesByEpoch(&cs, &start, &end)
+	slc, err := io.SliceColumnSeriesByEpoch(cs, &start, &end)
 	if err != nil {
 		return err
 	}
