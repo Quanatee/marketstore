@@ -184,7 +184,7 @@ func writeAggregates(
 	
 	csm := io.NewColumnSeriesMap()
 	if len(tqSlc.GetEpoch()) > 0 {
-		csm.AddColumnSeries(*aggTbk, aggregate(tqSlc, aggTbk))
+		csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, &aggTbk))
 	}
 	
 	return executor.WriteCSM(csm, false)
