@@ -24,7 +24,7 @@ var (
 )
 
 type Slice struct {
-    sort.Interface
+	sort.IntSlice
     idx []int
 }
 
@@ -172,7 +172,7 @@ func WriteAggregates(
 		}
 	}
 
-	epochs := cs.GetColumn("Epoch")
+	epochs := cs.GetColumn("Epoch").([]int64)
 	// Returns the indices that would sort cs
 	indices := Sort(epochs)
 	for column_key, column_values_ := range cs.GetColumns() {
