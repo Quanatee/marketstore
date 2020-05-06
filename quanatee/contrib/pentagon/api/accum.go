@@ -1,4 +1,4 @@
-package aggtrigger
+package api
 
 import (
 	"fmt"

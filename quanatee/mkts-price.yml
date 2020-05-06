@@ -11,15 +11,6 @@ timezone: "UTC"
 triggers:
   - module: stream.so
     on: "*/*/*"
-  - module: pentaggregation.so
-    on: "*/1Min/Price"
-    config:
-      destinations:
-        - 6Min
-        - 12Min
-        - 15Min
-        - 1H
-        - 4H
 bgworkers:
   - module: pentagon.so
     config:
@@ -27,6 +18,12 @@ bgworkers:
       tiingo_api_key: <tiingo_api_key>
       twelve_api_key: <twelve_api_key>
       query_start: 2017-01-01 00:00
+      timeframes:
+        - 6Min
+        - 12Min
+        - 15Min
+        - 1H
+        - 4H
       crypto_symbols:
         - BTCUSD
         - BNBUSD

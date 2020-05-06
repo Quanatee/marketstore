@@ -32,6 +32,7 @@ type FetcherConfig struct {
     TiingoApiKey    string   `yaml:"tiingo_api_key"`
 	TwelveApiKey    string   `yaml:"twelve_api_key"`
 	QueryStart      string   `yaml:"query_start"`
+    Timeframes	    []string `yaml:"timeframes"`
 	CryptoSymbols	[]string `yaml:"crypto_symbols"`
 	ForexSymbols 	[]string `yaml:"forex_symbols"`
 	EquitySymbols   []string `yaml:"equity_symbols"`
@@ -159,7 +160,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 			go filler.Bars(&wg2, symbol, "crypto", from.AddDate(0, 0, -crypto_limit), to)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
-		} else if filler.IsMarketOpen("crypto", from) == true {
+		} else if api.IsMarketOpen("crypto", from) == true {
 			// Market is open
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "crypto", from, to)
@@ -180,7 +181,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -forex_limit), to)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "forex")
-		} else if filler.IsMarketOpen("forex", from) == true {
+		} else if api.IsMarketOpen("forex", from) == true {
 			// Market is open
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "forex", from, to)
@@ -201,7 +202,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 			go filler.Bars(&wg2, symbol, "equity", from.AddDate(0, 0, -equity_limit), to)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
-		} else if filler.IsMarketOpen("equity", from) == true {
+		} else if api.IsMarketOpen("equity", from) == true {
 			// Market is open
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "equity", from, to)
@@ -222,7 +223,7 @@ func (qf *QuanateeFetcher) liveFutures(wg *sync.WaitGroup, from, to time.Time, f
 			go filler.Bars(&wg2, symbol, "futures", from.AddDate(0, 0, -futures_limit), to)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "futures")
-		} else if filler.IsMarketOpen("futures", from) == true {
+		} else if api.IsMarketOpen("futures", from) == true {
 			// Market is open
 			wg2.Add(1)
 			go filler.Bars(&wg2, symbol, "futures", from, to)

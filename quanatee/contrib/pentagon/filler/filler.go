@@ -25,18 +25,6 @@ var (
 	BackfillMarket *sync.Map
 )
 
-type OHLCV struct {
-	Open      map[int64]float32
-	High      map[int64]float32
-	Low       map[int64]float32
-	Close     map[int64]float32
-	Volume    map[int64]float32
-	HLC       map[int64]float32
-	TVAL      map[int64]float32
-	Spread    map[int64]float32
-	Split     map[int64]float32
-}
-
 func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	defer wg.Done()
 	if from.IsZero() {
@@ -47,7 +35,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 		to = time.Now()
 	}
 	
-	var ohlcvs []OHLCV
+	var ohlcvs []api.OHLCV
 	var sources []string
 
 	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
@@ -241,15 +229,17 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/1Min/Price")
 	csm := io.NewColumnSeriesMap()
 	csm.AddColumnSeries(*tbk, cs)
-
+	
 	executor.WriteCSM(csm, false)
+	
+	api.writeAggregates(symbol, "1Min", "Price", cs, from, to)
 	
 }
 
 
 func GetDataFromProvider(
 	provider, symbol, marketType string,
-	from, to time.Time) (OHLCV) {
+	from, to time.Time) (api.OHLCV) {
 	
 	filltype := "backfill"
 	if (to.Add(5*time.Minute)).After(time.Now()) {
@@ -263,7 +253,7 @@ func GetDataFromProvider(
 			log.Error("[polygon] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
-				reconstruct := OHLCV{
+				reconstruct := api.OHLCV{
 					Open: ohlcv.Open,
 					High: ohlcv.High,
 					Low: ohlcv.Low,
@@ -282,7 +272,7 @@ func GetDataFromProvider(
 			log.Error("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
-				reconstruct := OHLCV{
+				reconstruct := api.OHLCV{
 					Open: ohlcv.Open,
 					High: ohlcv.High,
 					Low: ohlcv.Low,
@@ -297,13 +287,13 @@ func GetDataFromProvider(
 		}
 	case "twelve":
 		// Twelve is not stable
-		return OHLCV{}
+		return api.OHLCV{}
 		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			log.Error("[twelve] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			if len(ohlcv.HLC) > 0 {
-				reconstruct := OHLCV{
+				reconstruct := api.OHLCV{
 					Open: ohlcv.Open,
 					High: ohlcv.High,
 					Low: ohlcv.Low,
@@ -317,47 +307,8 @@ func GetDataFromProvider(
 			}
 		}
 	}
-	return OHLCV{}
+	return api.OHLCV{}
 }
-
-func IsMarketOpen(
-	marketType string,
-	from time.Time) (bool) {
-
-	switch marketType {
-	case "crytpo":
-		return true
-	case "forex":
-		if ( 
-			( from.Weekday() == 0 && from.Hour() >= 22 ) ||
-			( from.Weekday() >= 1 && from.Weekday() <= 4 ) ||
-			( from.Weekday() == 5 && from.Hour() <= 21 ) ) {
-			return true
-		} else {
-			return false
-		}
-	case "equity":
-		if ( 
-			( from.Weekday() >= 1 && from.Weekday() <= 5 ) &&
-			( from.Hour() >= 13 && from.Hour() <= 21 ) ) {
-			return true
-		} else {
-			return false
-		}
-	case "futures":
-		if ( 
-			( from.Weekday() == 0 && from.Hour() >= 22 ) ||
-			( from.Weekday() >= 1 && from.Weekday() <= 4 ) ||
-			( from.Weekday() == 5 && from.Hour() <= 21 ) ) {
-			return true
-		} else {
-			return false
-		}
-	}
-
-	return true
-}
-
 
 func GetRandSeed() (int64) {
 	var b [8]byte
