@@ -117,7 +117,7 @@ func IsFuturesMarketOpen(epoch int64) bool {
 	return true
 }
 
-func writeAggregates(
+func WriteAggregates(
 	marketType, symbol, timeframe, bucket string,
 	min_cs io.ColumnSeries,
 	from, to time.Time) error {
