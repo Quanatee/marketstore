@@ -128,7 +128,7 @@ func writeAggregates(
 		if v, ok := LivefillAggCache.Load(tbk.String()); ok {
 			c := v.(*cachedAgg)
 			// Trim cs to keep only one days worth and store it
-			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(cs, to.AddDate(0, 0, -1), to)
+			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(cs, to.AddDate(0, 0, -1).Unix(), to.Unix())
 			LivefillAggCache.Store(tbk.String(), &cachedAgg{
 				cs:   trimmed_cs,
 				from: to.AddDate(0, 0, -1),
@@ -140,7 +140,7 @@ func writeAggregates(
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
 			c := v.(*cachedAgg)
 			// Trim cs to keep only one days worth and store it
-			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(cs, to.AddDate(0, 0, -1), to)
+			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(cs, to.AddDate(0, 0, -1).Unix(), to.Unix())
 			BackfillAggCache.Store(tbk.String(), &cachedAgg{
 				cs:   trimmed_cs,
 				from: to.AddDate(0, 0, -1),
