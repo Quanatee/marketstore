@@ -40,7 +40,6 @@ plugins:
 	# $(MAKE) -C contrib/iex
 	# $(MAKE) -C contrib/xignitefeeder
 	$(MAKE) -C quanatee/contrib/pentagon
-	$(MAKE) -C quanatee/contrib/pentaggregation
 
 fmt:
 	GOFLAGS=$(GOFLAGS) go fmt ./...
