@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 	"github.com/alpacahq/marketstore/utils"
+	"github.com/alpacahq/marketstore/utils/io"
 	"github.com/alpacahq/marketstore/executor"
 )
 
@@ -79,6 +80,7 @@ func IsCryptoMarketOpen(epoch int64) bool {
 }
 
 func IsForexMarketOpen(epoch int64) bool {
+	t := time.Unix(epoch, 0)
 	if ( 
 		( t.Weekday() == 0 && t.Hour() >= 22 ) ||
 		( t.Weekday() >= 1 && t.Weekday() <= 4 ) ||
