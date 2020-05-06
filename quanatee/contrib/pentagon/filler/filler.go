@@ -232,11 +232,6 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	
 	executor.WriteCSM(csm, false)
 	
-func WriteAggregates(
-	marketType, symbol, timeframe, bucket string,
-	min_cs io.ColumnSeries,
-	from, to time.Time) error {
-
 	for _, timeframe := range timeframes {
 		err := api.writeAggregates(marketType, symbol, timeframe, "Price", cs, from, to)
 		if err != nil {
@@ -244,7 +239,6 @@ func WriteAggregates(
 		}
 	}
 }
-
 
 func GetDataFromProvider(
 	provider, symbol, marketType string,
