@@ -175,20 +175,22 @@ func WriteAggregates(
 	epochs := cs.GetColumn("Epoch")
 	// Returns the indices that would sort cs
 	indices := Sort(epochs)
-	for column_key, column_values := range cs.columns {
+	for column_key, column_values := range cs.GetColumns() {
 		switch column_key {
 		case "Epoch":
 			var sorted_values []int64
 			for _, index := range indices {	
 				sorted_values = append(column_values[index])
 			}
-			cs.columns[column_key] = sorted_values
+			cs.Remove("Epoch")
+			cs.AddColumn("Epoch", sorted_values)
 		default:
 			var sorted_values []float32
 			for _, index := range indices {
 				sorted_values = append(column_values[index])
 			}
-			cs.columns[column_key] = sorted_values
+			cs.Remove(column_key)
+			cs.AddColumn(column_key, sorted_values)
 		}
 	}
 	
