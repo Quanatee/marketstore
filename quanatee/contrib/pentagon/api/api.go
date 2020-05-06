@@ -181,7 +181,7 @@ func WriteAggregates(
 			column_values := column_values_.([]int64)
 			var sorted_values []int64
 			for _, index := range indices {	
-				sorted_values = append(column_values[index])
+				sorted_values = append(sorted_values, column_values[index])
 			}
 			cs.Remove("Epoch")
 			cs.AddColumn("Epoch", sorted_values)
@@ -189,7 +189,7 @@ func WriteAggregates(
 			column_values := column_values_.([]float32)
 			var sorted_values []float32
 			for _, index := range indices {
-				sorted_values = append(column_values[index])
+				sorted_values = append(sorted_values, column_values[index])
 			}
 			cs.Remove(column_key)
 			cs.AddColumn(column_key, sorted_values)
