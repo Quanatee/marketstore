@@ -172,15 +172,24 @@ func WriteAggregates(
 		}
 	}
 
-	entries := cs.GetTime()
+	epochs := cs.columns["Epoch"]
 	// Returns the indices that would sort cs
-	indices := Sort(entries)
+	indices := Sort(epochs)
 	for column_key, column_values := range cs.columns {
-		var sorted_values []float32
-		for _, index := range indices {
-			sorted_values = append(column_values[index])
+		switch provider {
+		case "Epoch":
+			var sorted_values []int64
+			for _, index := range indices {
+				sorted_values = append(column_values[index])
+			}
+			cs.columns[column_key] = sorted_values
+		default:
+			var sorted_values []float32
+			for _, index := range indices {
+				sorted_values = append(column_values[index])
+			}
+			cs.columns[column_key] = sorted_values
 		}
-		cs.columns[column_key] = sorted_values
 	}
 	
 	log.Info("%s, %v", tbk.String, cs)
