@@ -172,7 +172,7 @@ func WriteAggregates(
 		}
 	}
 
-	epochs := cs.GetColumn("Epoch").([]int64)
+	epochs := cs.GetColumn("Epoch").([]int)
 	// Returns the indices that would sort cs
 	indices := Sort(sort.IntSlice(epochs))
 	
