@@ -178,7 +178,7 @@ func WriteAggregates(
 	for column_key, column_values := range cs.columns {
 		var sorted_values []float32
 		for _, index := range indices {
-			sorted_values = append(column_value[index])
+			sorted_values = append(column_values[index])
 		}
 		cs.columns[column_key] = sorted_values
 	}
