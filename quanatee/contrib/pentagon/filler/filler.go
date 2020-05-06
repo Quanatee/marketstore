@@ -232,7 +232,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	
 	executor.WriteCSM(csm, false)
 	
-	api.writeAggregates(marketType, symbol, "1Min", "Price", cs, from, to)
+	api.writeAggregates(marketType, symbol, "1Min", "Price", &cs, from, to)
 
 }
 

@@ -119,7 +119,7 @@ func IsFuturesMarketOpen(epoch int64) bool {
 
 func writeAggregates(
 	marketType, symbol, timeframe, bucket string,
-	min_cs io.ColumnSeries,
+	min_cs *io.ColumnSeries,
 	from, to time.Time) error {
 	
 	cs:= io.NewColumnSeries()
@@ -137,7 +137,7 @@ func writeAggregates(
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(min_cs, &c.cs)
+			cs = io.ColumnSeriesUnion(min_cs, &min_c.cs)
 		}
 	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
