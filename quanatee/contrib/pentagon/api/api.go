@@ -208,7 +208,8 @@ func WriteAggregates(
 		
 		window := utils.CandleDurationFromString(timeframe_duration.String)
 		start := window.Truncate(from).Unix()
-		end := window.Ceil(to).Add(-time.Second).Unix()
+		// end := window.Ceil(to).Add(-time.Second).Unix() // OG from aggtrigger
+		end := window.Ceil(to).Unix()
 		
 		slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
 		if err != nil {
@@ -287,7 +288,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 		}
 	}
 	// accumulate any remaining values if not yet
-	// outEpoch = append(outEpoch, groupKey.Unix())
+	outEpoch = append(outEpoch, groupKey.Unix())
 	accumGroup.apply(groupStart, len(ts))
 	
 	// finalize output
