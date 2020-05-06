@@ -141,7 +141,7 @@ func WriteAggregates(
 			})
 			cs = io.ColumnSeriesUnion(&min_cs, &min_c.cs)
 		} else {
-			cs = min_cs
+			cs = *min_cs
 		}
 	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
@@ -157,7 +157,7 @@ func WriteAggregates(
 			})
 			cs = io.ColumnSeriesUnion(&min_cs, &min_c.cs)
 		} else {
-			cs = min_cs
+			cs = *min_cs
 		}
 	}
 	
@@ -196,6 +196,7 @@ func WriteAggregates(
 		
 		csm := io.NewColumnSeriesMap()
 		if len(tqSlc.GetEpoch()) > 0 {
+			log.Info("Running %s len(%v)", aggTbk.String(), len(tqSlc.GetEpoch()))
 			csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, aggTbk))
 		}
 		
