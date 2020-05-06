@@ -287,7 +287,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 		}
 	}
 	// accumulate any remaining values if not yet
-	outEpoch = append(outEpoch, groupKey.Unix())
+	// outEpoch = append(outEpoch, groupKey.Unix())
 	accumGroup.apply(groupStart, len(ts))
 	
 	// finalize output
