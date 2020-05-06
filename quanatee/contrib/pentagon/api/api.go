@@ -230,10 +230,13 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 
 	ts := cs.GetTime()
 	outEpoch := make([]int64, 0)
+
 	
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 	
 	groupKey := timeWindow.Truncate(ts[0])
+	log.Info("%v", ts)
+	log.Info("%v", groupKey)
 	groupStart := 0
 	// accumulate inputs.  Since the input is ordered by
 	// time, it is just to slice by correct boundaries
