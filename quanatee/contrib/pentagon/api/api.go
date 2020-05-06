@@ -155,9 +155,9 @@ func writeAggregates(
 	}
 	
 	aggTbk := io.NewTimeBucketKeyFromString(symbol + "/" + timeframe + "/" + bucket)
-	timeframe := utils.CandleDurationFromString(aggTbk.GetItemInCategory("Timeframe"))
+	timeframe_duration := utils.CandleDurationFromString(timeframe)
 	
-	window := utils.CandleDurationFromString(timeframe.String)
+	window := utils.CandleDurationFromString(timeframe_duration.String)
 	start := window.Truncate(from).Unix()
 	end := window.Ceil(to).Add(-time.Second).Unix()
 	slc, err := io.SliceColumnSeriesByEpoch(cs, &start, &end)
