@@ -172,14 +172,14 @@ func WriteAggregates(
 		}
 	}
 
-	epochs := cs.columns["Epoch"]
+	epochs := cs.GetColumn("Epoch")
 	// Returns the indices that would sort cs
 	indices := Sort(epochs)
 	for column_key, column_values := range cs.columns {
-		switch provider {
+		switch column_key {
 		case "Epoch":
 			var sorted_values []int64
-			for _, index := range indices {
+			for _, index := range indices {	
 				sorted_values = append(column_values[index])
 			}
 			cs.columns[column_key] = sorted_values
