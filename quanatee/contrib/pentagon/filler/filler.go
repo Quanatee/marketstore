@@ -233,7 +233,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	executor.WriteCSM(csm, false)
 	
 	api.writeAggregates(symbol, "1Min", "Price", cs, from, to)
-	
+
 }
 
 
@@ -267,6 +267,7 @@ func GetDataFromProvider(
 			}
 		}
 	case "tiingo":
+		return api.OHLCV{}
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			log.Error("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)

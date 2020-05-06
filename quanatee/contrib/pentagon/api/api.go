@@ -134,7 +134,7 @@ func writeAggregates(
 			})
 			cs = io.ColumnSeriesUnion(cs, &c.cs)
 		}
-	else {
+	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
 			c := v.(*cachedAgg)
 			// Trim cs to keep only one days worth and store it
