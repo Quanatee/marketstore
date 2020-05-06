@@ -22,6 +22,16 @@ var (
 	BackfillAggCache *sync.Map
 )
 
+type Slice struct {
+    sort.Interface
+    idx []int
+}
+
+func (s Slice) Swap(i, j int) {
+    s.Interface.Swap(i, j)
+    s.idx[i], s.idx[j] = s.idx[j], s.idx[i]
+}
+
 type OHLCV struct {
 	Open      map[int64]float32
 	High      map[int64]float32
@@ -160,7 +170,20 @@ func WriteAggregates(
 			cs = &min_cs
 		}
 	}
+
+	entries := cs.GetTime()
+	// Returns the indices that would sort cs
+	indices := Sort(entries)
+	for column_key, column_values := range cs.columns {
+		var sorted_values []float32
+		for _, index := range indices {
+			sorted_values = append(column_value[index])
+		}
+		cs.columns[column_key] = sorted_values
+	}
 	
+	log.Info("%s, %v", tbk.String, cs)
+
 	for _, timeframe := range timeframes {
 
 		aggTbk := io.NewTimeBucketKeyFromString(symbol + "/" + timeframe + "/" + bucket)
@@ -230,7 +253,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 
 	ts := cs.GetTime()
 	outEpoch := make([]int64, 0)
-	log.Info("%s %v", tbk.String, ts)
+	
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 	
 	groupKey := timeWindow.Truncate(ts[0])
