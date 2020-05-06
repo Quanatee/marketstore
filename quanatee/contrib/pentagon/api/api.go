@@ -122,7 +122,7 @@ func writeAggregates(
 	min_cs io.ColumnSeries,
 	from, to time.Time) error {
 	
-	cs:= io.NewColumnSeries()
+	cs := io.NewColumnSeries()
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/" + "1Min" + "/" + bucket)
 	
 	if (to.Add(5*time.Minute)).After(time.Now()) {
@@ -137,7 +137,7 @@ func writeAggregates(
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(min_cs, &min_c.cs)
+			cs = io.ColumnSeriesUnion(&min_cs, &min_c.cs)
 		}
 	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
@@ -151,7 +151,7 @@ func writeAggregates(
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(min_cs, &min_c.cs)
+			cs = io.ColumnSeriesUnion(&min_cs, &min_c.cs)
 		}
 	}
 	
