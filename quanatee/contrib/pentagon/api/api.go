@@ -140,6 +140,8 @@ func WriteAggregates(
 				to: to,
 			})
 			cs = io.ColumnSeriesUnion(&min_cs, &min_c.cs)
+		} else {
+			cs = min_cs
 		}
 	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
@@ -154,6 +156,8 @@ func WriteAggregates(
 				to: to,
 			})
 			cs = io.ColumnSeriesUnion(&min_cs, &min_c.cs)
+		} else {
+			cs = min_cs
 		}
 	}
 	
@@ -165,6 +169,9 @@ func WriteAggregates(
 		window := utils.CandleDurationFromString(timeframe_duration.String)
 		start := window.Truncate(from).Unix()
 		end := window.Ceil(to).Add(-time.Second).Unix()
+		
+		log.Info("Running %s %v %v %v", aggTbk.String(), window, start, end)
+		
 		slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
 		if err != nil {
 			log.Error("%s/%s/%s: %v", symbol, timeframe, bucket, err)
