@@ -119,38 +119,39 @@ func IsFuturesMarketOpen(epoch int64) bool {
 
 func writeAggregates(
 	marketType, symbol, timeframe, bucket string,
-	cs io.ColumnSeries,
+	min_cs io.ColumnSeries,
 	from, to time.Time) error {
-
+	
+	cs:= io.NewColumnSeries()
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/" + "1Min" + "/" + bucket)
-
+	
 	if (to.Add(5*time.Minute)).After(time.Now()) {
 		if v, ok := LivefillAggCache.Load(tbk.String()); ok {
-			c := v.(*cachedAgg)
+			min_c := v.(*cachedAgg)
 			// Trim cs to keep only one days worth and store it
 			start := to.AddDate(0, 0, -1).Unix()
 			end := to.Unix()
-			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(cs, &start, &end)
+			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(min_cs, &start, &end)
 			LivefillAggCache.Store(tbk.String(), &cachedAgg{
 				cs:   trimmed_cs,
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(cs, c.cs)
+			cs = io.ColumnSeriesUnion(min_cs, &c.cs)
 		}
 	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
-			c := v.(*cachedAgg)
+			min_c := v.(*cachedAgg)
 			// Trim cs to keep only one days worth and store it
 			start := to.AddDate(0, 0, -1).Unix()
 			end := to.Unix()
-			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(cs, &start, &end)
+			trimmed_cs, _ := io.SliceColumnSeriesByEpoch(min_cs, &start, &end)
 			BackfillAggCache.Store(tbk.String(), &cachedAgg{
 				cs:   trimmed_cs,
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(cs, c.cs)
+			cs = io.ColumnSeriesUnion(min_cs, &min_c.cs)
 		}
 	}
 	
