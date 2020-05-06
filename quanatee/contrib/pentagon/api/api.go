@@ -29,7 +29,7 @@ type Slice struct {
 }
 
 func (s Slice) Swap(i, j int) {
-    s.Interface.Swap(i, j)
+	s.IntSlice.Swap(i, j)
     s.idx[i], s.idx[j] = s.idx[j], s.idx[i]
 }
 
