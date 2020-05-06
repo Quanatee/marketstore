@@ -173,18 +173,18 @@ func writeAggregates(
 	
 	switch marketType {
 	case "crytpo":
-		tqSlc = slc.ApplyTimeQual(IsCryptoMarketOpen)
+		tqSlc = *slc.ApplyTimeQual(IsCryptoMarketOpen)
 	case "forex":
-		tqSlc = slc.ApplyTimeQual(IsForexMarketOpen)
+		tqSlc = *slc.ApplyTimeQual(IsForexMarketOpen)
 	case "equity":
-		tqSlc = slc.ApplyTimeQual(IsEquityMarketOpen)
+		tqSlc = *slc.ApplyTimeQual(IsEquityMarketOpen)
 	case "futures":
-		tqSlc = slc.ApplyTimeQual(IsFuturesMarketOpen)
+		tqSlc = *slc.ApplyTimeQual(IsFuturesMarketOpen)
 	}
 	
 	csm := io.NewColumnSeriesMap()
 	if len(tqSlc.GetEpoch()) > 0 {
-		csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, &aggTbk))
+		csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, *aggTbk))
 	}
 	
 	return executor.WriteCSM(csm, false)
