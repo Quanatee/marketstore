@@ -118,10 +118,11 @@ func IsFuturesMarketOpen(epoch int64) bool {
 }
 
 func WriteAggregates(
-	marketType, symbol, timeframe, bucket string,
+	marketType, symbol, bucket string,
+	timeframes []string,
 	min_cs io.ColumnSeries,
-	from, to time.Time) error {
-	
+	from, to time.Time) {
+
 	cs := io.NewColumnSeries()
 	tbk := io.NewTimeBucketKeyFromString(symbol + "/" + "1Min" + "/" + bucket)
 	
@@ -155,39 +156,42 @@ func WriteAggregates(
 		}
 	}
 	
-	aggTbk := io.NewTimeBucketKeyFromString(symbol + "/" + timeframe + "/" + bucket)
-	timeframe_duration := utils.CandleDurationFromString(timeframe)
-	
-	window := utils.CandleDurationFromString(timeframe_duration.String)
-	start := window.Truncate(from).Unix()
-	end := window.Ceil(to).Add(-time.Second).Unix()
-	slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
-	if err != nil {
-		return err
-	}
-	if len(slc.GetEpoch()) == 0 {
-		return nil
-	}
+	for _, timeframe := range timeframes {
 
-	var tqSlc io.ColumnSeries
+		aggTbk := io.NewTimeBucketKeyFromString(symbol + "/" + timeframe + "/" + bucket)
+		timeframe_duration := utils.CandleDurationFromString(timeframe)
+		
+		window := utils.CandleDurationFromString(timeframe_duration.String)
+		start := window.Truncate(from).Unix()
+		end := window.Ceil(to).Add(-time.Second).Unix()
+		slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
+		if err != nil {
+			return err
+		}
+		if len(slc.GetEpoch()) == 0 {
+			return nil
+		}
 	
-	switch marketType {
-	case "crytpo":
-		tqSlc = *slc.ApplyTimeQual(IsCryptoMarketOpen)
-	case "forex":
-		tqSlc = *slc.ApplyTimeQual(IsForexMarketOpen)
-	case "equity":
-		tqSlc = *slc.ApplyTimeQual(IsEquityMarketOpen)
-	case "futures":
-		tqSlc = *slc.ApplyTimeQual(IsFuturesMarketOpen)
+		var tqSlc io.ColumnSeries
+		
+		switch marketType {
+		case "crytpo":
+			tqSlc = *slc.ApplyTimeQual(IsCryptoMarketOpen)
+		case "forex":
+			tqSlc = *slc.ApplyTimeQual(IsForexMarketOpen)
+		case "equity":
+			tqSlc = *slc.ApplyTimeQual(IsEquityMarketOpen)
+		case "futures":
+			tqSlc = *slc.ApplyTimeQual(IsFuturesMarketOpen)
+		}
+		
+		csm := io.NewColumnSeriesMap()
+		if len(tqSlc.GetEpoch()) > 0 {
+			csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, aggTbk))
+		}
+		
+		executor.WriteCSM(csm, false)
 	}
-	
-	csm := io.NewColumnSeriesMap()
-	if len(tqSlc.GetEpoch()) > 0 {
-		csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, aggTbk))
-	}
-	
-	return executor.WriteCSM(csm, false)
 }
 
 func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
