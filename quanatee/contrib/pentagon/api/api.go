@@ -208,8 +208,7 @@ func WriteAggregates(
 		
 		window := utils.CandleDurationFromString(timeframe_duration.String)
 		start := window.Truncate(from).Unix()
-		// end := window.Ceil(to).Add(-time.Second).Unix() // OG from aggtrigger
-		end := window.Ceil(to).Unix()
+		end := window.Ceil(to).Add(-time.Second).Unix()
 		
 		slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
 		if err != nil {
