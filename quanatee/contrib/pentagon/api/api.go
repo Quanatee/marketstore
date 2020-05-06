@@ -170,8 +170,6 @@ func WriteAggregates(
 		start := window.Truncate(from).Unix()
 		end := window.Ceil(to).Add(-time.Second).Unix()
 		
-		log.Info("Running %s %v %v %v", aggTbk.String(), window, start, end)
-		
 		slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
 		if err != nil {
 			log.Error("%s/%s/%s: %v", symbol, timeframe, bucket, err)
@@ -196,7 +194,6 @@ func WriteAggregates(
 		
 		csm := io.NewColumnSeriesMap()
 		if len(tqSlc.GetEpoch()) > 0 {
-			log.Info("Running %s len(%v)", aggTbk.String(), len(tqSlc.GetEpoch()))
 			csm.AddColumnSeries(*aggTbk, aggregate(&tqSlc, aggTbk))
 		}
 		

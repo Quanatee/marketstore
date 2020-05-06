@@ -232,8 +232,6 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	
 	executor.WriteCSM(csm, false)
 	
-	log.Info(timeframes)
-	
 	api.WriteAggregates(marketType, symbol, "Price", timeframes, *cs, from, to)
 	
 }
