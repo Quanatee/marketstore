@@ -24,12 +24,12 @@ var (
 )
 
 type Slice struct {
-	sort.IntSlice
+    sort.Interface
     idx []int
 }
 
 func (s Slice) Swap(i, j int) {
-	s.IntSlice.Swap(i, j)
+    s.Interface.Swap(i, j)
     s.idx[i], s.idx[j] = s.idx[j], s.idx[i]
 }
 
@@ -172,7 +172,7 @@ func WriteAggregates(
 		}
 	}
 
-	epochs := cs.GetColumn("Epoch").([]int64)
+	epochs := cs.GetColumn("Epoch")
 	// Returns the indices that would sort cs
 	indices := Sort(epochs)
 	for column_key, column_values_ := range cs.GetColumns() {
