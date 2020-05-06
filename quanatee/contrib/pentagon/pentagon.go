@@ -157,13 +157,13 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "crypto", from.AddDate(0, 0, -crypto_limit), to)
+			go filler.Bars(&wg2, symbol, "crypto", from.AddDate(0, 0, -crypto_limit), to, qf.config.Timeframes)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "crypto")
 		} else if api.IsMarketOpen("crypto", from) == true {
 			// Market is open
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "crypto", from, to)
+			go filler.Bars(&wg2, symbol, "crypto", from, to, qf.config.Timeframes)
 		}
 	}
 	wg2.Wait()
@@ -178,13 +178,13 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -forex_limit), to)
+			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -forex_limit), to, qf.config.Timeframes)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "forex")
 		} else if api.IsMarketOpen("forex", from) == true {
 			// Market is open
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from, to)
+			go filler.Bars(&wg2, symbol, "forex", from, to, qf.config.Timeframes)
 		}
 	}
 	wg2.Wait()
@@ -199,13 +199,13 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from.AddDate(0, 0, -equity_limit), to)
+			go filler.Bars(&wg2, symbol, "equity", from.AddDate(0, 0, -equity_limit), to, qf.config.Timeframes)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "equity")
 		} else if api.IsMarketOpen("equity", from) == true {
 			// Market is open
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "equity", from, to)
+			go filler.Bars(&wg2, symbol, "equity", from, to, qf.config.Timeframes)
 		}
 	}
 	wg2.Wait()
@@ -220,13 +220,13 @@ func (qf *QuanateeFetcher) liveFutures(wg *sync.WaitGroup, from, to time.Time, f
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "futures", from.AddDate(0, 0, -futures_limit), to)
+			go filler.Bars(&wg2, symbol, "futures", from.AddDate(0, 0, -futures_limit), to, qf.config.Timeframes)
 			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
 			filler.BackfillMarket.LoadOrStore(symbol, "futures")
 		} else if api.IsMarketOpen("futures", from) == true {
 			// Market is open
 			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "futures", from, to)
+			go filler.Bars(&wg2, symbol, "futures", from, to, qf.config.Timeframes)
 		}
 	}
 	wg2.Wait()
@@ -352,7 +352,7 @@ func (qf *QuanateeFetcher) DailyChecker() {
 				to = to.Add(1*time.Second)
 				go func() {
 					wg.Add(1)
-					filler.Bars(&wg, symbol, "equity", from.AddDate(0, 0, -equity_limit), to)
+					filler.Bars(&wg, symbol, "equity", from.AddDate(0, 0, -equity_limit), to, qf.config.Timeframes)
 					// Retrigger Backfill
 					filler.BackfillFrom.Store(symbol, from)
 					filler.BackfillMarket.Store(symbol, "equity")
@@ -380,7 +380,7 @@ func (qf *QuanateeFetcher) DailyChecker() {
 				to = to.Add(1*time.Second)
 				go func() {
 					wg.Add(1)
-					filler.Bars(&wg, symbol, "futures", from.AddDate(0, 0, -futures_limit), to)
+					filler.Bars(&wg, symbol, "futures", from.AddDate(0, 0, -futures_limit), to, qf.config.Timeframes)
 					// Retrigger Backfill
 					filler.BackfillFrom.Store(symbol, from)
 					filler.BackfillMarket.Store(symbol, "futures")
@@ -455,7 +455,7 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Tim
 	// request & write the missing bars
 	var wg2 sync.WaitGroup
 	wg2.Add(1)
-	go filler.Bars(&wg2, symbol, marketType, from, to)
+	go filler.Bars(&wg2, symbol, marketType, from, to, qf.config.Timeframes)
 	wg2.Wait()
 	return to
 }

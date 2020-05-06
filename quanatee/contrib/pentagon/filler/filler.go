@@ -25,7 +25,7 @@ var (
 	BackfillMarket *sync.Map
 )
 
-func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
+func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, timeframes []string) {
 	defer wg.Done()
 	if from.IsZero() {
 		from = time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -232,8 +232,10 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time) {
 	
 	executor.WriteCSM(csm, false)
 	
-	api.writeAggregates(marketType, symbol, "1Min", "Price", cs, from, to)
-
+	for _, timeframe := range timeframes {
+		api.writeAggregates(marketType, symbol, timeframe, "Price", cs, from, to)
+	}
+	
 }
 
 
