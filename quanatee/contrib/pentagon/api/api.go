@@ -118,7 +118,7 @@ func IsFuturesMarketOpen(epoch int64) bool {
 }
 
 func writeAggregates(
-	symbol, timeframe, bucket string,
+	marketType, symbol, timeframe, bucket string,
 	cs io.ColumnSeries,
 	from, to time.Time) error {
 
@@ -136,7 +136,7 @@ func writeAggregates(
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(cs, &c.cs)
+			cs = io.ColumnSeriesUnion(cs, c.cs)
 		}
 	} else {
 		if v, ok := BackfillAggCache.Load(tbk.String()); ok {
@@ -150,7 +150,7 @@ func writeAggregates(
 				from: to.AddDate(0, 0, -1),
 				to: to,
 			})
-			cs = io.ColumnSeriesUnion(cs, &c.cs)
+			cs = io.ColumnSeriesUnion(cs, c.cs)
 		}
 	}
 	
@@ -167,15 +167,18 @@ func writeAggregates(
 	if len(slc.GetEpoch()) == 0 {
 		return nil
 	}
+
+	var tqSlc io.ColumnSeries
+	
 	switch marketType {
 	case "crytpo":
-		tqSlc := slc.ApplyTimeQual(IsCryptoMarketOpen)
+		tqSlc = slc.ApplyTimeQual(IsCryptoMarketOpen)
 	case "forex":
-		tqSlc := slc.ApplyTimeQual(IsForexMarketOpen)
+		tqSlc = slc.ApplyTimeQual(IsForexMarketOpen)
 	case "equity":
-		tqSlc := slc.ApplyTimeQual(IsEquityMarketOpen)
+		tqSlc = slc.ApplyTimeQual(IsEquityMarketOpen)
 	case "futures":
-		tqSlc := slc.ApplyTimeQual(IsFuturesMarketOpen)
+		tqSlc = slc.ApplyTimeQual(IsFuturesMarketOpen)
 	}
 	
 	csm := io.NewColumnSeriesMap()
