@@ -166,10 +166,11 @@ func WriteAggregates(
 		end := window.Ceil(to).Add(-time.Second).Unix()
 		slc, err := io.SliceColumnSeriesByEpoch(*cs, &start, &end)
 		if err != nil {
-			return err
+			log.Error("%s/%s/%s: %v", symbol, timeframe, bucket, err)
+			continue
 		}
 		if len(slc.GetEpoch()) == 0 {
-			return nil
+			continue
 		}
 	
 		var tqSlc io.ColumnSeries
