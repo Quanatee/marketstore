@@ -230,7 +230,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 
 	ts := cs.GetTime()
 	outEpoch := make([]int64, 0)
-	log.Info("%s %v", tbk.String ts)
+	log.Info("%s %v", tbk.String, ts)
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 	
 	groupKey := timeWindow.Truncate(ts[0])
