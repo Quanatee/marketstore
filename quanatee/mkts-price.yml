@@ -27,39 +27,39 @@ bgworkers:
       crypto_symbols:
         - BTCUSD
         - BNBUSD
-        # - DASHUSD
-        # - ETHUSD
-        # - EOSUSD
-        # - LTCUSD
-        # - XLMUSD
-        # - XMRUSD
-        # - XRPUSD
+        - DASHUSD
+        - ETHUSD
+        - EOSUSD
+        - LTCUSD
+        - XLMUSD
+        - XMRUSD
+        - XRPUSD
       forex_symbols:
         - EURUSD
         - GBPUSD
-        # - USDJPY 
-        # - AUDUSD
-        # - USDCAD
-        # - USDCHF
-        # - USDMXN 
-        # - USDBRL
-        # - USDDKK 
-        # - USDNOK 
-        # - USDSEK
-        # - USDCNH 
-        # - USDHKD
-        # - USDRUB
-        # - KRWUSD
-        # - TWDUSD
-        # - USDSGD
-        # - USDINR 
-        # - THBUSD
-        # - VNDUSD
-        # - PHPUSD
-        # - AUDUSD
-        # - NZDUSD
-        # - XAGUSD
-        # - XAUUSD
+        - USDJPY 
+        - AUDUSD
+        - USDCAD
+        - USDCHF
+        - USDMXN 
+        - USDBRL
+        - USDDKK 
+        - USDNOK 
+        - USDSEK
+        - USDCNH 
+        - USDHKD
+        - USDRUB
+        - KRWUSD
+        - TWDUSD
+        - USDSGD
+        - USDINR 
+        - THBUSD
+        - VNDUSD
+        - PHPUSD
+        - AUDUSD
+        - NZDUSD
+        - XAGUSD
+        - XAUUSD
       futures_symbols:
        - DX
        - CL
@@ -89,54 +89,54 @@ bgworkers:
         - EZU 
         - VGK
         - EWU
-        # - EWL 
-        # - FLSW 
-        # - EDEN 
-        # - EWD
-        # - ENOR
-        # - MCHI 
-        # - FXI 
-        # - EWH 
-        # - FLHK 
-        # - ERUS 
-        # - FLRU
-        # - EWJ 
-        # - FLJP 
-        # - EWY 
-        # - FLKR 
-        # - EWT 
-        # - FLTW
-        # - EWA 
-        # - FLAU 
-        # - ENZL 
-        # - EWS 
-        # - INDA 
-        # - FLIN
-        # - NORW
-        # - DIA 
-        # - SPY 
-        # - QQQ
-        # - XLY 
-        # - XLF 
-        # - XLI 
-        # - XLK 
-        # - XLRE 
-        # - XLE 
-        # - XLC 
-        # - XLU 
-        # - XLV 
-        # - XLP 
-        # - XLB
-        # - VCSH 
-        # - VCIT
-        # - VCLT
-        # - SHY 
-        # - VGSH 
-        # - SCHO 
-        # - IEF 
-        # - VGIT 
-        # - SCHR
-        # - VGLT
+        - EWL 
+        - FLSW 
+        - EDEN 
+        - EWD
+        - ENOR
+        - MCHI 
+        - FXI 
+        - EWH 
+        - FLHK 
+        - ERUS 
+        - FLRU
+        - EWJ 
+        - FLJP 
+        - EWY 
+        - FLKR 
+        - EWT 
+        - FLTW
+        - EWA 
+        - FLAU 
+        - ENZL 
+        - EWS 
+        - INDA 
+        - FLIN
+        - NORW
+        - DIA 
+        - SPY 
+        - QQQ
+        - XLY 
+        - XLF 
+        - XLI 
+        - XLK 
+        - XLRE 
+        - XLE 
+        - XLC 
+        - XLU 
+        - XLV 
+        - XLP 
+        - XLB
+        - VCSH 
+        - VCIT
+        - VCLT
+        - SHY 
+        - VGSH 
+        - SCHO 
+        - IEF 
+        - VGIT 
+        - SCHR
+        - VGLT
         # # TOP 100 ETFs by Trading Volume and Market Cap
         # - EEM
         # - GDX
