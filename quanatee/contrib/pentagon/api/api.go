@@ -273,36 +273,38 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	outEpoch := make([]int64, 0)
 	
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
-	
-	groupKey := timeWindow.Truncate(ts[0])
-	groupStart := 0
-	// accumulate inputs.  Since the input is ordered by
-	// time, it is just to slice by correct boundaries
-	for i, t := range ts {
-		if t.Unix() >= groupKey.Unix() && i-1 > 0 {
-			if i-1 > 0 {
-				outEpoch = append(outEpoch, groupKey.Unix())
-				accumGroup.apply(groupStart, i-1)
-			}
-			groupStart = i
-			log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i, ts[groupStart], ts[i])
-		}
-		/*
-		if !timeWindow.IsWithin(t, groupKey) {
-			// Emit new row and re-init aggState
-			outEpoch = append(outEpoch, groupKey.Unix())
-			accumGroup.apply(groupStart, i)
-			groupKey = timeWindow.Truncate(t)
-			if i - groupStart == 1 {
+	if len(ts) > 2 {
+		groupKey := timeWindow.Truncate(ts[1])
+		groupStart := 0
+		// accumulate inputs.  Since the input is ordered by
+		// time, it is just to slice by correct boundaries
+		for i, t := range ts {
+			if t.Unix() >= groupKey.Unix() {
+				if i-1 > 0 {
+					outEpoch = append(outEpoch, groupKey.Unix())
+					accumGroup.apply(groupStart, i-1)
+				}
+				groupStart = i
 				log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i, ts[groupStart], ts[i])
 			}
-			groupStart = i
+			/*
+			if !timeWindow.IsWithin(t, groupKey) {
+				// Emit new row and re-init aggState
+				outEpoch = append(outEpoch, groupKey.Unix())
+				accumGroup.apply(groupStart, i)
+				groupKey = timeWindow.Truncate(t)
+				if i - groupStart == 1 {
+					log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i, ts[groupStart], ts[i])
+				}
+				groupStart = i
+			}
+			*/
 		}
-		*/
+		// accumulate any remaining values if not yet
+		//outEpoch = append(outEpoch, groupKey.Unix())
+		//accumGroup.apply(groupStart, len(ts))
+		
 	}
-	// accumulate any remaining values if not yet
-	//outEpoch = append(outEpoch, groupKey.Unix())
-	//accumGroup.apply(groupStart, len(ts))
 	
 	// finalize output
 	outCs := io.NewColumnSeries()
