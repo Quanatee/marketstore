@@ -25,8 +25,8 @@ bgworkers:
         # - 1H
         # - 4H
       crypto_symbols:
-        # - BTCUSD
-        # - BNBUSD
+        - BTCUSD
+        - BNBUSD
         # - DASHUSD
         # - ETHUSD
         # - EOSUSD
@@ -35,8 +35,8 @@ bgworkers:
         # - XMRUSD
         # - XRPUSD
       forex_symbols:
-        # - EURUSD
-        # - GBPUSD
+        - EURUSD
+        - GBPUSD
         # - USDJPY 
         # - AUDUSD
         # - USDCAD
@@ -62,7 +62,7 @@ bgworkers:
         # - XAUUSD
       futures_symbols:
        - DX
-      #  - CL
+       - CL
       #  - NG
       #  - ES
       #  - NQ
