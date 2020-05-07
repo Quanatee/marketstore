@@ -284,9 +284,9 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 					outEpoch = append(outEpoch, groupKey.Unix())
 					accumGroup.apply(groupStart, i-1)
 				}
+				log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i-1, ts[groupStart], ts[i-1])
 				groupKey = timeWindow.Ceil(t)
 				groupStart = i
-				log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i, ts[groupStart], ts[i])
 			}
 			/*
 			if !timeWindow.IsWithin(t, groupKey) {
