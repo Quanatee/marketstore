@@ -261,8 +261,8 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 		params = append(params, accumParam{"TVAL", "roc", "TROC"}) // Original output
     }
 	if cs.Exists("Spread") {
-		params = append(params, accumParam{"Spread", "avgl", "OpeningSpread"}) // Original output
-		params = append(params, accumParam{"Spread", "avgr", "ClosingSpread"}) // Original output
+		params = append(params, accumParam{"Spread", "avgl", "OSpread"}) // Original output
+		params = append(params, accumParam{"Spread", "avgr", "CSpread"}) // Original output
     }
 	if cs.Exists("Split") {
 		params = append(params, accumParam{"Split", "last", "Split"})
