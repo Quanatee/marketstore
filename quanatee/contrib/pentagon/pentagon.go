@@ -428,20 +428,23 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Tim
 	parsed, err := q.Parse()
 	if err != nil {
 		log.Error("%s query parse failure (%v), symbol data not available.", symbol, err)
-	}
-	scanner, err := executor.NewReader(parsed)
-	if err != nil {
-		log.Error("%s new scanner failure (%v)", symbol, err)
-	}
-	csm, err := scanner.Read()
-	if err != nil {
-		log.Error("%s scanner read failure (%v)", symbol, err)
-	}
-	epochs := csm[*tbk].GetEpoch()
-	if len(epochs) != 0 {
-		for _, epoch := range epochs {
-			if epoch == to.Unix() {
-				return to
+	} else {
+		scanner, err := executor.NewReader(parsed)
+		if err != nil {
+			log.Error("%s new scanner failure (%v)", symbol, err)
+		} else {
+			csm, err := scanner.Read()
+			if err != nil {
+				log.Error("%s scanner read failure (%v)", symbol, err)
+			} else {
+				epochs := csm[*tbk].GetEpoch()
+				if len(epochs) != 0 {
+					for _, epoch := range epochs {
+						if epoch == to.Unix() {
+							return to
+						}
+					}
+				}
 			}
 		}
 	}
