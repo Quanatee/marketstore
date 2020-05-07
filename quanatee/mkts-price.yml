@@ -73,11 +73,11 @@ bgworkers:
         # - VIXM
         # - USO 
         # - UNG 
-        # - DBO 
+        - DBO 
         # - BNO 
         # - UGA
         # - IAU 
-        # - SGOL
+        - SGOL
         # - SLV 
         # - SIVR
         # - EWC 
