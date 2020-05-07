@@ -287,7 +287,11 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 			if t.Hour() >= 20 && t.Hour() <= 22 {
 				log.Info("%v: %v-%v (%v-%v)", tbk.String, groupStart, i, ts[groupStart], ts[i])
 			}
-			groupStart = i+1
+			if len(ts) > i+1{
+				groupStart = i+1
+			} else {
+				break
+			}
 		}
 	}
 	// accumulate any remaining values if not yet
