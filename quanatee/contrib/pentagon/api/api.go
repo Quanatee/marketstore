@@ -261,7 +261,8 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 		params = append(params, accumParam{"TVAL", "roc", "TROC"}) // Original output
     }
 	if cs.Exists("Spread") {
-		params = append(params, accumParam{"Spread", "avgr", "Spread"})
+		params = append(params, accumParam{"Spread", "avgl", "OpeningSpread"}) // Original output
+		params = append(params, accumParam{"Spread", "avgr", "ClosingSpread"}) // Original output
     }
 	if cs.Exists("Split") {
 		params = append(params, accumParam{"Split", "last", "Split"})
@@ -279,32 +280,17 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 		for i, t := range ts {
 			// timestamp has iterated to the new Epoch, add it to accumGroup for aggregation
 			// Timestamp on close
-			// Example: New Epoch: 2020-05-01 03:15:00 +0000 UTC, Built From: 2020-05-01 03:00:00 +0000 UTC To: 2020-05-01 03:15:00 +0000 UTC
+			// Example: New Epoch: 2020-05-01 03:15:00 +0000 UTC, Built From: 2020-05-01 03:01:00 +0000 UTC To: 2020-05-01 03:15:00 +0000 UTC
 			if groupKey.Unix() <= t.Unix() {
 				if i > groupStart+1 {
 					outEpoch = append(outEpoch, groupKey.Unix())
 					accumGroup.apply(groupStart+1, i)
 				}
-				log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart+1, i, ts[groupStart+1], ts[i])
+				// log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart+1, i, ts[groupStart+1], ts[i])
 				groupKey = timeWindow.Ceil(t)
 				groupStart = i
 			}
-			/*
-			if !timeWindow.IsWithin(t, groupKey) {
-				// Emit new row and re-init aggState
-				outEpoch = append(outEpoch, groupKey.Unix())
-				accumGroup.apply(groupStart, i)
-				groupKey = timeWindow.Truncate(t)
-				if i - groupStart == 1 {
-					log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i, ts[groupStart], ts[i])
-				}
-				groupStart = i
-			}
-			*/
 		}
-		// accumulate any remaining values if not yet
-		//outEpoch = append(outEpoch, groupKey.Unix())
-		//accumGroup.apply(groupStart, len(ts))
 	}
 	
 	// finalize output

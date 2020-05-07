@@ -66,7 +66,7 @@ const (
 	
 	crypto_limit = 21
 	forex_limit  = 21
-	equity_limit = 21
+	equity_limit = 31
 	futures_limit  = 21
 )
 
@@ -409,34 +409,8 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Tim
 	
 	end := qf.TimeStarted
 	q.SetEnd(end.Unix())
-	
-	if from.IsZero() {
-		// Dynamically find missing values
-		parsed, err := q.Parse()
-		if err != nil {
-			log.Error("%s query parse failure (%v), symbol data not available.", err)
-			from = qf.QueryStart
-		}
-		scanner, err := executor.NewReader(parsed)
-		if err != nil {
-			log.Error("%s new scanner failure (%v)", err)
-			from = qf.QueryStart
-		}
-		csm, err := scanner.Read()
-		if err != nil {
-			log.Error("%s scanner read failure (%v)", err)
-			from = qf.QueryStart
-		}
-		epoch := csm[*tbk].GetEpoch()
-		if len(epoch) != 0 {
-			from = time.Unix(epoch[len(epoch)-1], 0)
-		} else {
-			from = qf.QueryStart
-		}
-	}
-	
+
 	to := from
-	// Keep requests under 5000 rows (Twelvedata limit). Equity gets more due to operating hours
 	switch marketType {
 	case "crypto":
 		to = to.AddDate(0, 0, crypto_limit)
@@ -450,8 +424,28 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Tim
 		to = to.AddDate(0, 0, equity_limit)
 	}
 	
-	// log.Info("%s backfill from %v to %v, stop:%v", symbol, from, to, stop)
-	
+	// If Epoch exists at to, data already exists
+	parsed, err := q.Parse()
+	if err != nil {
+		log.Error("%s query parse failure (%v), symbol data not available.", err)
+	}
+	scanner, err := executor.NewReader(parsed)
+	if err != nil {
+		log.Error("%s new scanner failure (%v)", err)
+	}
+	csm, err := scanner.Read()
+	if err != nil {
+		log.Error("%s scanner read failure (%v)", err)
+	}
+	epochs := csm[*tbk].GetEpoch()
+	if len(epochs) != 0 {
+		for _, epoch := range epochs {
+			if epoch == to.Unix() {
+				return to
+			}
+		}
+	}
+
 	// request & write the missing bars
 	var wg2 sync.WaitGroup
 	wg2.Add(1)
