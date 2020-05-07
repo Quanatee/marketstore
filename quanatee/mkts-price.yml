@@ -25,7 +25,7 @@ bgworkers:
         - 1H
         - 4H
       crypto_symbols:
-        - BTCUSD
+        # - BTCUSD
         # - BNBUSD
         # - DASHUSD
         # - ETHUSD
@@ -35,8 +35,8 @@ bgworkers:
         # - XMRUSD
         # - XRPUSD
       forex_symbols:
-        - EURUSD
-        - GBPUSD
+        # - EURUSD
+        # - GBPUSD
         # - USDJPY 
         # - AUDUSD
         # - USDCAD
@@ -68,8 +68,8 @@ bgworkers:
       #  - NQ
       equity_symbols:
         - VXX 
-        # - VIXY 
-        # - VXZ 
+        - VIXY 
+        - VXZ 
         # - VIXM
         # - USO 
         # - UNG 
