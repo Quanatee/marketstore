@@ -265,7 +265,8 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
     }
 	if cs.Exists("Split") {
 		params = append(params, accumParam{"Split", "last", "Split"})
-    }
+	}
+	
 	accumGroup := newAccumGroup(cs, params)
 
 	ts := cs.GetTime()
@@ -273,7 +274,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 	
-	groupKey := timeWindow.Truncate(ts[0])
+	groupKey := timeWindow.Ceil(ts[0])
 	groupStart := 0
 	// accumulate inputs.  Since the input is ordered by
 	// time, it is just to slice by correct boundaries
@@ -282,7 +283,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 			// Emit new row and re-init aggState
 			outEpoch = append(outEpoch, groupKey.Unix())
 			accumGroup.apply(groupStart, i)
-			groupKey = timeWindow.Truncate(t)
+			groupKey = timeWindow.Ceil(t)
 			groupStart = i
 		}
 	}
