@@ -283,7 +283,7 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 			// Emit new row and re-init aggState
 			outEpoch = append(outEpoch, groupKey.Unix())
 			accumGroup.apply(groupStart, i)
-			groupKey = timeWindow.Truncate(t)
+			groupKey = timeWindow.Ceil(t)
 			groupStart = i
 		}
 	}
