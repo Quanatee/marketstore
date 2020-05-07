@@ -198,10 +198,14 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		}
 	}
 	
+    sources := make([]int, 0, len(ohlcvs))
+    for k := range ohlcvs {
+        sources = append(sources, k)
+    }
 	if (to.Add(5*time.Minute)).After(time.Now()) {
-		log.Debug("filler.Bars(%s) livefill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesString(sources), from, to, len(Epochs))
+		log.Debug("filler.Bars(%s) livefill via %v [from %v to %v] | Length(%v)", symbol, sources, from, to, len(Epochs))
 	} else {
-		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, removeDuplicatesString(sources), from, to, len(Epochs))
+		log.Info("filler.Bars(%s) backfill via %v [from %v to %v] | Length(%v)", symbol, sources, from, to, len(Epochs))
 	}
 	
 	cs := io.NewColumnSeries()
