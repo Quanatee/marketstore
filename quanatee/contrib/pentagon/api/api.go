@@ -274,17 +274,18 @@ func aggregate(cs *io.ColumnSeries, tbk *io.TimeBucketKey) *io.ColumnSeries {
 	
 	timeWindow := utils.CandleDurationFromString(tbk.GetItemInCategory("Timeframe"))
 	if len(ts) > 2 {
-		groupKey := timeWindow.Ceil(ts[0])
+		groupKey := timeWindow.Ceil(ts[0]) // Get the upper-bounds of the timeframe for the new Epoch
 		groupStart := 0
-		// accumulate inputs.  Since the input is ordered by
-		// time, it is just to slice by correct boundaries
 		for i, t := range ts {
+			// timestamp has iterated to the new Epoch, add it to accumGroup for aggregation
+			// Timestamp on close
+			// Example: New Epoch: 2020-05-01 03:15:00 +0000 UTC, Built From: 2020-05-01 03:00:00 +0000 UTC To: 2020-05-01 03:15:00 +0000 UTC
 			if groupKey.Unix() <= t.Unix() {
-				if i-1 > 0 && i-1 > groupStart {
+				if i > groupStart+1 {
 					outEpoch = append(outEpoch, groupKey.Unix())
-					accumGroup.apply(groupStart, i-1)
+					accumGroup.apply(groupStart+1, i)
 				}
-				log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart, i-1, ts[groupStart], ts[i-1])
+				log.Info("%s: %v for %v-%v (%v-%v)", tbk.String(), groupKey, groupStart+1, i, ts[groupStart+1], ts[i])
 				groupKey = timeWindow.Ceil(t)
 				groupStart = i
 			}
