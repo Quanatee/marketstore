@@ -198,7 +198,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		}
 	}
 	
-    sources := make([]int, 0, len(ohlcvs))
+    sources := make([]string, 0, len(ohlcvs))
     for k := range ohlcvs {
         sources = append(sources, k)
     }
