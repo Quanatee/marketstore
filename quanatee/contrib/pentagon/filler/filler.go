@@ -35,8 +35,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		to = time.Now()
 	}
 	
-	var ohlcvs map[string]api.OHLCV
-
+	ohlcvs := map[string]api.OHLCV{}
+	
 	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs["polygon"] = ohlcv
