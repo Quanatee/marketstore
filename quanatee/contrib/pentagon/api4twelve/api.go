@@ -8,10 +8,6 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"math/rand"
-	crypto_rand "crypto/rand"
-	"encoding/binary"
-	
 	"net/http"
 	"net/url"
 	//"strconv"
@@ -57,9 +53,7 @@ func GetAggregates(
 	}
 	
 	q := u.Query()
-	rand.Seed(GetRandSeed())
-
-	q.Set("apikey", apiKeys[rand.Intn(len(apiKeys))])
+	q.Set("apikey", apiKeys[api.GetRandIntn(len(apiKeys))])
 	if strings.Compare(marketType, "equity") != 0 {
 		// USD
 		if strings.HasPrefix(symbol, "USD") {
@@ -160,7 +154,7 @@ func GetAggregates(
 					if aggCrypto.PriceData[bar].Volume > float32(1) {
 						ohlcv.Volume[Epoch] = float32(aggCrypto.PriceData[bar].Volume)
 					} else {
-						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
 					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
@@ -187,7 +181,7 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -210,7 +204,7 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -233,7 +227,7 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggFutures.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggFutures.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggFutures.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -317,13 +311,4 @@ func unmarshal(resp *http.Response, data interface{}) (err error) {
 	}
 
 	return json.Unmarshal(body, data)
-}
-
-func GetRandSeed() (int64) {
-	var b [8]byte
-	_, err := crypto_rand.Read(b[:])
-	if err != nil {
-		panic("cannot seed math/rand package with cryptographically secure random number generator")
-	}
-	return int64(binary.LittleEndian.Uint64(b[:]))
 }

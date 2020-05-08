@@ -66,7 +66,7 @@ func InitalizeSharedMaps() {
 	BackfillAggCache = &sync.Map{}
 }
 
-func GetRandIntn(n int) (int64) {
+func GetRandIntn(n int) (int) {
 	
 	var b [8]byte
 	_, err := crypto_rand.Read(b[:])
@@ -145,11 +145,11 @@ func IsFuturesMarketOpen(epoch int64) bool {
 	return true
 }
 
-func GetAlternateVolumePolygonFirst(marketType string, Epoch int64, to, from time.Time) (float32) {
+func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, from time.Time) (float32) {
 	
 	// Try provider daily volume with options for livefill and backfill
 	volume_alt := false
-	symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
+	symbolDailyVolume_, _ := PolygonDailyVolumes.Load(symbol)
 	if symbolDailyVolume_ != nil {
 		symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 		dailyVolume := float32(1)
@@ -187,7 +187,7 @@ func GetAlternateVolumePolygonFirst(marketType string, Epoch int64, to, from tim
 	}
 	if volume_alt == true {
 		// Try alternative daily volume, or set to 1
-		symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
+		symbolDailyVolume_, _ := TiingoDailyVolumes.Load(symbol)
 		if symbolDailyVolume_ != nil {
 			symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
 			dt := time.Unix(Epoch, 0)
@@ -227,7 +227,7 @@ func GetAlternateVolumePolygonFirst(marketType string, Epoch int64, to, from tim
 	}
 }
 
-func GetAlternateVolumeTiingoFirst(marketType string, Epoch int64, to, from time.Time) (float32) {
+func GetAlternateVolumeTiingoFirst(symbol, marketType string, Epoch int64, to, from time.Time) (float32) {
 	
 	// Try provider daily volume with options for livefill and backfill
 	volume_alt := false
