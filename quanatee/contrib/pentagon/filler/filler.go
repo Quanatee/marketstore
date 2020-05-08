@@ -45,8 +45,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 			ohlcvs["tiingo"] = ohlcv_ti
 		}
 	}
-	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(4) == 0 || len(ohlcv.HLC) == 0 {
-		// If backfill or 25% chance or polygon fails
+	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(3) == 1 || len(ohlcv.HLC) == 0 {
+		// If backfill or 34% chance or polygon fails
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
 			ohlcvs["twelve"] = ohlcv_tw
