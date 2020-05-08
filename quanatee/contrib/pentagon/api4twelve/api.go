@@ -106,7 +106,7 @@ func GetAggregates(
 	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto.PriceData)
 	} else if strings.Compare(marketType, "equity") == 0 {
-			length = len(aggEquity.PriceData)
+		length = len(aggEquity.PriceData)
 	} else if strings.Compare(marketType, "forex") == 0 {
 		length = len(aggForex.PriceData)
 	} else if strings.Compare(marketType, "futures") == 0 {
@@ -141,6 +141,7 @@ func GetAggregates(
 			}
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 			if err_dt != nil {
+				log.Error("[twelve] %s, %v", symbol, err_dt)
 				continue
 			}
 			if (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) {
@@ -160,12 +161,12 @@ func GetAggregates(
 			}
 		} else if strings.Compare(marketType, "equity") == 0 {
 			if len(aggEquity.PriceData) <= bar {
-				// Unknown issue that causes index out of range (Probably malformed json)
-				return &OHLCV{}, err
+				break
 			}
 			loc, err_loc := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, err_dt := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
 			if err_loc != nil || err_dt != nil {
+				log.Error("[twelve] %s, %v, %v", symbol, err_loc, err_dt)
 				continue
 			}
 			dt = dt.UTC()
@@ -194,6 +195,7 @@ func GetAggregates(
 			}
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
 			if err_dt != nil {
+				log.Error("[twelve] %s, %v", symbol, err_dt)
 				continue
 			}
 			if (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) {
@@ -217,6 +219,7 @@ func GetAggregates(
 			}
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggFutures.PriceData[bar].Date)
 			if err_dt != nil {
+				log.Error("[twelve] %s, %v", symbol, err_dt)
 				continue
 			}
 			if (aggFutures.PriceData[bar].Open != 0 && aggFutures.PriceData[bar].High != 0 && aggFutures.PriceData[bar].Low != 0 && aggFutures.PriceData[bar].Close != 0) {
