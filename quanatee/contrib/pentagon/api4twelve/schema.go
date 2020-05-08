@@ -17,7 +17,15 @@ type AggOHLCV struct {
 	Volume         float32 `json:"volume,string"`
 }
 
-// Equity
+type AggCryptoMeta struct {
+	Symbol          string        `json:"symbol"`
+	Timeframe       string        `json:"interval"`
+	CurrencyBase    string        `json:"currency_base"`
+	CurrencyQuote   string        `json:"currency_quote"`
+	Exchange	    string        `json:"exchange"`
+	AssetType	    string	      `json:"type"`
+}
+
 type AggEquityMeta struct {
 	Symbol          string        `json:"symbol"`
 	Timeframe       string        `json:"interval"`
@@ -35,15 +43,20 @@ type AggForexMeta struct {
 	AssetType	    string	      `json:"type"`
 }
 
-type AggCryptoMeta struct {
+type AggFuturesMeta struct {
 	Symbol          string        `json:"symbol"`
 	Timeframe       string        `json:"interval"`
-	CurrencyBase    string        `json:"currency_base"`
-	CurrencyQuote   string        `json:"currency_quote"`
+	Currency        string        `json:"currency"`
+	ExchangeTZ      string        `json:"exchange_timezone"`
 	Exchange	    string        `json:"exchange"`
 	AssetType	    string	      `json:"type"`
 }
 
+type AggCrypto struct {
+	PriceData       []AggOHLC	  		`json:"values"`
+	MetaData	    AggCryptoMeta   	`json:"meta"`
+	Status			string				`json:"status"`
+}
 
 type AggEquity struct {
 	PriceData       []AggOHLCV    		`json:"values"`
@@ -57,9 +70,9 @@ type AggForex struct {
 	Status			string				`json:"status"`
 }
 
-type AggCrypto struct {
-	PriceData       []AggOHLC	  		`json:"values"`
-	MetaData	    AggCryptoMeta   	`json:"meta"`
+type AggFutures struct {
+	PriceData       []AggOHLCV    		`json:"values"`
+	MetaData	    AggFuturesMeta	 	`json:"meta"`
 	Status			string				`json:"status"`
 }
 

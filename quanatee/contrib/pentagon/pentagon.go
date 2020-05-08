@@ -30,7 +30,7 @@ type QuanateeFetcher struct {
 type FetcherConfig struct {
     PolygonApiKey   string   `yaml:"polygon_api_key"`
     TiingoApiKey    string   `yaml:"tiingo_api_key"`
-	TwelveApiKey    string   `yaml:"twelve_api_key"`
+	TwelveApiKeys   []string `yaml:"twelve_api_keys"`
 	QueryStart      string   `yaml:"query_start"`
     Timeframes	    []string `yaml:"timeframes"`
 	CryptoSymbols	[]string `yaml:"crypto_symbols"`
@@ -80,7 +80,7 @@ func (qf *QuanateeFetcher) Run() {
 	*/
 	api4polygon.SetAPIKey(qf.config.PolygonApiKey)
 	api4tiingo.SetAPIKey(qf.config.TiingoApiKey)
-	api4twelve.SetAPIKey(qf.config.TwelveApiKey)
+	api4twelve.SetAPIKeys(qf.config.TwelveApiKeys)
 
 	log.Info("Scanning for previous stock split events and fetching historical daily volume:")
 	for _, symbol := range qf.config.CryptoSymbols {
@@ -126,9 +126,9 @@ func (qf *QuanateeFetcher) Run() {
 		wg.Add(1)
 		go qf.liveCrypto(&wg, from, to, firstLoop)
 		wg.Add(1)
-		go qf.liveForex(&wg, from, to, firstLoop)
-		wg.Add(1)
 		go qf.liveEquity(&wg, from, to, firstLoop)
+		wg.Add(1)
+		go qf.liveForex(&wg, from, to, firstLoop)
 		wg.Add(1)
 		go qf.liveFutures(&wg, from, to, firstLoop)
 		wg.Wait()
@@ -170,27 +170,6 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	log.Debug("Livefill crypto completed.")
 }
 
-func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
-	defer wg.Done()
-	var wg2 sync.WaitGroup
-	// Loop Forex Symbols
-	for _, symbol := range qf.config.ForexSymbols {
-		if firstLoop == true {
-			// Market is closed but we just started pentagon
-			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -forex_limit), to, qf.config.Timeframes)
-			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
-			filler.BackfillMarket.LoadOrStore(symbol, "forex")
-		} else if api.IsMarketOpen("forex", from) == true {
-			// Market is open
-			wg2.Add(1)
-			go filler.Bars(&wg2, symbol, "forex", from, to, qf.config.Timeframes)
-		}
-	}
-	wg2.Wait()
-	log.Debug("Livefill forex completed.")
-}
-
 func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
 	defer wg.Done()
 	var wg2 sync.WaitGroup
@@ -210,6 +189,27 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	}
 	wg2.Wait()
 	log.Debug("Livefill equity completed.")
+}
+
+func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
+	defer wg.Done()
+	var wg2 sync.WaitGroup
+	// Loop Forex Symbols
+	for _, symbol := range qf.config.ForexSymbols {
+		if firstLoop == true {
+			// Market is closed but we just started pentagon
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "forex", from.AddDate(0, 0, -forex_limit), to, qf.config.Timeframes)
+			filler.BackfillFrom.LoadOrStore(symbol, qf.QueryStart)
+			filler.BackfillMarket.LoadOrStore(symbol, "forex")
+		} else if api.IsMarketOpen("forex", from) == true {
+			// Market is open
+			wg2.Add(1)
+			go filler.Bars(&wg2, symbol, "forex", from, to, qf.config.Timeframes)
+		}
+	}
+	wg2.Wait()
+	log.Debug("Livefill forex completed.")
 }
 
 func (qf *QuanateeFetcher) liveFutures(wg *sync.WaitGroup, from, to time.Time, firstLoop bool) {
@@ -247,16 +247,13 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
-			// Delay for 1 second every 3 requests
-			count++
-			if count % 3 == 0 {
-				time.Sleep(time.Second)
-			}
 			symbol := key.(string)
 			marketType, _ := filler.BackfillMarket.Load(key)
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
 			if value != nil {
+				// Delay for 3 seconds every request to account for free TwelveData plan (12 * 6 per min)
+				time.Sleep(3*time.Second)
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
@@ -297,7 +294,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			return true
 		})
 		wg.Wait()
-		
 	}
 }
 
@@ -316,14 +312,14 @@ func (qf *QuanateeFetcher) DailyChecker() {
 			api4polygon.UpdateDailyVolumes(symbol, "crypto", qf.TimeStarted)
 			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
 		}
-		for _, symbol := range qf.config.ForexSymbols {
-			api4polygon.UpdateDailyVolumes(symbol, "forex", qf.TimeStarted)
-			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
-		}
 		for _, symbol := range qf.config.EquitySymbols {
 			api4polygon.UpdateDailyVolumes(symbol, "equity", qf.TimeStarted)
 			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
 			api4polygon.UpdateSplitEvents(symbol, qf.TimeStarted)
+		}
+		for _, symbol := range qf.config.ForexSymbols {
+			api4polygon.UpdateDailyVolumes(symbol, "forex", qf.TimeStarted)
+			api4tiingo.UpdateDailyVolumes(symbol, qf.TimeStarted)
 		}
 		for _, symbol := range qf.config.FuturesSymbols {
 			api4polygon.UpdateDailyVolumes(symbol, "futures", qf.TimeStarted)
@@ -414,10 +410,10 @@ func (qf *QuanateeFetcher) backfillBars(symbol, marketType string, from time.Tim
 	switch marketType {
 	case "crypto":
 		to = to.AddDate(0, 0, crypto_limit)
-	case "forex":
-		to = to.AddDate(0, 0, forex_limit)
 	case "equity":
 		to = to.AddDate(0, 0, equity_limit)
+	case "forex":
+		to = to.AddDate(0, 0, forex_limit)
 	case "futures":
 		to = to.AddDate(0, 0, futures_limit)
 	default:

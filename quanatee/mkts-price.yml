@@ -16,7 +16,13 @@ bgworkers:
     config:
       polygon_api_key: <polygon_api_key>
       tiingo_api_key: <tiingo_api_key>
-      twelve_api_key: <twelve_api_key>
+      twelve_api_keys:
+        - <twelve_api_key>
+        - <twelve_api_key2>
+        - <twelve_api_key3>
+        - <twelve_api_key4>
+        - <twelve_api_key5>
+        - <twelve_api_key6>
       query_start: 2017-01-01 00:00
       timeframes:
         - 12Min

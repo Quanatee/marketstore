@@ -3,12 +3,9 @@ package filler
 import (
 	"fmt"
 	//"math"
-	"math/rand"
 	"sync"
 	"time"
 	"strings"
-	crypto_rand "crypto/rand"
-    "encoding/binary"
 	
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
 	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api4polygon"
@@ -45,9 +42,8 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	if len(ohlcv_ti.HLC) > 0 {
 		ohlcvs["tiingo"] = ohlcv_ti
 	}
-	// Randomly run alt providers to ease api usage
-	rand.Seed(GetRandSeed())
-	if rand.Intn(3) <= 1 {
+	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(20) == 0 {
+		// If backfill or 5% chance
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
 			ohlcvs["twelve"] = ohlcv_tw
@@ -61,8 +57,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		if len(ohlcv_pgb.HLC) > 0 {
 			ohlcvs["polygon_busd"] = ohlcv_pgb
 		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(2) <= 1 {
+		if api.GetRandIntn(12) <= 9 {
 			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
 				ohlcvs["tiingo_busd"] = ohlcv_tib
@@ -78,8 +73,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		if len(ohlcv_pgt.HLC) > 0 {
 			ohlcvs["polygon_usdt"] = ohlcv_pgt
 		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(2) <= 1 {
+		if api.GetRandIntn(12) <= 9 {
 			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 			if len(ohlcv_tit.HLC) > 0 {
 				ohlcvs["tiingo_usdt"] = ohlcv_tit
@@ -95,8 +89,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		if len(ohlcv_pgc.HLC) > 0 {
 			ohlcvs["polygon_usdc"] = ohlcv_pgc
 		}
-		rand.Seed(GetRandSeed())
-		if rand.Intn(2) <= 1 {
+		if api.GetRandIntn(12) <= 9 {
 			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 			if len(ohlcv_tic.HLC) > 0 {
 				ohlcvs["tiingo_usdc"] = ohlcv_tic
@@ -265,7 +258,6 @@ func GetDataFromProvider(
 			}
 		}
 	case "twelve":
-		// Twelve is not stable
 		return api.OHLCV{}
 		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
@@ -289,14 +281,6 @@ func GetDataFromProvider(
 	return api.OHLCV{}
 }
 
-func GetRandSeed() (int64) {
-	var b [8]byte
-	_, err := crypto_rand.Read(b[:])
-	if err != nil {
-		panic("cannot seed math/rand package with cryptographically secure random number generator")
-	}
-	return int64(binary.LittleEndian.Uint64(b[:]))
-}
 func removeDuplicatesInt64(s []int64) []int64 {
 	seen := make(map[int64]struct{}, len(s))
 	j := 0

@@ -4,6 +4,9 @@ import (
 	"sync"
 	"time"
 	"sort"
+	"math/rand"
+	crypto_rand "crypto/rand"
+    "encoding/binary"
 	"github.com/alpacahq/marketstore/utils"
 	"github.com/alpacahq/marketstore/utils/io"
 	"github.com/alpacahq/marketstore/executor"
@@ -61,6 +64,19 @@ func InitalizeSharedMaps() {
 	TiingoDailyVolumes = &sync.Map{}
 	LivefillAggCache = &sync.Map{}
 	BackfillAggCache = &sync.Map{}
+}
+
+func GetRandIntn(n int) (int64) {
+	
+	var b [8]byte
+	_, err := crypto_rand.Read(b[:])
+	if err != nil {
+		panic("cannot seed math/rand package with cryptographically secure random number generator")
+	}
+	seed := int64(binary.LittleEndian.Uint64(b[:]))
+	
+	rand.Seed(seed)
+	return rand.Intn(n)
 }
 
 func IsMarketOpen(
@@ -127,6 +143,170 @@ func IsFuturesMarketOpen(epoch int64) bool {
 		return false
 	}
 	return true
+}
+
+func GetAlternateVolumePolygonFirst(marketType string, Epoch int64, to, from time.Time) (float32) {
+	
+	// Try provider daily volume with options for livefill and backfill
+	volume_alt := false
+	symbolDailyVolume_, _ := api.PolygonDailyVolumes.Load(symbol)
+	if symbolDailyVolume_ != nil {
+		symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+		dailyVolume := float32(1)
+		if (to.Add(5*time.Minute)).After(time.Now()) {
+			// Livefill, get the last daily volume
+			last_date := time.Time{}
+			for date := range symbolDailyVolume {
+				if date.After(last_date) {
+					last_date = date
+				}
+			}
+			dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+		} else {
+			// Backfill, directly retrieve the daily volume
+			dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+		}
+		if dailyVolume != 0 {
+			switch marketType {
+			case "crytpo":
+				return float32(dailyVolume/1440)
+			case "equity":
+				return float32(dailyVolume/390)
+			case "forex":
+				return float32(dailyVolume/1440)
+			case "futures":
+				return float32(dailyVolume/1440)
+			default:
+				volume_alt = true
+			}
+		} else {
+			volume_alt = true
+		}
+	} else {
+		volume_alt = true
+	}
+	if volume_alt == true {
+		// Try alternative daily volume, or set to 1
+		symbolDailyVolume_, _ := api.TiingoDailyVolumes.Load(symbol)
+		if symbolDailyVolume_ != nil {
+			symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+			dt := time.Unix(Epoch, 0)
+			dailyVolume := float32(1)
+			if (to.Add(5*time.Minute)).After(time.Now()) {
+				// Livefill, get the last daily volume
+				last_date := time.Time{}
+				for date := range symbolDailyVolume {
+					if date.After(last_date) {
+						last_date = date
+					}
+				}
+				dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+			} else {
+				// Backfill, directly retrieve the daily volume
+				dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+			}
+			if dailyVolume != 0 {
+				switch marketType {
+				case "crytpo":
+					return float32(dailyVolume/1440)
+				case "forex":
+					return float32(dailyVolume/1440)
+				case "equity":
+					return float32(dailyVolume/390)
+				case "futures":
+					return float32(dailyVolume/1440)
+				default:
+					return float32(1)
+				}
+			} else {
+				return float32(1)
+			}
+		} else {
+			return float32(1)
+		}
+	}
+}
+
+func GetAlternateVolumeTiingoFirst(marketType string, Epoch int64, to, from time.Time) (float32) {
+	
+	// Try provider daily volume with options for livefill and backfill
+	volume_alt := false
+	symbolDailyVolume_, _ := TiingoDailyVolumes.Load(symbol)
+	if symbolDailyVolume_ != nil {
+		symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+		dailyVolume := float32(1)
+		if (to.Add(5*time.Minute)).After(time.Now()) {
+			// Livefill, get the last daily volume
+			last_date := time.Time{}
+			for date := range symbolDailyVolume {
+				if date.After(last_date) {
+					last_date = date
+				}
+			}
+			dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+		} else {
+			// Backfill, directly retrieve the daily volume
+			dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+		}
+		if dailyVolume != 0 {
+			switch marketType {
+			case "crytpo":
+				return float32(dailyVolume/1440)
+			case "equity":
+				return float32(dailyVolume/390)
+			case "forex":
+				return float32(dailyVolume/1440)
+			case "futures":
+				return float32(dailyVolume/1440)
+			default:
+				volume_alt = true
+			}
+		} else {
+			volume_alt = true
+		}
+	} else {
+		volume_alt = true
+	}
+	if volume_alt == true {
+		// Try alternative daily volume, or set to 1
+		symbolDailyVolume_, _ := PolygonDailyVolumes.Load(symbol)
+		if symbolDailyVolume_ != nil {
+			symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
+			dt := time.Unix(Epoch, 0)
+			dailyVolume := float32(1)
+			if (to.Add(5*time.Minute)).After(time.Now()) {
+				// Livefill, get the last daily volume
+				last_date := time.Time{}
+				for date := range symbolDailyVolume {
+					if date.After(last_date) {
+						last_date = date
+					}
+				}
+				dailyVolume, _ = symbolDailyVolume[time.Date(last_date.Year(), last_date.Month(), last_date.Day(), 0, 0, 0, 0, time.UTC)]
+			} else {
+				// Backfill, directly retrieve the daily volume
+				dailyVolume, _ = symbolDailyVolume[time.Date(dt.Year(), dt.Month(), dt.Day(), 0, 0, 0, 0, time.UTC)]
+			}
+			if dailyVolume != 0 {
+				switch marketType {
+				case "crytpo":
+					return float32(dailyVolume/1440)
+				case "forex":
+					return float32(dailyVolume/1440)
+				case "equity":
+					return float32(dailyVolume/390)
+				case "futures":
+					return float32(dailyVolume/1440)
+				default:
+					return float32(1)
+				}
+			} else {
+				return float32(1)
+			}
+		} else {
+			return float32(1)
+		}
+	}
 }
 
 func WriteAggregates(

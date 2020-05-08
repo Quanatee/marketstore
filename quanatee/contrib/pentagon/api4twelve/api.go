@@ -8,6 +8,10 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"math/rand"
+	crypto_rand "crypto/rand"
+	"encoding/binary"
+	
 	"net/http"
 	"net/url"
 	//"strconv"
@@ -28,15 +32,16 @@ var (
 		"crypto": "%v/time_series",
 		"forex": "%v/time_series",
 		"equity": "%v/time_series",
+		"futures": "%v/time_series",
 	}
 	baseURL = "https://api.twelvedata.com"
 	start time.Time
-	apiKey 	 string
+	apiKeys 	[]string
 	length = 0
 )
 
-func SetAPIKey(key string) {
-	apiKey = key
+func SetAPIKeys(keys []string) {
+	apiKeys = keys
 }
 
 func GetAggregates(
@@ -52,7 +57,9 @@ func GetAggregates(
 	}
 	
 	q := u.Query()
-	q.Set("apikey", apiKey)
+	rand.Seed(GetRandSeed())
+
+	q.Set("apikey", apiKeys[rand.Intn(len(apiKeys))])
 	if strings.Compare(marketType, "equity") != 0 {
 		// USD
 		if strings.HasPrefix(symbol, "USD") {
@@ -83,29 +90,33 @@ func GetAggregates(
 
 	u.RawQuery = q.Encode()
 
+	var aggCrypto AggCrypto
 	var aggEquity AggEquity
 	var aggForex AggForex
-	var aggCrypto AggCrypto
+	var aggFutures AggFutures
 
-	if strings.Compare(marketType, "equity") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
-	} else if strings.Compare(marketType, "currency") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex)
-	} else if strings.Compare(marketType, "crypto") == 0 {
+	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
+	} else if strings.Compare(marketType, "equity") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
+	} else if strings.Compare(marketType, "forex") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex)
+	} else if strings.Compare(marketType, "futures") == 0 {
+		err = downloadAndUnmarshal(u.String(), retryCount, &aggFutures)
 	}
 
 	if err != nil {
-		log.Error("[twelve] %s %v", symbol, err)
 		return &OHLCV{}, err
 	}
 	
-	if strings.Compare(marketType, "equity") == 0 {
-		length = len(aggEquity.PriceData)
-	} else if strings.Compare(marketType, "currency") == 0 {
-		length = len(aggForex.PriceData)
-	} else if strings.Compare(marketType, "crypto") == 0 {
+	if strings.Compare(marketType, "crypto") == 0 {
 		length = len(aggCrypto.PriceData)
+	} else if strings.Compare(marketType, "equity") == 0 {
+			length = len(aggEquity.PriceData)
+	} else if strings.Compare(marketType, "forex") == 0 {
+		length = len(aggForex.PriceData)
+	} else if strings.Compare(marketType, "futures") == 0 {
+		length = len(aggFutures.PriceData)
 	}
 
 	if length == 0 {
@@ -123,14 +134,7 @@ func GetAggregates(
 		TVAL: make(map[int64]float32),
 		Spread: make(map[int64]float32),
 	}
-	// Panic recovery
-	/*
-    defer func() {
-        if err := recover(); err != nil {
-            log.Error("Panic occurred:", err)
-        }
-	}()
-	*/
+	
 	// Twelve candle formula (Timestamp on close)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
@@ -139,16 +143,13 @@ func GetAggregates(
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
 			if len(aggCrypto.PriceData) <= bar {
-				// Unknown issue that causes index out of range (Probably malformed json)
-				return &OHLCV{}, err
+				break
 			}
 			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggCrypto.PriceData[bar].Date)
 			if err_dt != nil {
-				return &OHLCV{}, err
+				continue
 			}
-			if ( (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) &&
-				(aggCrypto.PriceData[bar].Open != aggCrypto.PriceData[bar].Close) && 
-				(aggCrypto.PriceData[bar].High != aggCrypto.PriceData[bar].Low) ) {
+			if ( (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) {
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
@@ -156,33 +157,11 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggCrypto.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggCrypto.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = float32(1)
-					// Extra
-					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
-					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-				}
-			}
-		} else if strings.Compare(marketType, "currency") == 0 {
-			if len(aggForex.PriceData) <= bar {
-				// Unknown issue that causes index out of range (Probably malformed json)
-				return &OHLCV{}, err
-			}
-			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
-			if err_dt != nil {
-				return &OHLCV{}, err
-			}
-			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) &&
-				(aggForex.PriceData[bar].Open != aggForex.PriceData[bar].Close) && 
-				(aggForex.PriceData[bar].High != aggForex.PriceData[bar].Low) ) {
-				Epoch := dt.Unix()
-				if Epoch > from.Unix() && Epoch < to.Unix() {
-					// OHLCV
-					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
-					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
-					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
-					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = float32(1)
+					if aggCrypto.PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggCrypto.PriceData[bar].Volume)
+					} else {
+						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -197,12 +176,10 @@ func GetAggregates(
 			loc, err_loc := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, err_dt := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
 			if err_loc != nil || err_dt != nil {
-				return &OHLCV{}, err
+				continue
 			}
 			dt = dt.UTC()
-			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) &&
-				(aggEquity.PriceData[bar].Open != aggEquity.PriceData[bar].Close) && 
-				(aggEquity.PriceData[bar].High != aggEquity.PriceData[bar].Low) ) {
+			if ( (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) {
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
@@ -210,11 +187,53 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					if aggEquity.PriceData[bar].Volume != 0 {
-						ohlcv.Volume[Epoch] = aggEquity.PriceData[bar].Volume
-					} else {
-						ohlcv.Volume[Epoch] = float32(1)
-					}
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				}
+			}
+		} else if strings.Compare(marketType, "forex") == 0 {
+			if len(aggForex.PriceData) <= bar {
+				break
+			}
+			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggForex.PriceData[bar].Date)
+			if err_dt != nil {
+				continue
+			}
+			if ( (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) {
+				Epoch := dt.Unix()
+				if Epoch > from.Unix() && Epoch < to.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
+					// Extra
+					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
+					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
+					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
+				}
+			}
+		} else if strings.Compare(marketType, "futures") == 0 {
+			if len(aggFutures.PriceData) <= bar {
+				break
+			}
+			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggFutures.PriceData[bar].Date)
+			if err_dt != nil {
+				continue
+			}
+			if ( (aggFutures.PriceData[bar].Open != 0 && aggFutures.PriceData[bar].High != 0 && aggFutures.PriceData[bar].Low != 0 && aggFutures.PriceData[bar].Close != 0) {
+				Epoch := dt.Unix()
+				if Epoch > from.Unix() && Epoch < to.Unix() {
+					// OHLCV
+					ohlcv.Open[Epoch] = aggFutures.PriceData[bar].Open
+					ohlcv.High[Epoch] = aggFutures.PriceData[bar].High
+					ohlcv.Low[Epoch] = aggFutures.PriceData[bar].Low
+					ohlcv.Close[Epoch] = aggFutures.PriceData[bar].Close
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(marketType, Epoch, from, to)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -222,20 +241,10 @@ func GetAggregates(
 				}
 			}
 		}
-		
 	}
 
 	if len(ohlcv.HLC) == 0 {
 		log.Info("%s [twelve] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
-		if length == 1 {
-			if strings.Compare(marketType, "crypto") == 0 {
-				log.Debug("%s [twelve] LiveData: %v", symbol, aggCrypto)
-			} else if strings.Compare(marketType, "forex") == 0 {
-				log.Debug("%s [twelve] LiveData: %v", symbol, aggForex)
-			} else if strings.Compare(marketType, "equity") == 0 {
-				log.Debug("%s [twelve] LiveData: %v", symbol, aggEquity)
-			}
-		}
 	}
 	
 	return ohlcv, nil
@@ -308,4 +317,13 @@ func unmarshal(resp *http.Response, data interface{}) (err error) {
 	}
 
 	return json.Unmarshal(body, data)
+}
+
+func GetRandSeed() (int64) {
+	var b [8]byte
+	_, err := crypto_rand.Read(b[:])
+	if err != nil {
+		panic("cannot seed math/rand package with cryptographically secure random number generator")
+	}
+	return int64(binary.LittleEndian.Uint64(b[:]))
 }
