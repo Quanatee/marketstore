@@ -173,6 +173,7 @@ func GetAggregates(
 			dt = dt.UTC()
 			if (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) {
 				Epoch := dt.Unix()
+				log.Info("[twelve] %s: %v > %v < %v", symbol, from, dt, to)
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
@@ -201,6 +202,7 @@ func GetAggregates(
 			}
 			if (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) {
 				Epoch := dt.Unix()
+				log.Info("[twelve] %s: %v > %v < %v", symbol, from, dt, to)
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
