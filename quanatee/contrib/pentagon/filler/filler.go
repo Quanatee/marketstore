@@ -150,32 +150,17 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 				(ohlcv_.TVAL[Epoch] != 0) &&
 				(ohlcv_.Spread[Epoch] != 0) ) {
 				
-				if strings.Contains(source, "polygon") || strings.Contains(source, "twelve")  {
-					open += float32(ohlcv_.Open[Epoch] * split)
-					high += float32(ohlcv_.High[Epoch] * split)
-					low += float32(ohlcv_.Low[Epoch] * split)
-					close += float32(ohlcv_.Close[Epoch] * split)
-					hlc += float32(ohlcv_.HLC[Epoch] * split)
-					spread += float32(ohlcv_.Spread[Epoch] * split)
-					divisor += float32(1)
-					if ohlcv_.Volume[Epoch] > 1 {
-						volume += float32(ohlcv_.Volume[Epoch] / split)
-						tval += float32(ohlcv_.TVAL[Epoch])
-						volume_divisor += float32(1)
-					}
-				} else {
-					open += float32(ohlcv_.Open[Epoch])
-					high += float32(ohlcv_.High[Epoch])
-					low += float32(ohlcv_.Low[Epoch])
-					close += float32(ohlcv_.Close[Epoch])
-					hlc += float32(ohlcv_.HLC[Epoch])
-					spread += float32(ohlcv_.Spread[Epoch])
-					divisor += float32(1)
-					if ohlcv_.Volume[Epoch] > 1 {
-						volume += float32(ohlcv_.Volume[Epoch])
-						tval += float32(ohlcv_.TVAL[Epoch])
-						volume_divisor += float32(1)
-					}
+				open += float32(ohlcv_.Open[Epoch] * split)
+				high += float32(ohlcv_.High[Epoch] * split)
+				low += float32(ohlcv_.Low[Epoch] * split)
+				close += float32(ohlcv_.Close[Epoch] * split)
+				hlc += float32(ohlcv_.HLC[Epoch] * split)
+				spread += float32(ohlcv_.Spread[Epoch] * split)
+				divisor += float32(1)
+				if ohlcv_.Volume[Epoch] > 1 {
+					volume += float32(ohlcv_.Volume[Epoch] / split)
+					tval += float32(ohlcv_.TVAL[Epoch])
+					volume_divisor += float32(1)
 				}
 			}
 		}
@@ -260,6 +245,7 @@ func GetDataFromProvider(
 			}
 		}
 	case "tiingo":
+		return api.OHLCV{}
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			log.Error("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
