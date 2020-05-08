@@ -136,7 +136,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 				}
 			}
 		}
-		for source, ohlcv_ := range ohlcvs {
+		for _, ohlcv_ := range ohlcvs {
 			if ( (ohlcv_.Open[Epoch] != 0 && ohlcv_.High[Epoch] != 0 && ohlcv_.Low[Epoch] != 0 && ohlcv_.Close[Epoch] != 0) &&
 				(ohlcv_.Volume[Epoch] != 0) &&
 				(ohlcv_.HLC[Epoch] != 0) &&
