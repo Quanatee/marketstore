@@ -243,7 +243,6 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 		time.Sleep(next.Sub(time.Now()))
 		
 		wg := sync.WaitGroup{}
-		count := 0
 		// range over symbols that need backfilling, and
 		// backfill them from the last written record
 		filler.BackfillFrom.Range(func(key, value interface{}) bool {
