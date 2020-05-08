@@ -13,8 +13,8 @@ import (
 	//"strconv"
 	"time"
 
+	"github.com/alpacahq/marketstore/quanatee/contrib/pentagon/api"
 	"github.com/alpacahq/marketstore/utils/log"
-	//"github.com/valyala/fasthttp"
 	"gopkg.in/matryer/try.v1"
 )
 
@@ -151,11 +151,7 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggCrypto.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggCrypto.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggCrypto.PriceData[bar].Close
-					if aggCrypto.PriceData[bar].Volume > float32(1) {
-						ohlcv.Volume[Epoch] = float32(aggCrypto.PriceData[bar].Volume)
-					} else {
-						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
-					}
+					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -181,7 +177,11 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggEquity.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggEquity.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggEquity.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
+					if aggEquity.PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggEquity.PriceData[bar].Volume)
+					} else {
+						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
+					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
@@ -227,7 +227,11 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggFutures.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggFutures.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggFutures.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
+					if aggFutures.PriceData[bar].Volume > float32(1) {
+						ohlcv.Volume[Epoch] = float32(aggFutures.PriceData[bar].Volume)
+					} else {
+						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
+					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
