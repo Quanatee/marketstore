@@ -146,6 +146,7 @@ func IsFuturesMarketOpen(epoch int64) bool {
 
 func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, from time.Time) (float32) {
 	
+	dt := time.Unix(Epoch, 0)
 	// Try provider daily volume with options for livefill and backfill
 	volume_alt := false
 	symbolDailyVolume_, _ := PolygonDailyVolumes.Load(symbol)
@@ -189,7 +190,6 @@ func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, 
 		symbolDailyVolume_, _ := TiingoDailyVolumes.Load(symbol)
 		if symbolDailyVolume_ != nil {
 			symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
-			dt := time.Unix(Epoch, 0)
 			dailyVolume := float32(1)
 			if (to.Add(5*time.Minute)).After(time.Now()) {
 				// Livefill, get the last daily volume
@@ -224,10 +224,12 @@ func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, 
 			return float32(1)
 		}
 	}
+	return float32(1)
 }
 
 func GetAlternateVolumeTiingoFirst(symbol, marketType string, Epoch int64, to, from time.Time) (float32) {
 	
+	dt := time.Unix(Epoch, 0)
 	// Try provider daily volume with options for livefill and backfill
 	volume_alt := false
 	symbolDailyVolume_, _ := TiingoDailyVolumes.Load(symbol)
@@ -271,7 +273,6 @@ func GetAlternateVolumeTiingoFirst(symbol, marketType string, Epoch int64, to, f
 		symbolDailyVolume_, _ := PolygonDailyVolumes.Load(symbol)
 		if symbolDailyVolume_ != nil {
 			symbolDailyVolume := symbolDailyVolume_.(map[time.Time]float32)
-			dt := time.Unix(Epoch, 0)
 			dailyVolume := float32(1)
 			if (to.Add(5*time.Minute)).After(time.Now()) {
 				// Livefill, get the last daily volume
@@ -306,6 +307,7 @@ func GetAlternateVolumeTiingoFirst(symbol, marketType string, Epoch int64, to, f
 			return float32(1)
 		}
 	}
+	return float32(1)
 }
 
 func WriteAggregates(
