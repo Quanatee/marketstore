@@ -23,6 +23,13 @@ bgworkers:
         - <twelve_api_key4>
         - <twelve_api_key5>
         - <twelve_api_key6>
+        - <twelve_api_key7>
+        - <twelve_api_key8>
+        - <twelve_api_key9>
+        - <twelve_api_key10>
+        - <twelve_api_key11>
+        - <twelve_api_key12>
+        - <twelve_api_key13>
       query_start: 2017-01-01 00:00
       timeframes:
         - 12Min
