@@ -165,6 +165,7 @@ func GetAggregates(
 			}
 			loc, err_loc := time.LoadLocation(aggEquity.MetaData.ExchangeTZ)
 			dt, err_dt := time.ParseInLocation("2006-01-02 15:04:05", aggEquity.PriceData[bar].Date, loc)
+			dt = dt.UTC()
 			if err_loc != nil || err_dt != nil {
 				log.Error("[twelve] %s, %v, %v", symbol, err_loc, err_dt)
 				continue
