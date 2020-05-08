@@ -74,7 +74,6 @@ func GetRandIntn(n int) (int) {
 		panic("cannot seed math/rand package with cryptographically secure random number generator")
 	}
 	seed := int64(binary.LittleEndian.Uint64(b[:]))
-	
 	rand.Seed(seed)
 	return rand.Intn(n)
 }
