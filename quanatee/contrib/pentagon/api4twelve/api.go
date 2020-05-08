@@ -129,11 +129,11 @@ func GetAggregates(
 		Spread: make(map[int64]float32),
 	}
 	
-	// Twelve candle formula (Timestamp on close)
+	// Twelve candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
-	// Timestamped at 14:05
-	// We use Timestamp on close, so no change
+	// Timestamped at 14:04
+	// We use Timestamp on close, so +60 to Timestamp
     for bar := 0; bar < length; bar++ {
 		if strings.Compare(marketType, "crypto") == 0 {
 			if len(aggCrypto.PriceData) <= bar {
@@ -145,7 +145,7 @@ func GetAggregates(
 				continue
 			}
 			if (aggCrypto.PriceData[bar].Open != 0 && aggCrypto.PriceData[bar].High != 0 && aggCrypto.PriceData[bar].Low != 0 && aggCrypto.PriceData[bar].Close != 0) {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto.PriceData[bar].Open
@@ -170,10 +170,8 @@ func GetAggregates(
 				log.Error("[twelve] %s, %v, %v", symbol, err_loc, err_dt)
 				continue
 			}
-			dt = dt.UTC()
 			if (aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0) {
-				Epoch := dt.Unix()
-				log.Info("[twelve] %s: %v > %v < %v", symbol, from, dt, to)
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
@@ -201,8 +199,7 @@ func GetAggregates(
 				continue
 			}
 			if (aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0) {
-				Epoch := dt.Unix()
-				log.Info("[twelve] %s: %v > %v < %v", symbol, from, dt, to)
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
@@ -226,7 +223,7 @@ func GetAggregates(
 				continue
 			}
 			if (aggFutures.PriceData[bar].Open != 0 && aggFutures.PriceData[bar].High != 0 && aggFutures.PriceData[bar].Low != 0 && aggFutures.PriceData[bar].Close != 0) {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggFutures.PriceData[bar].Open

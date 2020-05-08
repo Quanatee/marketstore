@@ -38,18 +38,20 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	if len(ohlcv.HLC) > 0 {
 		ohlcvs["polygon"] = ohlcv
 	}
-	ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
-	if len(ohlcv_ti.HLC) > 0 {
-		ohlcvs["tiingo"] = ohlcv_ti
+	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(2) == 0 || len(ohlcv.HLC) == 0 {
+		// If backfill or 50% chance or polygon fails
+		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+		if len(ohlcv_ti.HLC) > 0 {
+			ohlcvs["tiingo"] = ohlcv_ti
+		}
 	}
-	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(20) == 0 {
-		// If backfill or 5% chance
+	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(4) == 0 || len(ohlcv.HLC) == 0 {
+		// If backfill or 25% chance or polygon fails
 		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
 		if len(ohlcv_tw.HLC) > 0 {
 			ohlcvs["twelve"] = ohlcv_tw
 		}
 	}
-	
 	// If crypto, we randomly mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
 		// BUSD
@@ -57,7 +59,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		if len(ohlcv_pgb.HLC) > 0 {
 			ohlcvs["polygon_busd"] = ohlcv_pgb
 		}
-		if api.GetRandIntn(12) <= 9 {
+		if api.GetRandIntn(13) <= 9 {
 			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
 			if len(ohlcv_tib.HLC) > 0 {
 				ohlcvs["tiingo_busd"] = ohlcv_tib
@@ -73,7 +75,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		if len(ohlcv_pgt.HLC) > 0 {
 			ohlcvs["polygon_usdt"] = ohlcv_pgt
 		}
-		if api.GetRandIntn(12) <= 9 {
+		if api.GetRandIntn(13) <= 9 {
 			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
 			if len(ohlcv_tit.HLC) > 0 {
 				ohlcvs["tiingo_usdt"] = ohlcv_tit
@@ -89,7 +91,7 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 		if len(ohlcv_pgc.HLC) > 0 {
 			ohlcvs["polygon_usdc"] = ohlcv_pgc
 		}
-		if api.GetRandIntn(12) <= 9 {
+		if api.GetRandIntn(13) <= 9 {
 			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
 			if len(ohlcv_tic.HLC) > 0 {
 				ohlcvs["tiingo_usdc"] = ohlcv_tic

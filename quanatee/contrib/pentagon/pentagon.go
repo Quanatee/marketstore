@@ -251,8 +251,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
 			if value != nil {
-				// Delay for 3 seconds every request to account for free TwelveData plan (12 * 6 per min)
-				time.Sleep(3*time.Second)
+				// Delay for 1 second every request to account for free TwelveData plan
+				time.Sleep(1*time.Second)
 				go func() {
 					wg.Add(1)
 					defer wg.Done()

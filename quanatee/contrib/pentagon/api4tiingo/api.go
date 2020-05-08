@@ -284,7 +284,7 @@ func GetAggregates(
 	}
 
 	if len(ohlcv.HLC) == 0 {
-		log.Debug("%s [tiingo] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
+		log.Info("%s [tiingo] returned %v results and validated %v results between %v and %v | Link: %s", symbol, length, len(ohlcv.HLC), from, to, u.String())
 	}
 	
 	return ohlcv, nil
