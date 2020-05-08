@@ -258,7 +258,6 @@ func GetDataFromProvider(
 			}
 		}
 	case "twelve":
-		return api.OHLCV{}
 		ohlcv, err := api4twelve.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
 			log.Error("[twelve] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
