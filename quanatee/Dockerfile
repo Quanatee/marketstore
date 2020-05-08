@@ -57,6 +57,39 @@ RUN test -z "$TWELVE_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-pri
 ARG TWELVE_API_KEY2=${TWELVE_API_KEY2}
 RUN test -z "$TWELVE_API_KEY2" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key2>|$TWELVE_API_KEY2|g" mkts.yml
 
+ARG TWELVE_API_KEY3=${TWELVE_API_KEY3}
+RUN test -z "$TWELVE_API_KEY3" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key3>|$TWELVE_API_KEY3|g" mkts.yml
+
+ARG TWELVE_API_KEY4=${TWELVE_API_KEY4}
+RUN test -z "$TWELVE_API_KEY4" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key4>|$TWELVE_API_KEY4|g" mkts.yml
+
+ARG TWELVE_API_KEY5=${TWELVE_API_KEY5}
+RUN test -z "$TWELVE_API_KEY5" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key5>|$TWELVE_API_KEY5|g" mkts.yml
+
+ARG TWELVE_API_KEY6=${TWELVE_API_KEY6}
+RUN test -z "$TWELVE_API_KEY6" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key6>|$TWELVE_API_KEY6|g" mkts.yml
+
+ARG TWELVE_API_KEY7=${TWELVE_API_KEY7}
+RUN test -z "$TWELVE_API_KEY7" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key7>|$TWELVE_API_KEY7|g" mkts.yml
+
+ARG TWELVE_API_KEY8=${TWELVE_API_KEY8}
+RUN test -z "$TWELVE_API_KEY8" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key8>|$TWELVE_API_KEY8|g" mkts.yml
+
+ARG TWELVE_API_KEY9=${TWELVE_API_KEY9}
+RUN test -z "$TWELVE_API_KEY9" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key9>|$TWELVE_API_KEY9|g" mkts.yml
+
+ARG TWELVE_API_KEY10=${TWELVE_API_KEY10}
+RUN test -z "$TWELVE_API_KEY10" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key10>|$TWELVE_API_KEY10|g" mkts.yml
+
+ARG TWELVE_API_KEY11=${TWELVE_API_KEY11}
+RUN test -z "$TWELVE_API_KEY11" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key11>|$TWELVE_API_KEY11|g" mkts.yml
+
+ARG TWELVE_API_KEY12=${TWELVE_API_KEY12}
+RUN test -z "$TWELVE_API_KEY12" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key12>|$TWELVE_API_KEY12|g" mkts.yml
+
+ARG TWELVE_API_KEY13=${TWELVE_API_KEY13}
+RUN test -z "$TWELVE_API_KEY13" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key13>|$TWELVE_API_KEY13|g" mkts.yml
+
 ENTRYPOINT marketstore start --config mkts.yml && /bin/bash
 # ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key2>|${TWELVE_API_KEY2}|g" mkts.yml && sed -i "s|<twelve_api_key3>|${TWELVE_API_KEY3}|g" mkts.yml && sed -i "s|<twelve_api_key4>|${TWELVE_API_KEY4}|g" mkts.yml && sed -i "s|<twelve_api_key5>|${TWELVE_API_KEY5}|g" mkts.yml && sed -i "s|<twelve_api_key6>|${TWELVE_API_KEY6}|g" && marketstore start --config mkts.yml && /bin/bash
 # ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key2>|${TWELVE_API_KEY2}|g" mkts.yml && sed -i "s|<twelve_api_key3>|${TWELVE_API_KEY3}|g" mkts.yml && sed -i "s|<twelve_api_key4>|${TWELVE_API_KEY4}|g" mkts.yml && sed -i "s|<twelve_api_key5>|${TWELVE_API_KEY5}|g" mkts.yml && sed -i "s|<twelve_api_key6>|${TWELVE_API_KEY6}|g" && sed -i "s|<twelve_api_key7>|${TWELVE_API_KEY7}|g" && sed -i "s|<twelve_api_key8>|${TWELVE_API_KEY8}|g" && sed -i "s|<twelve_api_key9>|${TWELVE_API_KEY9}|g" && sed -i "s|<twelve_api_key10>|${TWELVE_API_KEY10}|g" && sed -i "s|<twelve_api_key11>|${TWELVE_API_KEY11}|g" && sed -i "s|<twelve_api_key12>|${TWELVE_API_KEY12}|g" && sed -i "s|<twelve_api_key13>|${TWELVE_API_KEY13}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
