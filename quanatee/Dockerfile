@@ -46,15 +46,17 @@ COPY /quanatee/mkts-store.yml .
 # "cp -u" only copies when file is missing or newer to assure that mkts.yml is not overwritten once created
 
 ARG POLYGON_API_KEY=${POLYGON_API_KEY}
-RUN test -z "$POLYGON_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+RUN test -z "$POLYGON_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<polygon_api_key>|$POLYGON_API_KEY|g" mkts.yml
 
 ARG TIINGO_API_KEY=${TIINGO_API_KEY}
-RUN test -z "$TIINGO_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+RUN test -z "$TIINGO_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<tiingo_api_key>|$TIINGO_API_KEY|g" mkts.yml
 
 ARG TWELVE_API_KEY=${TWELVE_API_KEY}
-RUN test -z "$TWELVE_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml
+RUN test -z "$TWELVE_API_KEY" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key>|$TWELVE_API_KEY|g" mkts.yml
 
-RUN ls
+ARG TWELVE_API_KEY2=${TWELVE_API_KEY2}
+RUN test -z "$TWELVE_API_KEY2" && cp -u mkts-store.yml mkts.yml || cp -u mkts-price.yml mkts.yml ; sed -i "s|<twelve_api_key2>|$TWELVE_API_KEY2|g" mkts.yml
 
-ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key2>|${TWELVE_API_KEY2}|g" mkts.yml && sed -i "s|<twelve_api_key3>|${TWELVE_API_KEY3}|g" mkts.yml && sed -i "s|<twelve_api_key4>|${TWELVE_API_KEY4}|g" mkts.yml && sed -i "s|<twelve_api_key5>|${TWELVE_API_KEY5}|g" mkts.yml && sed -i "s|<twelve_api_key6>|${TWELVE_API_KEY6}|g" && marketstore start --config mkts.yml && /bin/bash
+ENTRYPOINT marketstore start --config mkts.yml && /bin/bash
+# ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key2>|${TWELVE_API_KEY2}|g" mkts.yml && sed -i "s|<twelve_api_key3>|${TWELVE_API_KEY3}|g" mkts.yml && sed -i "s|<twelve_api_key4>|${TWELVE_API_KEY4}|g" mkts.yml && sed -i "s|<twelve_api_key5>|${TWELVE_API_KEY5}|g" mkts.yml && sed -i "s|<twelve_api_key6>|${TWELVE_API_KEY6}|g" && marketstore start --config mkts.yml && /bin/bash
 # ENTRYPOINT sed -i "s|<polygon_api_key>|${POLYGON_API_KEY}|g" mkts.yml && sed -i "s|<tiingo_api_key>|${TIINGO_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key>|${TWELVE_API_KEY}|g" mkts.yml && sed -i "s|<twelve_api_key2>|${TWELVE_API_KEY2}|g" mkts.yml && sed -i "s|<twelve_api_key3>|${TWELVE_API_KEY3}|g" mkts.yml && sed -i "s|<twelve_api_key4>|${TWELVE_API_KEY4}|g" mkts.yml && sed -i "s|<twelve_api_key5>|${TWELVE_API_KEY5}|g" mkts.yml && sed -i "s|<twelve_api_key6>|${TWELVE_API_KEY6}|g" && sed -i "s|<twelve_api_key7>|${TWELVE_API_KEY7}|g" && sed -i "s|<twelve_api_key8>|${TWELVE_API_KEY8}|g" && sed -i "s|<twelve_api_key9>|${TWELVE_API_KEY9}|g" && sed -i "s|<twelve_api_key10>|${TWELVE_API_KEY10}|g" && sed -i "s|<twelve_api_key11>|${TWELVE_API_KEY11}|g" && sed -i "s|<twelve_api_key12>|${TWELVE_API_KEY12}|g" && sed -i "s|<twelve_api_key13>|${TWELVE_API_KEY13}|g" mkts.yml && marketstore start --config mkts.yml && /bin/bash
