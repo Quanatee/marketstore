@@ -267,8 +267,6 @@ bgworkers:
         - IAGG
         - ICSH
         # DJI AND NASDAQ 100
-        - WTI
-        - ICE
         - AAPL
         - UNH
         - HD
