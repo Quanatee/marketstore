@@ -43,15 +43,6 @@ type AggForexMeta struct {
 	AssetType	    string	      `json:"type"`
 }
 
-type AggFuturesMeta struct {
-	Symbol          string        `json:"symbol"`
-	Timeframe       string        `json:"interval"`
-	Currency        string        `json:"currency"`
-	ExchangeTZ      string        `json:"exchange_timezone"`
-	Exchange	    string        `json:"exchange"`
-	AssetType	    string	      `json:"type"`
-}
-
 type AggCrypto struct {
 	PriceData       []AggOHLC	  		`json:"values"`
 	MetaData	    AggCryptoMeta   	`json:"meta"`
@@ -67,12 +58,6 @@ type AggEquity struct {
 type AggForex struct {
 	PriceData       []AggOHLC    		`json:"values"`
 	MetaData	    AggForexMeta		`json:"meta"`
-	Status			string				`json:"status"`
-}
-
-type AggFutures struct {
-	PriceData       []AggOHLCV    		`json:"values"`
-	MetaData	    AggFuturesMeta	 	`json:"meta"`
 	Status			string				`json:"status"`
 }
 

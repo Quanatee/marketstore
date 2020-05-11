@@ -73,12 +73,6 @@ bgworkers:
         - NZDUSD
         - XAGUSD
         - XAUUSD
-      futures_symbols:
-       - DX
-       - CL
-       - NG
-       - ES
-       - NQ
       equity_symbols:
         - VXX 
         - VIXY 
@@ -292,7 +286,6 @@ bgworkers:
         - DIS
         - TRV
         - JPM
-        - UTX
         - AXP
         - MRK
         - NKE

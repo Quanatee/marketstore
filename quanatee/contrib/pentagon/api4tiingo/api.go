@@ -28,7 +28,6 @@ var (
 		"crypto": "%v/tiingo/crypto/prices",
 		"forex": "%v/tiingo/fx/%v/prices",
 		"equity": "%v/iex/%v/prices",
-		"futures": "%v/iex/%v/prices",
 	}
 	baseURL = "https://api.tiingo.com"
 	start time.Time
@@ -113,7 +112,6 @@ func GetAggregates(
 	var aggCrypto []AggCrypto
 	var aggEquity AggEquity
 	var aggForex AggForex
-	var aggFutures AggFutures
 
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
@@ -121,8 +119,6 @@ func GetAggregates(
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity.PriceData)
 	} else if strings.Compare(marketType, "forex") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex.PriceData)
-	} else if strings.Compare(marketType, "futures") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &aggFutures.PriceData)
 	}
 
 	if err != nil {
@@ -139,8 +135,6 @@ func GetAggregates(
 			length = len(aggEquity.PriceData)
 	} else if strings.Compare(marketType, "forex") == 0 {
 		length = len(aggForex.PriceData)
-	} else if strings.Compare(marketType, "futures") == 0 {
-		length = len(aggFutures.PriceData)
 	}
 
 	if length == 0 {
@@ -247,32 +241,6 @@ func GetAggregates(
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High
 					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
-					ohlcv.Volume[Epoch] = api.GetAlternateVolumeTiingoFirst(symbol, marketType, Epoch, from, to)
-					// Extra
-					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
-					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-				}
-			}
-		}
-	} else if strings.Compare(marketType, "futures") == 0 {
-		for bar := 0; bar < len(aggFutures.PriceData); bar++ {
-			if len(aggFutures.PriceData) <= bar {
-				log.Info("[tiingo] %s bar went too far %v/%v", symbol, bar, len(aggFutures.PriceData))
-				break
-			}
-			dt, err_dt := time.Parse(time.RFC3339, aggFutures.PriceData[bar].Date)
-			if err_dt != nil {
-				continue
-			}
-			if aggFutures.PriceData[bar].Open != 0 && aggFutures.PriceData[bar].High != 0 && aggFutures.PriceData[bar].Low != 0 && aggFutures.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix()
-				if Epoch > from.Unix() && Epoch < to.Unix() {
-					// OHLCV
-					ohlcv.Open[Epoch] = aggFutures.PriceData[bar].Open
-					ohlcv.High[Epoch] = aggFutures.PriceData[bar].High
-					ohlcv.Low[Epoch] = aggFutures.PriceData[bar].Low
-					ohlcv.Close[Epoch] = aggFutures.PriceData[bar].Close
 					ohlcv.Volume[Epoch] = api.GetAlternateVolumeTiingoFirst(symbol, marketType, Epoch, from, to)
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3

@@ -28,7 +28,6 @@ var (
 		"crypto": "%v/time_series",
 		"forex": "%v/time_series",
 		"equity": "%v/time_series",
-		"futures": "%v/time_series",
 	}
 	baseURL = "https://api.twelvedata.com"
 	start time.Time
@@ -87,7 +86,6 @@ func GetAggregates(
 	var aggCrypto AggCrypto
 	var aggEquity AggEquity
 	var aggForex AggForex
-	var aggFutures AggFutures
 
 	if strings.Compare(marketType, "crypto") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggCrypto)
@@ -95,10 +93,7 @@ func GetAggregates(
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggEquity)
 	} else if strings.Compare(marketType, "forex") == 0 {
 		err = downloadAndUnmarshal(u.String(), retryCount, &aggForex)
-	} else if strings.Compare(marketType, "futures") == 0 {
-		err = downloadAndUnmarshal(u.String(), retryCount, &aggFutures)
 	}
-
 	if err != nil {
 		return &OHLCV{}, err
 	}
@@ -109,8 +104,6 @@ func GetAggregates(
 		length = len(aggEquity.PriceData)
 	} else if strings.Compare(marketType, "forex") == 0 {
 		length = len(aggForex.PriceData)
-	} else if strings.Compare(marketType, "futures") == 0 {
-		length = len(aggFutures.PriceData)
 	}
 
 	if length == 0 {
@@ -207,34 +200,6 @@ func GetAggregates(
 					ohlcv.Low[Epoch] = aggForex.PriceData[bar].Low
 					ohlcv.Close[Epoch] = aggForex.PriceData[bar].Close
 					ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
-					// Extra
-					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
-					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]
-					ohlcv.Spread[Epoch] = ohlcv.High[Epoch] - ohlcv.Low[Epoch]
-				}
-			}
-		} else if strings.Compare(marketType, "futures") == 0 {
-			if len(aggFutures.PriceData) <= bar {
-				break
-			}
-			dt, err_dt := time.Parse("2006-01-02 15:04:05", aggFutures.PriceData[bar].Date)
-			if err_dt != nil {
-				log.Error("[twelve] %s, %v", symbol, err_dt)
-				continue
-			}
-			if (aggFutures.PriceData[bar].Open != 0 && aggFutures.PriceData[bar].High != 0 && aggFutures.PriceData[bar].Low != 0 && aggFutures.PriceData[bar].Close != 0) {
-				Epoch := dt.Unix() + 60
-				if Epoch > from.Unix() && Epoch < to.Unix() {
-					// OHLCV
-					ohlcv.Open[Epoch] = aggFutures.PriceData[bar].Open
-					ohlcv.High[Epoch] = aggFutures.PriceData[bar].High
-					ohlcv.Low[Epoch] = aggFutures.PriceData[bar].Low
-					ohlcv.Close[Epoch] = aggFutures.PriceData[bar].Close
-					if aggFutures.PriceData[bar].Volume > float32(1) {
-						ohlcv.Volume[Epoch] = float32(aggFutures.PriceData[bar].Volume)
-					} else {
-						ohlcv.Volume[Epoch] = api.GetAlternateVolumePolygonFirst(symbol, marketType, Epoch, from, to)
-					}
 					// Extra
 					ohlcv.HLC[Epoch] = (ohlcv.High[Epoch] + ohlcv.Low[Epoch] + ohlcv.Close[Epoch])/3
 					ohlcv.TVAL[Epoch] = ohlcv.HLC[Epoch] * ohlcv.Volume[Epoch]

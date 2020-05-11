@@ -89,9 +89,6 @@ func IsMarketOpen(
 		return IsForexMarketOpen(from.Unix())
 	case "equity":
 		return IsEquityMarketOpen(from.Unix())
-	case "futures":
-		return IsFuturesMarketOpen(from.Unix())
-	}
 
 	return true
 }
@@ -131,19 +128,6 @@ func IsEquityMarketOpen(epoch int64) bool {
 	return true
 }
 
-func IsFuturesMarketOpen(epoch int64) bool {
-	t := time.Unix(epoch, 0)
-	if ( 
-		( t.Weekday() == 0 && t.Hour() >= 22 ) ||
-		( t.Weekday() >= 1 && t.Weekday() <= 4 ) ||
-		( t.Weekday() == 5 && t.Hour() <= 21 ) ) {
-		return true
-	} else {
-		return false
-	}
-	return true
-}
-
 func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, from time.Time) (float32) {
 	
 	dt := time.Unix(Epoch, 0)
@@ -173,8 +157,6 @@ func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, 
 			case "equity":
 				return float32(dailyVolume/390)
 			case "forex":
-				return float32(dailyVolume/1440)
-			case "futures":
 				return float32(dailyVolume/1440)
 			default:
 				volume_alt = true
@@ -212,8 +194,6 @@ func GetAlternateVolumePolygonFirst(symbol, marketType string, Epoch int64, to, 
 					return float32(dailyVolume/1440)
 				case "equity":
 					return float32(dailyVolume/390)
-				case "futures":
-					return float32(dailyVolume/1440)
 				default:
 					return float32(1)
 				}
@@ -257,8 +237,6 @@ func GetAlternateVolumeTiingoFirst(symbol, marketType string, Epoch int64, to, f
 				return float32(dailyVolume/390)
 			case "forex":
 				return float32(dailyVolume/1440)
-			case "futures":
-				return float32(dailyVolume/1440)
 			default:
 				volume_alt = true
 			}
@@ -295,8 +273,6 @@ func GetAlternateVolumeTiingoFirst(symbol, marketType string, Epoch int64, to, f
 					return float32(dailyVolume/1440)
 				case "equity":
 					return float32(dailyVolume/390)
-				case "futures":
-					return float32(dailyVolume/1440)
 				default:
 					return float32(1)
 				}
@@ -409,9 +385,6 @@ func WriteAggregates(
 			tqSlc = *slc.ApplyTimeQual(IsForexMarketOpen)
 		case "equity":
 			tqSlc = *slc.ApplyTimeQual(IsEquityMarketOpen)
-		case "futures":
-			tqSlc = *slc.ApplyTimeQual(IsFuturesMarketOpen)
-		}
 		
 		csm := io.NewColumnSeriesMap()
 		if len(tqSlc.GetEpoch()) > 0 {

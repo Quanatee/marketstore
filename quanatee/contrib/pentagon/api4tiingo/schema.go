@@ -59,18 +59,6 @@ type AggEquity struct {
 	PriceData	[]AggEquityData
 }
 
-type AggFuturesData struct {
-	Date           string  `json:"date"` // "2017-12-19T00:00:00Z"
-	Close          float32 `json:"close"`
-	High           float32 `json:"high"`
-	Low            float32 `json:"low"`
-	Open           float32 `json:"open"`
-}
-
-type AggFutures struct {
-	PriceData	[]AggFuturesData
-}
-
 type OHLCV struct {
 	Open      map[int64]float32
 	High      map[int64]float32

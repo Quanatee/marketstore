@@ -33,7 +33,6 @@ var (
 		"crypto": "X:",
 		"forex": "C:",
 		"equity": "",
-		"futures": "",
 	}
 )
 
