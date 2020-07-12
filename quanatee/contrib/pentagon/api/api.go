@@ -385,6 +385,7 @@ func WriteAggregates(
 			tqSlc = *slc.ApplyTimeQual(IsForexMarketOpen)
 		case "equity":
 			tqSlc = *slc.ApplyTimeQual(IsEquityMarketOpen)
+		}
 		
 		csm := io.NewColumnSeriesMap()
 		if len(tqSlc.GetEpoch()) > 0 {
