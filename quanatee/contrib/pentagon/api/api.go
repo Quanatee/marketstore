@@ -89,7 +89,7 @@ func IsMarketOpen(
 		return IsForexMarketOpen(from.Unix())
 	case "equity":
 		return IsEquityMarketOpen(from.Unix())
-
+	}
 	return true
 }
 
