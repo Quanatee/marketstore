@@ -34,74 +34,41 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	
 	ohlcvs := map[string]api.OHLCV{}
 	
-	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
-	if len(ohlcv.HLC) > 0 {
-		ohlcvs["polygon"] = ohlcv
-	}
-	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(2) == 0 || len(ohlcv.HLC) == 0 {
-		// If backfill or 50% chance or polygon fails
-		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
-		if len(ohlcv_ti.HLC) > 0 {
-			ohlcvs["tiingo"] = ohlcv_ti
-		}
-	}
-	if (to.Add(5*time.Minute)).Before(time.Now()) || api.GetRandIntn(3) == 1 || len(ohlcv.HLC) == 0 {
-		// If backfill or 34% chance or polygon fails
-		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
-		if len(ohlcv_tw.HLC) > 0 {
-			ohlcvs["twelve"] = ohlcv_tw
-		}
-	}
-	// If crypto, we randomly mix fiat USD with stablecoins USDT and USDC to create a robust CRYPTO/USD
+	// If crypto
 	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
-		// BUSD
-		ohlcv_pgb := GetDataFromProvider("polygon", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
-		if len(ohlcv_pgb.HLC) > 0 {
-			ohlcvs["polygon_busd"] = ohlcv_pgb
-		}
-		if api.GetRandIntn(13) <= 9 {
-			ohlcv_tib := GetDataFromProvider("tiingo", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
-			if len(ohlcv_tib.HLC) > 0 {
-				ohlcvs["tiingo_busd"] = ohlcv_tib
-			}
-		} else {
-			ohlcv_twb := GetDataFromProvider("twelve", symbol[:len(symbol)-3] + "B" + symbol[len(symbol)-3:], marketType, from, to)
-			if len(ohlcv_twb.HLC) > 0 {
-				ohlcvs["twelve_busd"] = ohlcv_twb
-			}
-		}
+
 		// USDT
 		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
 		if len(ohlcv_pgt.HLC) > 0 {
 			ohlcvs["polygon_usdt"] = ohlcv_pgt
 		}
-		if api.GetRandIntn(13) <= 9 {
-			ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
-			if len(ohlcv_tit.HLC) > 0 {
-				ohlcvs["tiingo_usdt"] = ohlcv_tit
-			}
-		} else {
-			ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
-			if len(ohlcv_twt.HLC) > 0 {
-				ohlcvs["twelve_usdt"] = ohlcv_twt
-			}
+		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
+		if len(ohlcv_tit.HLC) > 0 {
+			ohlcvs["tiingo_usdt"] = ohlcv_tit
 		}
-		// USDC
-		ohlcv_pgc := GetDataFromProvider("polygon", symbol+"C", marketType, from, to)
-		if len(ohlcv_pgc.HLC) > 0 {
-			ohlcvs["polygon_usdc"] = ohlcv_pgc
+		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
+		if len(ohlcv_twt.HLC) > 0 {
+			ohlcvs["twelve_usdt"] = ohlcv_twt
 		}
-		if api.GetRandIntn(13) <= 9 {
-			ohlcv_tic := GetDataFromProvider("tiingo", symbol+"C", marketType, from, to)
-			if len(ohlcv_tic.HLC) > 0 {
-				ohlcvs["tiingo_usdc"] = ohlcv_tic
-			}
-		} else {
-			ohlcv_twc := GetDataFromProvider("twelve", symbol+"C", marketType, from, to)
-			if len(ohlcv_twc.HLC) > 0 {
-				ohlcvs["twelve_usdc"] = ohlcv_twc
-			}
+		
+	} else {
+		
+		// Polygon
+		ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
+		if len(ohlcv.HLC) > 0 {
+			ohlcvs["polygon"] = ohlcv
 		}
+		// Tiingo
+		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+		if len(ohlcv_ti.HLC) > 0 {
+			ohlcvs["tiingo"] = ohlcv_ti
+		}
+		// Twelvedata
+		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
+		if len(ohlcv_tw.HLC) > 0 {
+			ohlcvs["twelve"] = ohlcv_tw
+		}
+		
 	}
 	
 	// Get the Epoch slice of the largest OHLCV set
