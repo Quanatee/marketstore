@@ -236,6 +236,9 @@ func GetAggregates(
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
 				Epoch := dt.Unix()
 				if Epoch > from.Unix() && Epoch < to.Unix() {
+					if length < 600 {
+						log.Info("[tiingo] %s: %v > %v < %v", symbol, from, dt, to)
+					}
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
 					ohlcv.High[Epoch] = aggForex.PriceData[bar].High

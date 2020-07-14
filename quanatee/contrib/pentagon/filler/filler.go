@@ -34,40 +34,20 @@ func Bars(wg *sync.WaitGroup, symbol, marketType string, from, to time.Time, tim
 	
 	ohlcvs := map[string]api.OHLCV{}
 	
-	// If crypto
-	if strings.Compare(marketType, "crypto") == 0 && strings.HasSuffix(symbol, "USD") {
-
-		// USDT
-		ohlcv_tit := GetDataFromProvider("tiingo", symbol+"T", marketType, from, to)
-		if len(ohlcv_tit.HLC) > 0 {
-			ohlcvs["tiingo_usdt"] = ohlcv_tit
-		}
-		ohlcv_twt := GetDataFromProvider("twelve", symbol+"T", marketType, from, to)
-		if len(ohlcv_twt.HLC) > 0 {
-			ohlcvs["twelve_usdt"] = ohlcv_twt
-		}
-		ohlcv_pgt := GetDataFromProvider("polygon", symbol+"T", marketType, from, to)
-		if len(ohlcv_pgt.HLC) > 0 {
-			ohlcvs["polygon_usdt"] = ohlcv_pgt
-		}
-		
-	} else {
-		
-		// Tiingo
-		ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
-		if len(ohlcv_ti.HLC) > 0 {
-			ohlcvs["tiingo"] = ohlcv_ti
-		}
-		// Twelvedata
-		ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
-		if len(ohlcv_tw.HLC) > 0 {
-			ohlcvs["twelve"] = ohlcv_tw
-		}
-		// Polygon
-		ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
-		if len(ohlcv.HLC) > 0 {
-			ohlcvs["polygon"] = ohlcv
-		}
+	// Polygon
+	ohlcv := GetDataFromProvider("polygon", symbol, marketType, from, to)
+	if len(ohlcv.HLC) > 0 {
+		ohlcvs["polygon"] = ohlcv
+	}
+	// Tiingo
+	ohlcv_ti := GetDataFromProvider("tiingo", symbol, marketType, from, to)
+	if len(ohlcv_ti.HLC) > 0 {
+		ohlcvs["tiingo"] = ohlcv_ti
+	}
+	// Twelvedata
+	ohlcv_tw := GetDataFromProvider("twelve", symbol, marketType, from, to)
+	if len(ohlcv_tw.HLC) > 0 {
+		ohlcvs["twelve"] = ohlcv_tw
 	}
 	
 	// Get the Epoch slice of the largest OHLCV set
