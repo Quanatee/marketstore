@@ -160,11 +160,12 @@ func GetAggregates(
         }
 	}()
 	*/
-	// Tiingo candle formula (Timestamp on close)
+	// Tiingo candle formula (Timestamp on open)
 	// Requested at 14:05:01
 	// Candle built from 14:04 to 14:05
-	// Timestamped at 14:05
-	// We use Timestamp on close, so no change
+	// Timestamped at 14:04
+	// Open candle available at 14:05 (showing only open data)
+	// We use Timestamp on close, so +60 to Timestamp and remove the open candle
 	if strings.Compare(marketType, "crypto") == 0 {
 		for bar := 0; bar < len(aggCrypto[0].PriceData); bar++ {
 			if len(aggCrypto[0].PriceData) <= bar {
@@ -177,7 +178,7 @@ func GetAggregates(
 				continue
 			}
 			if aggCrypto[0].PriceData[bar].Open != 0 && aggCrypto[0].PriceData[bar].High != 0 && aggCrypto[0].PriceData[bar].Low != 0 && aggCrypto[0].PriceData[bar].Close != 0 {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggCrypto[0].PriceData[bar].Open
@@ -207,7 +208,7 @@ func GetAggregates(
 				continue
 			}
 			if aggEquity.PriceData[bar].Open != 0 && aggEquity.PriceData[bar].High != 0 && aggEquity.PriceData[bar].Low != 0 && aggEquity.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggEquity.PriceData[bar].Open
@@ -234,7 +235,7 @@ func GetAggregates(
 				continue
 			}
 			if aggForex.PriceData[bar].Open != 0 && aggForex.PriceData[bar].High != 0 && aggForex.PriceData[bar].Low != 0 && aggForex.PriceData[bar].Close != 0 {
-				Epoch := dt.Unix()
+				Epoch := dt.Unix() + 60
 				if Epoch > from.Unix() && Epoch < to.Unix() {
 					// OHLCV
 					ohlcv.Open[Epoch] = aggForex.PriceData[bar].Open
