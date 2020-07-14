@@ -145,7 +145,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	var wg2 sync.WaitGroup
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
-		time.Sleep(10*time.Millisecond)
+		time.Sleep(100*time.Millisecond)
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
@@ -167,7 +167,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	var wg2 sync.WaitGroup
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
-		time.Sleep(10*time.Millisecond)
+		time.Sleep(100*time.Millisecond)
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
@@ -189,7 +189,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	var wg2 sync.WaitGroup
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
-		time.Sleep(10*time.Millisecond)
+		time.Sleep(100*time.Millisecond)
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
