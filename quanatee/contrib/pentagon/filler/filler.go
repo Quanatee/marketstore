@@ -210,7 +210,7 @@ func GetDataFromProvider(
 		return api.OHLCV{}
 		ohlcv, err := api4tiingo.GetAggregates(symbol, marketType, "1", "min", from, to)
 		if err != nil {
-			log.Error("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
+			log.Info("[tiingo] %s %s bars from: %v to %v failure: (%v)", symbol, filltype, from, to, err)
 		} else {
 			log.Info("GetDataFromProvider(%s) backfill via %s [from %v to %v] | Length(%v)", symbol, provider, from, to, len(ohlcv.HLC))
 			if len(ohlcv.HLC) > 0 {
