@@ -99,7 +99,7 @@ func (qf *QuanateeFetcher) Run() {
 	from := time.Now().Add(time.Minute)
 	from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 	to := from.Add(time.Minute)
-	to = to.Add(5*time.Second)
+	to = to.Add(1*time.Second)
 	
 	firstLoop := true
 	var wg sync.WaitGroup
@@ -134,7 +134,7 @@ func (qf *QuanateeFetcher) Run() {
 		// Update from and to dates
 		from = from.Add(time.Minute)
 		to = from.Add(time.Minute)
-		to = to.Add(5*time.Second)
+		to = to.Add(1*time.Second)
 
 	}
 
@@ -145,6 +145,7 @@ func (qf *QuanateeFetcher) liveCrypto(wg *sync.WaitGroup, from, to time.Time, fi
 	var wg2 sync.WaitGroup
 	// Loop Crypto Symbols
 	for _, symbol := range qf.config.CryptoSymbols {
+		time.Sleep(10*time.Millisecond)
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
@@ -166,6 +167,7 @@ func (qf *QuanateeFetcher) liveEquity(wg *sync.WaitGroup, from, to time.Time, fi
 	var wg2 sync.WaitGroup
 	// Loop Equity Symbols
 	for _, symbol := range qf.config.EquitySymbols {
+		time.Sleep(10*time.Millisecond)
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
@@ -187,6 +189,7 @@ func (qf *QuanateeFetcher) liveForex(wg *sync.WaitGroup, from, to time.Time, fir
 	var wg2 sync.WaitGroup
 	// Loop Forex Symbols
 	for _, symbol := range qf.config.ForexSymbols {
+		time.Sleep(10*time.Millisecond)
 		if firstLoop == true {
 			// Market is closed but we just started pentagon
 			wg2.Add(1)
@@ -221,8 +224,8 @@ func (qf *QuanateeFetcher) workBackfillBars() {
 			// make sure epoch value isn't nil (i.e. hasn't
 			// been backfilled already)
 			if value != nil {
-				// Delay for 5 second every request to account for free TwelveData plan
-				time.Sleep(5*time.Second)
+				// Delay for 1 second every request to account for free TwelveData plan
+				time.Sleep(1*time.Second)
 				go func() {
 					wg.Add(1)
 					defer wg.Done()
@@ -309,7 +312,7 @@ func (qf *QuanateeFetcher) DailyChecker() {
 				from := time.Now().Add(time.Minute)
 				from = time.Date(from.Year(), from.Month(), from.Day(), from.Hour(), from.Minute(), 0, 0, time.UTC)
 				to := from.Add(time.Minute)
-				to = to.Add(5*time.Second)
+				to = to.Add(1*time.Second)
 				go func() {
 					wg.Add(1)
 					filler.Bars(&wg, symbol, "equity", from.AddDate(0, 0, -equity_limit), to, qf.config.Timeframes)
